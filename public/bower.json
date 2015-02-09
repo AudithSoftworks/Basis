@@ -1,0 +1,26 @@
+{
+	"name"        : "Basis",
+	"version"     : "1.0.0",
+	"description" : "Audith.Basis - Laravel 4.x powered sub-project",
+	"keywords"    : [
+		"audith",
+		"basis",
+		"laravel"
+	],
+	"authors"     : [
+		"Şəhriyar İmanov <shehi@imanov.me>"
+	],
+	"license"     : "MIT",
+	"homepage"    : "http://imanov.me",
+	"ignore"      : [
+		"**/.*",
+		"node_modules",
+		"bower_components",
+		"test",
+		"tests"
+	],
+	"dependencies": {
+		"jquery"                 : "~2.1.1",
+		"bootstrap-sass-official": "3.2.*"
+	}
+}
