@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
 
 class NestedEntitiesTableSeeder extends Seeder
 {
@@ -13,25 +13,19 @@ class NestedEntitiesTableSeeder extends Seeder
     public function run()
     {
         Schema::dropIfExists('nested_entities');
-        Schema::create(
-            'nested_entities',
-            function ($table) {
-                /**
-                 * @var \Illuminate\Database\Schema\Blueprint $table
-                 */
-                $table->engine = 'InnoDb';
+        Schema::create('nested_entities', function (Blueprint $table) {
+            $table->engine = 'InnoDb';
 
-                $table->mediumInteger('id', true, true);
-                $table->string('name', 255);
-                $table->mediumInteger('left_range', false, true);
-                $table->mediumInteger('right_range', false, true);
-                $table->integer('created_at', false, true);
-                $table->integer('updated_at', false, true)->nullable();
-                $table->integer('deleted_at', false, true)->nullable();
+            $table->mediumInteger('id', true, true);
+            $table->string('name', 255);
+            $table->mediumInteger('left_range', false, true);
+            $table->mediumInteger('right_range', false, true);
+            $table->integer('created_at', false, true);
+            $table->integer('updated_at', false, true)->nullable();
+            $table->integer('deleted_at', false, true)->nullable();
 
-                $table->unique(array('left_range', 'right_range'));
-            }
-        );
+            $table->unique(array('left_range', 'right_range'));
+        });
 
         DB::table('nested_entities')->insert(
             array(
