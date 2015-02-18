@@ -1,10 +1,15 @@
 ## Audith.Basis on Laravel 5
 
 [![Build Status](https://travis-ci.org/AudithSoftworks/Basis.svg)](https://travis-ci.org/AudithSoftworks/Basis)
-[![Total Downloads](https://poser.pugx.org/audithsoftworks/basis/downloads.svg)](https://packagist.org/packages/audithsoftworks/basis)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3/mini.png)](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3)
+[![Code Climate](https://codeclimate.com/github/AudithSoftworks/Basis/badges/gpa.svg)](https://codeclimate.com/github/AudithSoftworks/Basis)
+[![Code Quality](https://scrutinizer-ci.com/g/AudithSoftworks/Basis/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AudithSoftworks/Basis)
 [![Latest Stable Version](https://poser.pugx.org/audithsoftworks/basis/v/stable.svg)](https://packagist.org/packages/audithsoftworks/basis)
-[![Latest Unstable Version](https://poser.pugx.org/audithsoftworks/basis/v/unstable.svg)](https://packagist.org/packages/audithsoftworks/basis)
 [![License](https://poser.pugx.org/audithsoftworks/basis/license.svg)](https://packagist.org/packages/audithsoftworks/basis)
+
+[![Dependency Status](https://www.versioneye.com/user/projects/54e4da21d1ec573c99000554/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54e4da21d1ec573c99000554)
+[![Dependency Status](https://www.versioneye.com/user/projects/54e4da25d1ec573c99000562/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54e4da25d1ec573c99000562)
+[![Dependency Status](https://www.versioneye.com/user/projects/54e4da24d1ec5734f4000717/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54e4da24d1ec5734f4000717)
 
 ### License
 

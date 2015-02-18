@@ -3,7 +3,7 @@
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateFilesTable extends Migration
+class CreateNestedEntities extends Migration
 {
     /**
      * Run the migrations.
@@ -12,19 +12,18 @@ class CreateFilesTable extends Migration
      */
     public function up()
     {
-        Schema::create('files', function (Blueprint $table) {
+        Schema::create('nested_entities', function (Blueprint $table) {
             $table->engine = 'InnoDb';
 
-            $table->integer('id', true, true);
-            $table->string('hash', 32);
-            $table->string('mime', 24);
-            $table->bigInteger('size');
-            $table->text('metadata');
+            $table->mediumInteger('id', true, true);
+            $table->string('name', 255);
+            $table->mediumInteger('left_range', false, true);
+            $table->mediumInteger('right_range', false, true);
             $table->integer('created_at', false, true);
             $table->integer('updated_at', false, true)->nullable();
             $table->integer('deleted_at', false, true)->nullable();
 
-            $table->unique('hash');
+            $table->unique(array('left_range', 'right_range'));
         });
     }
 
@@ -35,6 +34,6 @@ class CreateFilesTable extends Migration
      */
     public function down()
     {
-        Schema::drop('files');
+        Schema::drop('nested_entities');
     }
 }
