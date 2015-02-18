@@ -1,11 +1,9 @@
 <?php
 
-use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
+use \Illuminate\Database\Seeder;
 
 class DatabaseSeeder extends Seeder
 {
-
     /**
      * Run the database seeds.
      *
@@ -13,10 +11,9 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        \Eloquent::unguard();
+        Eloquent::unguard();
 
         $this->call('NestedEntitiesTableSeeder');
-        $this->command->info('NestedEntities table created and seeded.');
+        $this->command->info('NestedEntitiesTable seeded.');
     }
-
 }

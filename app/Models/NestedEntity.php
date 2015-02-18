@@ -2,7 +2,7 @@
 
 use \Illuminate\Database\Eloquent\SoftDeletes;
 
-class NestedEntities extends \Eloquent
+class NestedEntity extends \Eloquent
 {
     use SoftDeletes;
 
@@ -243,10 +243,7 @@ class NestedEntities extends \Eloquent
             ->select('node.id', 'node.name')
             ->leftJoin(
                 $this->table . ' as parent',
-                function ($join) {
-                    /**
-                     * @var $join \Illuminate\Database\Query\JoinClause
-                     */
+                function (\Illuminate\Database\Query\JoinClause $join) {
                     $join->on('node.left_range', '<=', 'parent.right_range')
                         ->on('node.left_range', '>=', 'parent.left_range');
                 });
@@ -267,7 +264,6 @@ class NestedEntities extends \Eloquent
             $nestedEntities->whereBetween('left_range', array($parentEntity->left_range, $parentEntity->right_range));
         }
 
-        //return $categories->toSql();
         return $nestedEntities->get();
     }
 }

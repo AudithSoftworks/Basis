@@ -1,6 +1,6 @@
 <?php namespace App\Models;
 
-class Categories extends NestedEntities
+class Category extends NestedEntity
 {
     protected $table = "categories";
 }

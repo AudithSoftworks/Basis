@@ -11,7 +11,8 @@ class NestedEntitiesTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('nested_entities')->insert(
+        DB::table('nested_entities')->truncate();
+	    DB::table('nested_entities')->insert(
             array(
                 'name' => 'Root',
                 'left_range' => 1,

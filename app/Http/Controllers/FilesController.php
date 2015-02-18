@@ -1,7 +1,38 @@
 <?php namespace App\Http\Controllers;
 
+use \Audith\Contracts\File,
+    \Response;
+
 class FilesController extends Controller
 {
+    /**
+     * @var File
+     */
+    public $file;
+
+    /**
+     * @param File $file
+     */
+    public function __construct(File $file)
+    {
+        $this->file = $file;
+    }
+
+    /**
+     *
+     */
+    public function index()
+    {
+        ob_start();
+        session_id($_COOKIE["PHPSESSID"]);
+        session_start();
+        $key = ini_get("session.upload_progress.prefix") . "myForm";
+        $session = $_SESSION;
+        $session2 = \Session::all();
+        echo Response::json($_SESSION);
+        return ob_get_clean();
+    }
+
     /**
      * Show the form for creating a new resource.
      *
@@ -9,7 +40,10 @@ class FilesController extends Controller
      */
     public function create()
     {
-        //
+        session_id($_COOKIE["PHPSESSID"]);
+        session_start();
+
+        return \View::make("/file/create");
     }
 
 
@@ -20,16 +54,17 @@ class FilesController extends Controller
      */
     public function store()
     {
-        $newEntityName = Input::get('entityName');
-        $referenceEntityId = Input::get('referenceEntityId');
-        $methodName = Input::get('methodName');
+        session_id($_COOKIE["PHPSESSID"]);
+        session_start();
 
-        $newCollection = new Categories();
-        if (!method_exists($newCollection, $methodName)) {
-            throw new \BadMethodCallException("Method [" . $methodName . "] not found!");
-        }
 
-        return $newCollection->$methodName($newEntityName, $referenceEntityId);
+        /*
+
+        $contents = "test";
+
+        return $this->file->post($contents, File::VISIBILITY_PUBLIC);
+
+        */
     }
 
 
@@ -44,9 +79,7 @@ class FilesController extends Controller
     {
         $id = preg_match('/^[a-z0-9]{32}$/i', $id) ? strtolower($id) : intval($id);
 
-        return Cache::rememberForever('file-' . $id, function ($id) {
-            return Files::where(is_numeric($id) ? 'id' : 'hash', '=', $id)->get();
-        });
+        return $this->file->get($id);
     }
 
 
@@ -72,21 +105,22 @@ class FilesController extends Controller
      */
     public function update($id)
     {
-        //
+        $id = preg_match('/^[a-z0-9]{32}$/i', $id) ? strtolower($id) : intval($id);
+        $contents = "test";
+
+        return $this->file->put($id, $contents, File::VISIBILITY_PUBLIC);
     }
 
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $id
+     * @param integer[]|string[] $ids Collection of numeric ids or Md5-hashes of the files to be deleted.
      *
      * @return Response
      */
-    public function destroy($id)
+    public function destroy(array $ids)
     {
-        $collection = new Categories();
-
-        return $collection->remove(intval($id));
+        return $this->file->delete($ids);
     }
 }

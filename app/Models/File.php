@@ -2,7 +2,7 @@
 
 use \Illuminate\Database\Eloquent\SoftDeletes;
 
-class Files extends \Eloquent
+class File extends \Eloquent
 {
     use SoftDeletes;
 

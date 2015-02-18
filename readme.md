@@ -1,6 +1,7 @@
 ## Audith.Basis on Laravel 5
 
 [![Build Status](https://travis-ci.org/AudithSoftworks/Basis.svg)](https://travis-ci.org/AudithSoftworks/Basis)
+[![HHVM Tested](http://hhvm.h4cc.de/badge/AudithSoftworks/Basis.png)](http://hhvm.h4cc.de/package/AudithSoftworks/Basis)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3/mini.png)](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3)
 [![Code Climate](https://codeclimate.com/github/AudithSoftworks/Basis/badges/gpa.svg)](https://codeclimate.com/github/AudithSoftworks/Basis)
 [![Code Quality](https://scrutinizer-ci.com/g/AudithSoftworks/Basis/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AudithSoftworks/Basis)

@@ -9,3 +9,4 @@ composer.lock
 _ide_helper.php
 /vendor
 node_modules
+bower_components

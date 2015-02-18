@@ -1,11 +1,13 @@
 <?php namespace App\Http\Controllers;
 
+use \App\Models\Category;
+
 class CategoriesController extends Controller
 {
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return \Response
      */
     public function create()
     {
@@ -16,15 +18,15 @@ class CategoriesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
+     * @return \Response
      */
     public function store()
     {
-        $newEntityName = Input::get('entityName');
-        $referenceEntityId = Input::get('referenceEntityId');
-        $methodName = Input::get('methodName');
+        $newEntityName = \Input::get('entityName');
+        $referenceEntityId = \Input::get('referenceEntityId');
+        $methodName = \Input::get('methodName');
 
-        $newCollection = new Categories();
+        $newCollection = new Category();
         if (!method_exists($newCollection, $methodName)) {
             throw new \BadMethodCallException("Method [" . $methodName . "] not found!");
         }
@@ -38,11 +40,11 @@ class CategoriesController extends Controller
      *
      * @param  int $id
      *
-     * @return Response
+     * @return \Response
      */
     public function show($id)
     {
-        $categories = new Categories();
+        $categories = new Category();
 
         return $categories->find(intval($id));
     }
@@ -53,7 +55,7 @@ class CategoriesController extends Controller
      *
      * @param  int $id
      *
-     * @return Response
+     * @return \Response
      */
     public function edit($id)
     {
@@ -66,7 +68,7 @@ class CategoriesController extends Controller
      *
      * @param  int $id
      *
-     * @return Response
+     * @return \Response
      */
     public function update($id)
     {
@@ -79,11 +81,11 @@ class CategoriesController extends Controller
      *
      * @param  int $id
      *
-     * @return Response
+     * @return \Response
      */
     public function destroy($id)
     {
-        $collection = new Categories();
+        $collection = new Category();
 
         return $collection->remove(intval($id));
     }
