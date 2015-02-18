@@ -10,7 +10,8 @@ before_script:
 env:
   - DB=mysql
   - DB=pgsql
-addons: postgresql: "9.3"
+addons:
+  postgresql: "9.3"
 script:
   - composer install
   - phpunit
