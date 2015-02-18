@@ -4,7 +4,8 @@
 !.gitkeep
 !.env.example
 !.travis.yml
+*.mwb.bak
 composer.lock
 _ide_helper.php
 /vendor
-/node_modules
+node_modules
