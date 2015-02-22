@@ -249,7 +249,7 @@ class NestedEntity extends \Eloquent
                 });
 
         # Scenario-1: Select'ing *single path only* with leaf node at the end of that path
-        $flag == self::SELECT_SINGLE_PATH_ONLY and $nestedEntities->select('parent.id', 'parent.name')->where('node.id', '=', $id)->orderBy('node.left_range');
+        $flag == self::SELECT_SINGLE_PATH_ONLY && $nestedEntities->select('parent.id', 'parent.name')->where('node.id', '=', $id)->orderBy('parent.left_range');
 
         # Scenario-2: Select'ing *descendents* of provided parent-entity, with the bare minumum
         $flag == self::SELECT_ALL_WITH_MINIMUM_INFO and $nestedEntities->where('parent.id', '=', $id)->orderBy('node.left_range');
@@ -258,7 +258,7 @@ class NestedEntity extends \Eloquent
         $flag == self::SELECT_WITH_DEPTH_INFO and $nestedEntities->addSelect('node.name', \DB::raw('(COUNT(parent.name)-1) as depth'))->groupBy('node.id')->orderBy('node.left_range');
 
         # Scenario-4: Fetches leaves only
-        $flag == self::SELECT_LEAVES_ONLY and $nestedEntities = \DB::table($this->table)->select('id', 'name')->where('right_range', '=', \DB::raw('left_range + 1'));
+        $flag == self::SELECT_LEAVES_ONLY and $nestedEntities = \DB::table($this->table)->select('id', 'name')->where('right_range', '=', \DB::raw('left_range + 1'))->orderBy('left_range');
         if ($flag == self::SELECT_LEAVES_ONLY and $id !== 1) {
             $parentEntity = \DB::table($this->table)->select('left_range', 'right_range')->where('id', $id)->first();
             $nestedEntities->whereBetween('left_range', array($parentEntity->left_range, $parentEntity->right_range));

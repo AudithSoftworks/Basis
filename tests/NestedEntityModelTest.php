@@ -131,12 +131,11 @@ class NestedEntityModelTest extends TestCase
 
     public function testFetches()
     {
-        $nestedEntitiesModel = new NestedEntity();
-
         //----------------------------------------------------
         // Case 1: Fetch with SELECT_ALL_WITH_MINIMUM_INFO
         //----------------------------------------------------
 
+        $nestedEntitiesModel = new NestedEntity();
         $fetchWithMinimumInfoContent = $nestedEntitiesModel->fetch();
         $this->assertEquals(1, $fetchWithMinimumInfoContent[0]->id);
         $this->assertEquals('Root', $fetchWithMinimumInfoContent[0]->name);
@@ -154,11 +153,13 @@ class NestedEntityModelTest extends TestCase
         $this->assertEquals('Insert At The End - 1', $fetchWithMinimumInfoContent[6]->name);
         $this->assertEquals(5, $fetchWithMinimumInfoContent[7]->id);
         $this->assertEquals('Insert At The End - 2', $fetchWithMinimumInfoContent[7]->name);
+        unset($nestedEntitiesModel);
 
         //----------------------------------------------
         // Case 2: Fetch with SELECT_WITH_DEPTH_INFO
         //----------------------------------------------
 
+        $nestedEntitiesModel = new NestedEntity();
         $fetchWithDepthInfo = $nestedEntitiesModel->fetch(NestedEntity::SELECT_WITH_DEPTH_INFO);
         $this->assertEquals(1, $fetchWithDepthInfo[0]->id);
         $this->assertEquals(0, $fetchWithDepthInfo[0]->depth);
@@ -176,31 +177,38 @@ class NestedEntityModelTest extends TestCase
         $this->assertEquals(1, $fetchWithDepthInfo[6]->depth);
         $this->assertEquals(5, $fetchWithDepthInfo[7]->id);
         $this->assertEquals(2, $fetchWithDepthInfo[7]->depth);
+        unset($nestedEntitiesModel);
 
         //----------------------------------------------
         // Case 3: Fetch with SELECT_SINGLE_PATH_ONLY
         //----------------------------------------------
 
+        $nestedEntitiesModel = new NestedEntity();
         $fetchSinglePathOnly = $nestedEntitiesModel->fetch(NestedEntity::SELECT_SINGLE_PATH_ONLY, 7);
         $this->assertCount(3, $fetchSinglePathOnly);
         $this->assertEquals(3, $fetchSinglePathOnly[1]->id);
         $this->assertEquals('Insert At The Beginning - 1', $fetchSinglePathOnly[1]->name);
+        unset($nestedEntitiesModel);
 
         //----------------------------------------------
         // Case 4: Fetch with SELECT_LEAVES_ONLY
         //----------------------------------------------
 
+        $nestedEntitiesModel = new NestedEntity();
         $fetchLeavesOnly = $nestedEntitiesModel->fetch(NestedEntity::SELECT_LEAVES_ONLY);
         $this->assertCount(4, $fetchLeavesOnly);
-        $this->assertEquals(5, $fetchLeavesOnly[0]->id);
-        $this->assertEquals(6, $fetchLeavesOnly[1]->id);
-        $this->assertEquals(7, $fetchLeavesOnly[2]->id);
-        $this->assertEquals(8, $fetchLeavesOnly[3]->id);
+        $this->assertEquals(8, $fetchLeavesOnly[0]->id);
+        $this->assertEquals(7, $fetchLeavesOnly[1]->id);
+        $this->assertEquals(6, $fetchLeavesOnly[2]->id);
+        $this->assertEquals(5, $fetchLeavesOnly[3]->id);
+        unset($nestedEntitiesModel);
 
+        $nestedEntitiesModel = new NestedEntity();
         $fetchLeavesOnlyWithinDefiniteRange = $nestedEntitiesModel->fetch(NestedEntity::SELECT_LEAVES_ONLY, 3);
         $this->assertCount(2, $fetchLeavesOnlyWithinDefiniteRange);
-        $this->assertEquals(7, $fetchLeavesOnlyWithinDefiniteRange[0]->id);
-        $this->assertEquals(8, $fetchLeavesOnlyWithinDefiniteRange[1]->id);
+        $this->assertEquals(8, $fetchLeavesOnlyWithinDefiniteRange[0]->id);
+        $this->assertEquals(7, $fetchLeavesOnlyWithinDefiniteRange[1]->id);
+        unset($nestedEntitiesModel);
     }
 
 
