@@ -9,7 +9,9 @@ Route::get('/php-info', function () {
 
 Route::resources([
     'files' => 'FilesController',
-    'users' => 'UsersController'
+    'users' => 'UsersController',
+    'admin' => 'AdminController',
+    'admin-demo' => 'AdminDemoController'
 ]);
 
 Route::controllers([

@@ -22,6 +22,8 @@ on_stylesheet_saved do |file|
   end
 end
 
+add_import_path "public/bower_components"
+
 # Set this to the root of your project when deployed:
 http_path = "/public"
 css_dir = "public/stylesheets"
