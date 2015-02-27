@@ -29,3 +29,6 @@ install: travis_retry composer install --no-interaction --prefer-source
 script:
   - php artisan migrate --force
   - vendor/bin/phpunit
+
+notifications:
+  hipchat: f504f9e2e6696c17589a7b49f4ce05@Audith.Basis
