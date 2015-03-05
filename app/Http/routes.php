@@ -9,13 +9,13 @@ Route::get('/php-info', function () {
 
 Route::resources([
     'files' => 'FilesController',
-    'users' => 'UsersController',
-    'admin' => 'AdminController',
-    'admin-demo' => 'AdminDemoController'
+    'users' => 'UsersController'
 ]);
 
 Route::controllers([
     'auth' => 'Users\AuthController',
     'password' => 'Users\PasswordController',
+    'admin' => 'AdminController',
+    'admin-demo' => 'Admin\DemoController',
     '' => 'HomeController'
 ]);

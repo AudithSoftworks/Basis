@@ -327,7 +327,7 @@ function notificationCall() {
             inEffect: 'slideRight',
             outEffect: 'slideBottom',
             closeButton: true,
-            delay: 5000
+            delay: 50000
         });
         setTimeout(function () {
             $.amaran({
@@ -421,14 +421,13 @@ var plot;
 function flot_real_time_chart_start() {
     'use strict';
 
-    plot = $.plot("#realTimeChart", [getRandomData()], {
+    plot = $.plot("article.memberBox > figure", [getRandomData()], {
         series: {
             lines: {
                 show: true,
                 lineWidth: 1,
                 fill: true,
                 fillColor: {
-
                     colors: [
                         {
                             opacity: 0.2
@@ -518,7 +517,7 @@ function plotAccordingToChoicesDataSet() {
         ++i;
     });
 
-// insert checkboxes
+    // insert checkboxes
     choiceContainer = $("#choicesWidget");
     $.each(datasets, function (key, val) {
         //<input class="switchCheckBox" type="checkbox" checked data-size="mini">
@@ -531,7 +530,7 @@ function plotAccordingToChoicesDataSet() {
     plotAccordingToChoices();
 }
 
-function plotAccordingToChoices() {
+function plotAccordingToChoices(event, state) {
     'use strict';
 
     var data = [];
@@ -562,10 +561,14 @@ function plotAccordingToChoices() {
             }
         });
     }
+    console.log(event);
+    console.log(state);
     $(".switchCheckBox").bootstrapSwitch();
 }
 function plotAccordingToChoicesToggle() {
     'use strict';
 
-    $(".switchCheckBox").on('switchChange.bootstrapSwitch', plotAccordingToChoices());
+    $(".switchCheckBox").on('switchChange.bootstrapSwitch', function(event, state){
+        return plotAccordingToChoices(event, state);
+    });
 }

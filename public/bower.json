@@ -36,6 +36,9 @@
         "countUp.js": "1.3.*",
         "skycons-html5": "*",
         "bower-jvectormap-2": "*",
-        "amaranjs": "*"
+        "amaranjs": "*",
+        "humane-js": "3.*",
+        "bootbox": "4.*",
+        "notifyjs": "*"
     }
 }

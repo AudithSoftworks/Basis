@@ -1,0 +1,47 @@
+.tab-pane {
+    padding: $grid-gutter-width/2;
+}
+
+.nav-tabs {
+    > li {
+        > a {
+            @include border-radius(1px 1px 0 0);
+            color: #555;
+            font-size: 15px;
+        }
+
+        &.active {
+            > a {
+                outline: 0;
+                color: #269abc;
+
+                &:hover, &:focus {
+                    outline: 0;
+                    color: #269abc;
+                }
+            }
+        }
+    }
+
+    &.nav-justified {
+        > .active {
+            > a {
+                border-left: 1px solid #E0E0E0;
+                border-right: 1px solid #E0E0E0;
+                border-top: 1px solid #E0E0E0;
+
+                &:hover, &:focus {
+                    border-left: 1px solid #E0E0E0;
+                    border-right: 1px solid #E0E0E0;
+                    border-top: 1px solid #E0E0E0;
+                }
+            }
+        }
+
+        > li {
+            > a {
+                @include border-radius(1px 1px 0 0);
+            }
+        }
+    }
+}

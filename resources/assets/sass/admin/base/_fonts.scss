@@ -43,3 +43,18 @@ header {
 ul.main-nav li a {
     font-family: 'Armata', sans-serif;
 }
+
+main {
+    > section.row {
+        > article {
+            > ul {
+                > li {
+                    > strong {
+                        font-family: 'Armata', sans-serif;
+                        font-weight: normal;
+                    }
+                }
+            }
+        }
+    }
+}

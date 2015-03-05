@@ -1,7 +1,7 @@
 @import "compass/reset";
 @import "compass/css3";
 
-header {
+body > header {
     background-color: #555557;
     color: white;
 
@@ -117,6 +117,11 @@ header {
                         display: block;
                         @include border-radius(50%);
                     }
+                }
+
+                &.menu-control > button {
+                    padding-left: 0;
+                    padding-right: 0;
                 }
 
                 > a:hover {
@@ -396,9 +401,7 @@ header {
                             }
 
                             .label {
-                                border-radius: 50%;
-                                -moz-border-radius: 50%;
-                                -webkit-border-radius: 50%;
+                                @include border-radius(50%);
                                 left: 7px;
                                 line-height: 11px;
                                 padding: 5px;

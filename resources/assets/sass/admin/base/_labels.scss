@@ -1,10 +1,9 @@
 .label {
     @include border-radius(1px);
     font-weight: 400;
-
 }
 
-.label-Blue, .label-blue {
+.label-blue {
     background-color: #6b97f4;
 }
 
@@ -12,7 +11,7 @@
     background-color: #58595b;
 }
 
-.label-lightBlue {
+.label-light-blue {
     background-color: #269abc;
 }
 

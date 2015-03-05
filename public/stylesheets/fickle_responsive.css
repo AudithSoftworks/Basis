@@ -528,7 +528,7 @@ Primary use :	Layout & All Pages
 /*------------------------------------------------------------------
    ---------- MIN-WIDTH : 0PX & MAX-WIDTH : 650PX -----------
 -------------------------------------------------------------------*/
-@media all and (min-width: 0px) and (max-width: 650px) {
+@media all and (min-width: 0px) and (max-width: 767px) {
     /*Layout element start*/
     #left-navigation .user-image, #left-navigation .social-icon{
         display: none;
@@ -745,7 +745,7 @@ Primary use :	Layout & All Pages
 /*------------------------------------------------------------------
    ---------- MIN-WIDTH : 0PX & MAX-WIDTH : 600PX -----------
 -------------------------------------------------------------------*/
-@media all and (min-width: 0px) and (max-width: 600px) {
+@media all and (min-width: 0px) and (max-width: 767px) {
     /** Profile **/
     .ls-user-details .user-detail .user-pic {
         left: 345px;
@@ -777,7 +777,7 @@ Primary use :	Layout & All Pages
 /*------------------------------------------------------------------
    ---------- MIN-WIDTH : 0PX & MAX-WIDTH : 480PX -----------
 -------------------------------------------------------------------*/
-@media all and (min-width: 0px) and (max-width: 480px) {
+@media all and (min-width: 0px) and (max-width: 767px) {
     ul.mainNav{
         display: none;
     }
@@ -953,7 +953,7 @@ Primary use :	Layout & All Pages
 /*------------------------------------------------------------------
    ---------- MIN-WIDTH : 0PX & MAX-WIDTH : 479PX -----------
 -------------------------------------------------------------------*/
-@media all and (min-width: 0px) and (max-width: 479px) {
+@media all and (min-width: 0px) and (max-width: 767px) {
     /****** Index Page  ******/
     .memberBox-details ul li{
         padding: 0 4%;
@@ -1066,7 +1066,7 @@ Primary use :	Layout & All Pages
 /*------------------------------------------------------------------
    ---------- MIN-WIDTH : 0PX & MAX-WIDTH : 400PX -----------
 -------------------------------------------------------------------*/
-@media all and (min-width: 0px) and (max-width: 400px) {
+@media all and (min-width: 0px) and (max-width: 767px) {
     /*Element Page Start*/
     .element-progress.v-progressbar .progress.vertical{
         width: 40px;
@@ -1280,7 +1280,7 @@ Primary use :	Layout & All Pages
 /*------------------------------------------------------------------
    ---------- MIN-WIDTH : 0PX & MAX-WIDTH : 359PX -----------
 -------------------------------------------------------------------*/
-@media all and (min-width: 0px) and (max-width: 359px) {
+@media all and (min-width: 0px) and (max-width: 767px) {
     /******* Index page start ******/
     .memberBox-details ul li{
         margin-bottom: 20px;

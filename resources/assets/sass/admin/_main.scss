@@ -1,314 +1,311 @@
 @import "compass/reset";
 @import "compass/css3";
 
-main {
-    width: 100%;
+body > aside {
+    width: 200px;
+    background-color: #58595B;
+    float: left;
+    position: absolute;
+    left: 0;
     height: 100%;
-    background: #ffffff;
-    color: #565656;
+    overflow: visible !important;
 
-    > aside {
-        width: 200px;
-        background-color: #58595B;
-        float: left;
-        position: absolute;
-        left: 0;
-        height: 100%;
-        overflow: visible !important;
+    > figure.user-image {
+        margin: 10px auto;
+        width: 80px;
+        position: relative;
+
+        > img {
+            @include border-radius(50%);
+            overflow: hidden;
+        }
+
+        > figcaption.user-online-status {
+            display: block;
+            left: 0;
+            position: absolute;
+            top: 10px;
+
+            > span {
+                text-indent: -99999px;
+            }
+        }
+    }
+
+    > ul.social-icon {
+        list-style: none;
+        margin: 0 0 5px;
+        padding: 0;
+        text-align: center;
+
+        > li {
+            display: inline-block;
+            margin: 0 5px;
+
+            > a {
+                color: #FF7878;
+                font-size: 15px;
+                @include transition(all 0.3s ease-in-out);
+
+                &:hover {
+                    color: #FFFFFF;
+                }
+            }
+        }
+    }
+
+    &.minimized {
+        width: 50px;
 
         > figure.user-image {
-            margin: 10px auto;
-            width: 80px;
-            position: relative;
+            width: 40px;
 
             > img {
-                @include border-radius(50%);
-                overflow: hidden;
+                width: 40px;
             }
 
             > figcaption.user-online-status {
+                top: -5px;
+            }
+        }
+
+        > ul.social-icon {
+            display: none;
+        }
+    }
+
+    > ul.main-nav {
+        padding: 0;
+        margin: 0;
+        list-style: none;
+        background: #555557;
+
+        &.mobile {
+            display: none;
+        }
+
+        li {
+            border-top: 1px solid #58595B;
+            position: relative;
+
+            &:last-child {
+                border-bottom: 1px solid #58595B;
+            }
+
+            > a {
+                line-height: 13px;
+                font-size: 13px;
+                padding: 10px 5px 10px 10px;
                 display: block;
-                left: 0;
-                position: absolute;
-                top: 10px;
+                text-decoration: none;
+                color: #c6c6c6;
+                outline: 0;
+                position: relative;
+                @include transition(all 0.3s ease-in-out);
+
+                &.active {
+                    color: #fff;
+                    background-color: #7A8B83;
+                }
+
+                &:hover {
+                    background-color: #7a8b83;
+                    color: #ffffff;
+                    @include transition(all 0.3s ease-in-out);
+                }
+
+                > i {
+                    margin-right: 5px;
+                    width: 15px;
+                    font-size: 14px;
+
+                    &:first-child {
+                        text-align: center;
+                    }
+                }
+
+                > b {
+                    width: 12px;
+                }
 
                 > span {
-                    text-indent: -99999px;
+                    line-height: 13px;
+                    font-size: 13px;
+
+                    &.badge {
+                        @include border-radius(2px);
+                        font-size: 10px;
+                        font-weight: 400;
+                        line-height: 10px;
+                        padding: 2px 5px;
+                        position: absolute;
+                        right: 30px;
+                    }
+                }
+            }
+
+            &.active {
+                ul {
+                    display: block;
+
+                    li {
+                        ul {
+                            display: none;
+                        }
+                    }
+                }
+            }
+
+            ul {
+                margin: 0;
+                padding: 0;
+                display: none;
+                list-style: none;
+                background: #58595B;
+
+                li {
+                    margin: 0;
+                    padding: 0;
+                    clear: both;
+                    border: none;
+
+                    a {
+                        padding-left: 30px;
+                        font-size: 12px;
+                        font-weight: normal;
+                        outline: 0;
+
+                        &:hover {
+                            background-color: #7a8b83;
+                            color: #ffffff;
+                        }
+
+                        &.active {
+                            color: #ffffff;
+                            background-color: #7a8b83;
+                        }
+                    }
+
+                    ul {
+                        li {
+                            a {
+                                color: #c6c6c6;
+                                padding-left: 30px;
+
+                                &:hover {
+                                    background-color: #7a8b83;
+                                    color: #fff;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        &.check {
+            li {
+                &.check, &:hover {
+                    width: 200px;
+                    background: #49494B;
+                    z-index: 999;
                 }
             }
         }
 
         &.active {
-            width: 50px;
-
-            > figure.user-image {
-                width: 40px;
-
-                > img {
-                    width: 40px;
-                }
-
-                > figcaption.user-online-status {
-                    top: -5px;
-                }
-            }
-        }
-
-        > ul.social-icon {
-            list-style: none;
-            margin: 0 0 5px;
-            padding: 0;
-            text-align: center;
-
             > li {
-                display: inline-block;
-                margin: 0 5px;
-
-                > a {
-                    color: #FF7878;
-                    font-size: 15px;
-                    @include transition(all 0.3s ease-in-out);
-
-                    &:hover {
-                        color: #FFFFFF;
-                    }
+                &:hover, &.check {
+                    width: 250px;
+                    z-index: 11;
                 }
-            }
-        }
-
-        &.active > ul.social-icon {
-            display: none;
-        }
-
-        > ul.main-nav {
-            padding: 0;
-            margin: 0;
-            list-style: none;
-            background: #555557;
-
-            &.mobile {
-                display: none;
             }
 
             li {
-                border-top: 1px solid #58595B;
-                position: relative;
+                ul {
+                    display: none;
+                    left: 0;
 
-                &:last-child {
-                    border-bottom: 1px solid #58595B;
-                }
-
-                a {
-                    line-height: 13px;
-                    font-size: 13px;
-                    padding: 10px 5px 10px 10px;
-                    display: block;
-                    text-decoration: none;
-                    color: #c6c6c6;
-                    outline: 0;
-                    position: relative;
-                    @include transition(all 0.3s ease-in-out);
+                    &.open {
+                        display: block;
+                    }
 
                     &.active {
-                        color: #fff;
-                        background-color: #7A8B83;
-                    }
+                        display: none;
 
-                    &:hover {
-                        background-color: #7a8b83;
-                        color: #ffffff;
-                        @include transition(all 0.3s ease-in-out);
-                    }
-
-                    i {
-                        margin-right: 5px;
-                        width: 15px;
-                        font-size: 14px;
-                    }
-
-                    b {
-                        width: 12px;
-                    }
-
-                    span {
-                        line-height: 13px;
-                        font-size: 13px;
-
-                        &.badge {
-                            @include border-radius(2px);
-                            font-size: 10px;
-                            font-weight: 400;
-                            line-height: 10px;
-                            padding: 2px 5px;
-                            position: absolute;
-                            right: 30px;
+                        &.open {
+                            display: block;
                         }
                     }
                 }
 
                 &.active {
                     ul {
-                        display: block;
-
-                        li {
-                            ul {
-                                display: none;
-                            }
-                        }
-                    }
-                }
-
-                ul {
-                    margin: 0;
-                    padding: 0;
-                    display: none;
-                    list-style: none;
-                    background: #58595B;
-
-                    li {
-                        margin: 0;
-                        padding: 0;
-                        clear: both;
-                        border: none;
-
-                        a {
-                            padding-left: 30px;
-                            font-size: 12px;
-                            font-weight: normal;
-                            outline: 0;
-
-                            &:hover {
-                                background-color: #7a8b83;
-                                color: #ffffff;
-                            }
-
-                            &.active {
-                                color: #ffffff;
-                                background-color: #7a8b83;
-                            }
-                        }
-
-                        ul {
-                            li {
-                                a {
-                                    color: #c6c6c6;
-                                    padding-left: 30px;
-
-                                    &:hover {
-                                        background-color: #7a8b83;
-                                        color: #fff;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            &.check {
-                li {
-                    &.check, &:hover {
-                        width: 200px;
-                        background: #49494B;
-                        z-index: 999;
-                    }
-                }
-            }
-
-            &.active {
-                > li {
-                    &:hover, &.check {
-                        width: 250px;
-                        z-index: 11;
-                    }
-                }
-
-                li {
-                    ul {
                         display: none;
-                        left: 0;
 
                         &.open {
                             display: block;
-                        }
-
-                        &.active {
-                            display: none;
-
-                            &.open {
-                                display: block;
-                            }
-                        }
-                    }
-
-                    &.active {
-                        ul {
-                            display: none;
-
-                            &.open {
-                                display: block;
-                            }
-                        }
-
-                        a {
-                            i {
-                                color: #fff;
-                            }
                         }
                     }
 
                     a {
                         i {
-                            padding-left: 10px;
-                        }
-
-                        b, span {
-                            display: none;
-                        }
-                    }
-
-                    &:hover, &.check {
-                        background: #555557;
-
-                        a {
-                            span, b {
-                                display: inline-block;
-                            }
+                            color: #fff;
                         }
                     }
                 }
 
-                ul {
-                    position: absolute;
-                    left: 50px;
-                    width: 200px;
-                    background-color: #4c4c4e;
+                a {
+                    i {
+                        padding-left: 10px;
+                    }
 
-                    li {
-                        ul.open {
-                            display: block;
+                    b, span {
+                        display: none;
+                    }
+                }
+
+                &:hover, &.check {
+                    background: #555557;
+
+                    a {
+                        span, b {
+                            display: inline-block;
                         }
+                    }
+                }
+            }
 
+            ul {
+                position: absolute;
+                left: 50px;
+                width: 200px;
+                background-color: #4c4c4e;
+
+                li {
+                    ul.open {
+                        display: block;
+                    }
+
+                    ul {
+                        display: none;
+                    }
+
+                    &.active {
                         ul {
-                            display: none;
-                        }
+                            display: block;
 
-                        &.active {
-                            ul {
-                                display: block;
+                            li.active {
+                                ul {
+                                    display: block;
 
-                                li.active {
                                     ul {
-                                        display: block;
+                                        display: none;
+                                    }
 
+                                    li.active {
                                         ul {
-                                            display: none;
-                                        }
-
-                                        li.active {
-                                            ul {
-                                                display: block;
-                                            }
+                                            display: block;
                                         }
                                     }
                                 }
@@ -317,37 +314,134 @@ main {
                     }
                 }
             }
-
-            b {
-                float: right;
-                font-size: 14px;
-                font-weight: 400;
-            }
         }
 
-        &.active > ul.mainNav {
-            li {
-                a {
-                    i {
-                        width: 50px;
-                    }
+        b {
+            float: right;
+            font-size: 14px;
+            font-weight: 400;
+        }
+    }
 
-                    b {
-                        width: 22px;
-                    }
-
-                    span.badge {
-                        right: 25px;
-                    }
+    &.active > ul.mainNav {
+        li {
+            a {
+                i {
+                    width: 50px;
                 }
 
-                ul {
-                    li {
-                        a {
-                            padding-left: 20px;
+                b {
+                    width: 22px;
+                }
+
+                span.badge {
+                    right: 25px;
+                }
+            }
+
+            ul {
+                li {
+                    a {
+                        padding-left: 20px;
+                    }
+                }
+            }
+        }
+    }
+}
+
+body > main {
+    width: 100%;
+    height: 100%;
+    background-color: #58595B;
+    color: #565656;
+    margin-top: 5px;
+    min-height: 900px;
+
+    @media all and (min-width: 0px) and (max-width: 767px) {
+        padding-left: 15px !important;
+    }
+
+    @media all and (min-width: 768px) and (max-width: 991px) {
+        padding-left: 65px !important;
+    }
+
+    @media all and (min-width: 992px) {
+        padding-left: 215px !important;
+    }
+
+    > * {
+        background-color: #f9f9f9;
+    }
+
+    > h2 {
+        margin: 0 -15px;
+        padding: ($grid-gutter-width/2) ($grid-gutter-width/2) 0;
+    }
+
+    > aside.row {
+        padding-top: 15px;
+    }
+
+    > section.row {
+        padding-bottom: $grid-gutter-width/2;
+
+        > article {
+            &.panel {
+                background-color: inherit;
+                @include box-shadow(none);
+
+                > * {
+                    background-color: white;
+                    padding-left: $grid-gutter-width/2;
+                    padding-right: $grid-gutter-width/2;
+                    border-width: 0 1px;
+                    border-style: solid;
+                    border-color: #E0E0E0;
+                    position: relative;
+                    @include box-shadow(0 8px 0 0 rgba(255, 255, 255, 1), 0 -8px 0 0 rgba(255, 255, 255, 1), 1px 0 5px 0 rgba(0, 0, 0, 0.1), -1px 0 5px 0 rgba(0, 0, 0, 0.1));
+
+                    &:first-child {
+                        padding-top: $grid-gutter-width/2;
+                        border-width: 1px 1px 0;
+                        @include border-radius(4px 4px 0 0);
+                        @include box-shadow(none);
+
+                        &:after {
+                            content: "";
+                            position: absolute;
+                            z-index: 10000;
+                            top: 0;
+                            bottom: 0;
+                            left: 0;
+                            right: 0;
+                            @include box-shadow(0 8px 0 0 rgba(255, 255, 255, 1), 0 -1px 0 0 rgba(0, 0, 0, 0.1), 1px 0 5px 0 rgba(0, 0, 0, 0.1), -1px 0 5px 0 rgba(0, 0, 0, 0.1));
+                        }
+                    }
+
+                    &:last-child {
+                        padding-bottom: $grid-gutter-width/2;
+                        border-width: 0 1px 1px;
+                        @include border-radius(0 0 4px 4px);
+                        @include box-shadow(none);
+
+                        &:after {
+                            content: "";
+                            position: absolute;
+                            z-index: 10000;
+                            top: 0;
+                            bottom: 0;
+                            left: 0;
+                            right: 0;
+                            @include box-shadow(0 1px 0 0 rgba(0, 0, 0, 0.1), 0 -8px 0 0 rgba(255, 255, 255, 1), 1px 0 5px 0 rgba(0, 0, 0, 0.1), -1px 0 5px 0 rgba(0, 0, 0, 0.1));
                         }
                     }
                 }
+            }
+
+            h3 {
+                margin: 0;
+                padding-bottom: $grid-gutter-width/2;
             }
         }
     }

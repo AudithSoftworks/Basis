@@ -1,26 +1,54 @@
-var $windowWidth = $(window).width();
-var $settingsSidebarControl = $('.settings-sidebar > button');
-var $navigationControl = $('header > nav > ul > li.menu-control > button');
-var $leftNavigation = $('#left-navigation');
-var $minWrapper = $('#min-wrapper');
-var $navigation = $('ul.main-nav');
+var headerSettingsSidebarControl = $('.settings-sidebar > button');
+var headerNavigationControl = $('header > nav > ul > li.menu-control > button');
+var leftColumn = $('body > aside');
+var leftNavigation = $('ul.main-nav');
+var mainContent = $('main');
 
 jQuery(document).ready(function ($) {
     'use strict';
 
     callNavigation(); // Left Navigation Accordion
 
-    // Browser size detect on loading Start
-    if ($windowWidth > 1025) {
-        onDesktop();
+    Breakpoint.init();
+    if (Breakpoint.is('xs')) {
+        leftNavigation.addClass('mobile').css('display', 'none');
+        leftColumn.css('width', '100%');
+        headerNavigationControl.removeClass('spinIn').addClass('spinOut').removeClass('active');
+        leftColumn.children('ul').removeClass('active');
+        $(mainContent).css('paddingLeft', '0');
+    } else if (Breakpoint.is('sm')) {
+        leftNavigation.addClass('active');
+        mainContent.addClass('active');
+        leftColumn.addClass('minimized');
+        leftNavigation.slideDown();
     }
-    else if ($windowWidth < 500) {
-        // On phone
-        onPhoneDefault()
-    } else if ($windowWidth < 1025) {
-        // On Pad
-        onTabletDefault();
-    }
+    $(window).on('change:breakpoint', function (e, current /*, previous */) {
+        switch (current) {
+            case 'xs':
+                leftNavigation.addClass('mobile').css('display', 'none');
+                leftColumn.animate({width: '100%'}, 100, function () {
+                    headerNavigationControl.removeClass('spinIn').addClass('spinOut');
+                    headerNavigationControl.removeClass('active');
+                    leftColumn.children('ul').removeClass('active');
+                    leftColumn.removeClass('minimized');
+                });
+                break;
+            case 'sm':
+                leftNavigation.removeAttr('style').removeClass('mobile');
+                leftColumn.removeAttr('style');
+                mainContent.removeAttr('style');
+
+                leftNavigation.addClass('active');
+                leftColumn.addClass('minimized');
+                mainContent.addClass('active');
+                break;
+            default:
+                leftNavigation.removeAttr('style').removeClass('mobile active');
+                leftColumn.removeAttr('style').removeClass('minimized');
+                mainContent.removeAttr('style');
+                break;
+        }
+    });
 
     minimizeLeftMenuHoverDisplay();
     settingsSidebarDisplay(); //Right Box Display
@@ -40,7 +68,7 @@ jQuery(document).ready(function ($) {
 function callNavigation() {
     'use strict';
 
-    $navigation.multiAccordion({
+    leftNavigation.multiAccordion({
         multiAccordion: true,
         speed: 500,
         closedSign: '<i class="fa fa-caret-down"></i>',
@@ -55,11 +83,11 @@ function callNavigation() {
 function minimizeLeftMenuHoverDisplay() {
     $('ul.main-nav li').hover(
         function () {
-            if ($($leftNavigation).hasClass('active')) {
+            if (leftColumn.hasClass('minimized')) {
                 $(this).children('ul').addClass('open');
             }
         }, function () {
-            if ($($leftNavigation).hasClass('active')) {
+            if (leftColumn.hasClass('minimized')) {
                 $(this).children('ul').removeClass('open');
                 $(this).children('ul').removeAttr("style");
             }
@@ -81,7 +109,7 @@ function dropDownMenuControl() {
 // Resize Call after resize left menu Start
 //-----------------------------------------------
 
-function changeMenuSizeTriger() {
+function changeMenuSizeTrigger() {
     'use strict';
 
     $(window).trigger('resize');
@@ -94,129 +122,26 @@ function changeMenuSizeTriger() {
 //-----------------------------------------------
 // Left Navigation Transition  callback Start
 //-----------------------------------------------
-// $leftNavigation.on('webkitTransitionEnd moztransitionend transitionend oTransitionEnd', function (){
+// leftColumn.on('webkitTransitionEnd moztransitionend transitionend oTransitionEnd', function (){
 // });
 
 function leftBarMinimize() {
     'use strict';
 
-    $($navigationControl).click(function () {
-        if ($navigation.hasClass('active')) {
-            $leftNavigation.removeClass('active');
-            $navigation.removeClass('active');
-            $minWrapper.removeClass('active');
-            changeMenuSizeTriger();
+    $(headerNavigationControl).click(function () {
+        if (leftNavigation.hasClass('active')) {
+            leftColumn.removeClass('minimized');
+            leftNavigation.removeClass('active');
+            mainContent.removeClass('active');
+            changeMenuSizeTrigger();
         } else {
-            $navigation.addClass('active');
-            $minWrapper.addClass('active');
-            $leftNavigation.addClass('active');
-            $navigation.find('ul').removeAttr('style');
-            changeMenuSizeTriger();
+            leftNavigation.addClass('active');
+            mainContent.addClass('active');
+            leftColumn.addClass('minimized');
+            leftNavigation.find('ul').removeAttr('style');
+            changeMenuSizeTrigger();
         }
     });
-}
-
-function onDesktop() {
-    'use strict';
-}
-
-//------------------------
-// Tablet view Start
-//------------------------
-
-function onTabletDefault() {
-    'use strict';
-
-    $navigation.addClass('active');
-    $minWrapper.addClass('active');
-    $leftNavigation.addClass('active');
-    $navigation.slideDown();
-}
-
-function onTablet() {
-    'use strict';
-
-    $navigation.addClass('active');
-    $minWrapper.addClass('active');
-    $leftNavigation.addClass('active');
-}
-
-//----------------------
-// Phone view Start
-//----------------------
-
-function onPhoneDefault() {
-    'use strict';
-
-    $navigation.addClass('mobile');
-    $navigation.css('display', 'none');
-    $leftNavigation.css('width', '100%');
-    $navigationControl.removeClass('spinIn').addClass('spinOut');
-    $navigationControl.removeClass('active');
-    $leftNavigation.children('ul').removeClass('active');
-    $leftNavigation.removeClass('active');
-
-    $($minWrapper).css('paddingLeft', '0');
-}
-function onPhone() {
-    'use strict';
-
-    $($navigation).addClass('mobile');
-    $($navigation).css('display', 'none');
-    $($leftNavigation).animate({
-        width: '100%'
-    }, 100, function () {
-        $navigationControl.removeClass('spinIn').addClass('spinOut');
-        $navigationControl.removeClass('active');
-        $leftNavigation.children('ul').removeClass('active');
-        $leftNavigation.removeClass('active');
-    });
-    $($minWrapper).animate({
-        paddingLeft: '0'
-    }, 100, function () {
-    });
-}
-
-//-----------------------------
-// Layout Size Change Start
-//-----------------------------
-
-var resizeId;
-$(window).resize(function () {
-    clearTimeout(resizeId);
-    resizeId = setTimeout(doneResizingLayout, 500);
-});
-
-function doneResizingLayout() {
-    var $currentWindowWidth = $(window).width();
-    if ($windowWidth != $currentWindowWidth) {
-        if ($currentWindowWidth < 500) {
-            onPhone();
-        } else if ($currentWindowWidth < 1025) {
-            $leftNavigation.removeAttr('style');
-            $minWrapper.removeAttr('style');
-            $leftNavigation.removeAttr('style');
-            $navigation.removeAttr('style');
-            $navigation.removeClass('mobile');
-
-            onTablet();
-        } else if ($currentWindowWidth > 1025) {
-            desktopResize();
-        }
-        $windowWidth = $currentWindowWidth;
-    } else {
-        $windowWidth = $currentWindowWidth;
-    }
-}
-
-function desktopResize() {
-    $leftNavigation.removeAttr('style');
-    $minWrapper.removeAttr('style');
-    $leftNavigation.removeAttr('style');
-    $navigation.removeAttr('style');
-    $navigation.removeClass('mobile');
-    onDesktop();
-
 }
 
 //-----------------------------
@@ -226,7 +151,7 @@ function desktopResize() {
 function settingsSidebarDisplay() {
     'use strict';
 
-    $settingsSidebarControl.click(function (e) {
+    headerSettingsSidebarControl.click(function (e) {
         e.defaultPrevented = true;
         $(".settings-sidebar > form").show().animate({right: '0'}, 500);
     });
@@ -244,10 +169,10 @@ function phoneNavControl() {
     'use strict';
 
     $('.phone-nav-control').click(function () {
-        if ($navigation.is(":hidden")) {
-            $navigation.slideDown();
+        if (leftNavigation.is(":hidden")) {
+            leftNavigation.slideDown();
         } else {
-            $navigation.slideUp();
+            leftNavigation.slideUp();
         }
     });
 }

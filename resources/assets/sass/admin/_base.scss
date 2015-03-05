@@ -4,31 +4,29 @@
 @import "bootstrap-sass-official/assets/stylesheets/bootstrap-sprockets";
 @import "bootstrap-sass-official/assets/stylesheets/bootstrap";
 
-@import "base/progress";
+@import "../common/_bootstrap-progressbar";
+@import "../common/amaranjs";
+
+@import "base/variables";
+@import "base/colors";
 @import "base/fonts";
 @import "base/badges";
 @import "base/labels";
-
-body {
-    font-size: 14px;
-    height: 100%;
-    background: #f9f9f9;
-}
-
-body.single-page {
-    background: #565656;
-}
+@import "base/progress";
+@import "base/breadcrumbs";
+@import "base/notifications";
+@import "base/tabs";
 
 h1 {
     font-size: 24px;
 }
 
 h2 {
-    font-size: 22px;
+    font-size: 20px;
 }
 
 h3 {
-    font-size: 20px;
+    font-size: 16px;
 }
 
 h4 {
@@ -70,4 +68,14 @@ textarea {
 
 a:hover {
     text-decoration: none;
+}
+
+body {
+    font-size: 14px;
+    height: 100%;
+//    background-color: #f9f9f9;
+
+    &.single-page {
+        background-color: #565656;
+    }
 }
