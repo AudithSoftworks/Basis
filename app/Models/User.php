@@ -1,10 +1,10 @@
 <?php namespace App\Models;
 
-use \Illuminate\Auth\Authenticatable;
-use \Illuminate\Auth\Passwords\CanResetPassword;
-use \Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use \Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-use \Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Auth\Authenticatable;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends \Eloquent implements AuthenticatableContract, CanResetPasswordContract
 {

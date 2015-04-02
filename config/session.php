@@ -39,7 +39,7 @@ return [
     | automatically by Laravel and you can use the Session like normal.
     |
     */
-    'encrypt' => false,
+    'encrypt' => true,
 
     /*
     |--------------------------------------------------------------------------
@@ -135,7 +135,5 @@ return [
     | the cookie from being sent to you if it can not be done securely.
     |
     */
-
     'secure' => false,
-
 ];

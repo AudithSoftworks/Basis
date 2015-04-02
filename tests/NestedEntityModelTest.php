@@ -1,6 +1,6 @@
 <?php
 
-use \App\Models\NestedEntity;
+use App\Models\NestedEntity;
 
 class NestedEntityModelTest extends TestCase
 {
