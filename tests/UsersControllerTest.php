@@ -18,6 +18,8 @@ class UsersControllerTest extends TestCase
                 break;
             case 'testUpdate with data set #0':
             case 'testUpdate with data set #2':
+            case 'testUpdate with data set #3':
+            case 'testUpdate with data set #4':
                 $handshakeRequestEndpointUrl = '/users/1/edit';
                 break;
             case 'testUpdate with data set #1':
@@ -49,17 +51,17 @@ class UsersControllerTest extends TestCase
     {
         return array(
             array(
-                array('email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver'),
+                array('email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'),
                 ''
             ),
-            array(
-                array('password' => 'theWeakestPasswordEver'),
-                'LoginRequiredException'
+            array( // Validation fail: password_confirmation missing
+                array('email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver'),
+                'HttpResponseException'
             ),
-            array(
-                array('email' => 'john.doe@example.com'),
-                'PasswordRequiredException'
-            )
+            array( // Validation fail: email missing
+                array('password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'),
+                'HttpResponseException'
+            ),
         );
     }
 
@@ -77,8 +79,16 @@ class UsersControllerTest extends TestCase
         $this->assertNotEmpty($responseRaw, 'Response needs to be not-empty.');
         $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
         if (!empty($exceptionExpected)) {
-            $this->assertResponseStatus(500);
-            $this->assertContains($exceptionExpected, $responseRaw);
+            switch ($exceptionExpected) {
+                case 'HttpResponseException':
+                    $this->assertResponseStatus(422);
+                    break;
+                default:
+                    $this->assertResponseStatus(500);
+                    break;
+            }
+            $this->assertObjectHasAttribute('exception', $responseAsObject, 'Response object needs to have a \'exception\' field.');
+            $this->assertContains($exceptionExpected, $responseAsObject->exception);
         } else {
             $this->assertResponseStatus(201);
             $this->assertEquals('Created', $responseAsObject->message, 'Response message should be \'Created\'.');
@@ -90,32 +100,33 @@ class UsersControllerTest extends TestCase
         return array(
             array(
                 array('id' => 1, 'email' => 'john.doe@example.com'),
-                false
+                ''
             ),
             array(
                 array('id' => 2, 'email' => 'john.doe@example.com'),
-                true
+                'UserNotFoundException'
             )
         );
     }
 
     /**
      * @dataProvider data_testShow
-     * @depends testStore
+     * @depends      testStore
      *
      * @param array   $user
-     * @param boolean $expectNotFoundException
+     * @param string  $exceptionExpected
      */
-    public function testShow(array $user, $expectNotFoundException)
+    public function testShow(array $user, $exceptionExpected)
     {
         $response = $this->call('GET', '/users/' . $user['id']);
         $responseRaw = $response->getContent();
         $responseAsObject = json_decode($responseRaw);
         $this->assertNotEmpty($responseRaw, 'Response needs to be not-empty.');
         $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
-        if ($expectNotFoundException) {
+        if (!empty($exceptionExpected)) {
             $this->assertResponseStatus(404);
-            $this->assertEquals('Not Found', $responseAsObject->message, 'Response message should be \'Not Found\'.');
+            $this->assertObjectHasAttribute('exception', $responseAsObject, 'Response object needs to have a \'exception\' field.');
+            $this->assertContains($exceptionExpected, $responseAsObject->exception);
         } else {
             $this->assertResponseStatus(200);
             $this->assertEquals('Found', $responseAsObject->message, 'Response message should be \'Found\'.');
@@ -129,16 +140,52 @@ class UsersControllerTest extends TestCase
     {
         return array(
             array(
-                array('id' => 1, 'email' => 'john.doe@example.com', 'currentPassword' => 'someWrongPassword', 'password' => 's0m34ardPa55w0rd'),
+                array( // Wrong old_password
+                    'id' => 1,
+                    'email' => 'john.doe@example.com',
+                    'old_password' => 'someWrongPassword',
+                    'password' => 's0m34ardPa55w0rd',
+                    'password_confirmation' => 's0m34ardPa55w0rd'
+                ),
                 'PasswordNotValidException'
             ),
             array(
-                array('id' => 2, 'email' => 'john.doe@example.com', 'currentPassword' => 'someWrongPassword', 'password' => 's0m34ardPa55w0rd'),
+                array( // Validation fail: password_confirmation missing
+                    'id' => 1,
+                    'email' => 'john.doe@example.com',
+                    'old_password' => 'theWeakestPasswordEver',
+                    'password' => 's0m34ardPa55w0rd'
+                ),
+                'HttpResponseException'
+            ),
+            array(
+                array( // Validation fail: old_password missing
+                    'id' => 1,
+                    'email' => 'john.doe@example.com',
+                    'password' => 's0m34ardPa55w0rd',
+                    'password_confirmation' => 's0m34ardPa55w0rd'
+                ),
+                'HttpResponseException'
+            ),
+            array(
+                array( // Non-existing user
+                    'id' => 2,
+                    'email' => 'john.doe@example.com',
+                    'old_password' => 'theWeakestPasswordEver',
+                    'password' => 's0m34ardPa55w0rd',
+                    'password_confirmation' => 's0m34ardPa55w0rd'
+                ),
                 'UserNotFoundException'
             ),
             array(
-                array('id' => 1, 'email' => 'john.doe@example.com', 'currentPassword' => 'theWeakestPasswordEver', 'password' => 's0m34ardPa55w0rd'),
-                false
+                array( // Correct data
+                    'id' => 1,
+                    'email' => 'john.doe@example.com',
+                    'old_password' => 'theWeakestPasswordEver',
+                    'password' => 's0m34ardPa55w0rd',
+                    'password_confirmation' => 's0m34ardPa55w0rd'
+                ),
+                ''
             )
         );
     }
@@ -158,8 +205,19 @@ class UsersControllerTest extends TestCase
         $this->assertNotEmpty($responseRaw, 'Response needs to be not-empty.');
         $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
         if (!empty($exceptionExpected)) {
-            $this->assertResponseStatus(500);
-            $this->assertContains($exceptionExpected, $responseRaw);
+            switch ($exceptionExpected) {
+                case 'UserNotFoundException':
+                    $this->assertResponseStatus(404);
+                    break;
+                case 'HttpResponseException':
+                    $this->assertResponseStatus(422);
+                    break;
+                default:
+                    $this->assertResponseStatus(500);
+                    break;
+            }
+            $this->assertObjectHasAttribute('exception', $responseAsObject, 'Response object needs to have a \'exception\' field.');
+            $this->assertContains($exceptionExpected, $responseAsObject->exception);
         } else {
             $this->assertResponseStatus(200);
             $this->assertEquals('Updated', $responseAsObject->message, 'Response message should be \'Updated\'.');
@@ -179,7 +237,7 @@ class UsersControllerTest extends TestCase
             ),
             array(
                 array('id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'),
-                false
+                ''
             )
         );
     }
@@ -200,7 +258,8 @@ class UsersControllerTest extends TestCase
         $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
         if (!empty($exceptionExpected)) {
             $this->assertResponseStatus(500);
-            $this->assertContains($exceptionExpected, $responseRaw);
+            $this->assertObjectHasAttribute('exception', $responseAsObject, 'Response object needs to have a \'exception\' field.');
+            $this->assertContains($exceptionExpected, $responseAsObject->exception);
         } else {
             $this->assertResponseStatus(200);
             $this->assertEquals('Deleted', $responseAsObject->message, 'Response message should be \'Deleted\'.');

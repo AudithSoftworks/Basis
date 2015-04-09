@@ -1,9 +1,8 @@
 <?php namespace App\Http\Controllers;
 
-use App\Exceptions\Users\LoginRequiredException;
-use App\Exceptions\Users\PasswordRequiredException;
 use App\Exceptions\Users\UserNotFoundException;
 use App\Exceptions\Users\PasswordNotValidException;
+use Illuminate\Http\Exception\HttpResponseException;
 use App\Models\User;
 use Illuminate\Http\Request;
 
@@ -41,20 +40,33 @@ class UsersController extends Controller
     public function store(Request $request)
     {
         try {
-            if (!$request->has('email')) {
-                throw new LoginRequiredException;
-            } elseif (!$request->has('password')) {
-                throw new PasswordRequiredException;
+            $validator = \Validator::make($request->all(), [
+                'name' => 'sometimes|required|max:255',
+                'email' => 'required|email|max:255|unique:users',
+                'password' => 'required|confirmed|min:' . \Config::get('auth.password.min-length'),
+            ]);
+
+            if ($validator->fails()) {
+                $this->throwValidationException($request, $validator);
             }
 
             $user = new User();
+            $request->has('name') && $user->name = $request->input("name");
             $user->email = $request->input("email");
             $user->password = \Hash::make($request->input("password"));
             $user->save();
 
             return response()->json(['message' => 'Created'])->setStatusCode(201); // HTTP/1.1 201 Created
+        } catch (HttpResponseException $e) {
+            return response()->json([
+                'exception' => get_class($e),
+                'message' => $e->getMessage()
+            ])->setStatusCode(422);
         } catch (\Exception $e) {
-            return response()->json(['message' => get_class($e)])->setStatusCode(500);
+            return response()->json([
+                'exception' => get_class($e),
+                'message' => $e->getMessage()
+            ])->setStatusCode(500);
         }
     }
 
@@ -70,11 +82,19 @@ class UsersController extends Controller
         try {
             if ($user = User::find($id)) {
                 return response()->json(['message' => 'Found', 'data' => $user->toJson()]);
-            } else {
-                return response()->json(['message' => 'Not Found'])->setStatusCode(404);
             }
+
+            throw new UserNotFoundException('Not found');
+        } catch (UserNotFoundException $e) {
+            return response()->json([
+                'exception' => get_class($e),
+                'message' => $e->getMessage()
+            ])->setStatusCode(404);
         } catch (\Exception $e) {
-            return response()->json(['message' => get_class($e)])->setStatusCode(500);
+            return response()->json([
+                'exception' => get_class($e),
+                'message' => $e->getMessage()
+            ])->setStatusCode(500);
         }
     }
 
@@ -90,11 +110,14 @@ class UsersController extends Controller
         try {
             if ($user = User::find($id)) {
                 return response()->json(['message' => 'Ready', 'data' => $user->toJson()]);
-            } else {
-                return response()->json(['message' => 'Not Found'])->setStatusCode(404);
             }
-        } catch (\Exception $e) {
-            return response()->json(['message' => get_class($e)])->setStatusCode(500);
+
+            throw new UserNotFoundException;
+        } catch (UserNotFoundException $e) {
+            return response()->json([
+                'exception' => get_class($e),
+                'message' => $e->getMessage()
+            ])->setStatusCode(404);
         }
     }
 
@@ -119,17 +142,42 @@ class UsersController extends Controller
                 throw new UserNotFoundException;
             }
 
-            if (!\Hash::check($request->input("currentPassword"), $user->password)) {
+            $validator = \Validator::make($request->all(), [
+                'name' => 'sometimes|required|max:255',
+                'email' => 'required|email|max:255|unique:users,email,' . $id,
+                'password' => 'required|confirmed|min:' . \Config::get('auth.password.min-length'),
+                'old_password' => 'required|min:' . \Config::get('auth.password.min-length'),
+            ]);
+
+            if ($validator->fails()) {
+                $this->throwValidationException($request, $validator);
+            }
+
+            if (!\Hash::check($request->input("old_password"), $user->password)) {
                 throw new PasswordNotValidException;
             }
 
+            $request->has('name') && $user->name = $request->input("name");
             $user->email = $request->input("email");
             $user->password = \Hash::make($request->input("password"));
             $user->save();
 
             return response()->json(['message' => 'Updated'])->setStatusCode(200);
+        } catch (UserNotFoundException $e) {
+            return response()->json([
+                'exception' => get_class($e),
+                'message' => $e->getMessage()
+            ])->setStatusCode(404);
+        } catch (HttpResponseException $e) {
+            return response()->json([
+                'exception' => get_class($e),
+                'message' => $e->getMessage()
+            ])->setStatusCode(422);
         } catch (\Exception $e) {
-            return response()->json(['message' => get_class($e)])->setStatusCode(500);
+            return response()->json([
+                'exception' => get_class($e),
+                'message' => $e->getMessage()
+            ])->setStatusCode(500);
         }
     }
 
@@ -159,7 +207,10 @@ class UsersController extends Controller
 
             return response()->json(['message' => 'Deleted'])->setStatusCode(200);
         } catch (\Exception $e) {
-            return response()->json(['message' => get_class($e)])->setStatusCode(500);
+            return response()->json([
+                'exception' => get_class($e),
+                'message' => $e->getMessage()
+            ])->setStatusCode(500);
         }
     }
 }
