@@ -1,10 +1,12 @@
 <?php
 
-use \Symfony\Component\HttpFoundation\ResponseHeaderBag;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class UsersControllerTest extends TestCase
 {
     public static $csrfToken = null;
+
+    public static $passwordResetToken = null;
 
     public function setUp()
     {
@@ -32,6 +34,19 @@ class UsersControllerTest extends TestCase
             case 'testDestroy with data set #1':
                 $handshakeRequestEndpointUrl = '/users/2';
                 break;
+            case 'testPostEmail with data set #0':
+            case 'testPostEmail with data set #1':
+                $handshakeRequestEndpointUrl = '/password/email';
+                break;
+            case 'testPostReset with data set #0':
+            case 'testPostReset with data set #1':
+            case 'testPostReset with data set #2':
+            case 'testPostReset with data set #3':
+            case 'testPostReset with data set #4':
+            case 'testPostReset with data set #5':
+            case 'testPostReset with data set #6':
+                $handshakeRequestEndpointUrl = '/password/reset/' . self::$passwordResetToken;
+                break;
             default:
                 return;
         }
@@ -51,11 +66,11 @@ class UsersControllerTest extends TestCase
     {
         return array(
             array(
-                array('email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'),
+                array('email' => 'shehi@imanov.me', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'),
                 ''
             ),
             array( // Validation fail: password_confirmation missing
-                array('email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver'),
+                array('email' => 'shehi@imanov.me', 'password' => 'theWeakestPasswordEver'),
                 'HttpResponseException'
             ),
             array( // Validation fail: email missing
@@ -99,12 +114,12 @@ class UsersControllerTest extends TestCase
     {
         return array(
             array(
-                array('id' => 1, 'email' => 'john.doe@example.com'),
+                array('id' => 1, 'email' => 'shehi@imanov.me'),
                 ''
             ),
             array(
-                array('id' => 2, 'email' => 'john.doe@example.com'),
-                'UserNotFoundException'
+                array('id' => 2, 'email' => 'shehi@imanov.me'),
+                'NotFoundHttpException'
             )
         );
     }
@@ -113,8 +128,8 @@ class UsersControllerTest extends TestCase
      * @dataProvider data_testShow
      * @depends      testStore
      *
-     * @param array   $user
-     * @param string  $exceptionExpected
+     * @param array  $user
+     * @param string $exceptionExpected
      */
     public function testShow(array $user, $exceptionExpected)
     {
@@ -129,10 +144,9 @@ class UsersControllerTest extends TestCase
             $this->assertContains($exceptionExpected, $responseAsObject->exception);
         } else {
             $this->assertResponseStatus(200);
-            $this->assertEquals('Found', $responseAsObject->message, 'Response message should be \'Found\'.');
             $this->assertObjectHasAttribute('data', $responseAsObject, 'Response object needs to have a \'data\' field.');
             $_responseObjectDataAttribute = json_decode($responseAsObject->data);
-            $this->assertEquals($user['email'], $_responseObjectDataAttribute->email, 'User email should be equal to \'john.doe@example.com\'.');
+            $this->assertEquals($user['email'], $_responseObjectDataAttribute->email, 'User email should be equal to \'shehi@imanov.me\'.');
         }
     }
 
@@ -142,7 +156,7 @@ class UsersControllerTest extends TestCase
             array(
                 array( // Wrong old_password
                     'id' => 1,
-                    'email' => 'john.doe@example.com',
+                    'email' => 'shehi@imanov.me',
                     'old_password' => 'someWrongPassword',
                     'password' => 's0m34ardPa55w0rd',
                     'password_confirmation' => 's0m34ardPa55w0rd'
@@ -152,7 +166,7 @@ class UsersControllerTest extends TestCase
             array(
                 array( // Validation fail: password_confirmation missing
                     'id' => 1,
-                    'email' => 'john.doe@example.com',
+                    'email' => 'shehi@imanov.me',
                     'old_password' => 'theWeakestPasswordEver',
                     'password' => 's0m34ardPa55w0rd'
                 ),
@@ -161,7 +175,7 @@ class UsersControllerTest extends TestCase
             array(
                 array( // Validation fail: old_password missing
                     'id' => 1,
-                    'email' => 'john.doe@example.com',
+                    'email' => 'shehi@imanov.me',
                     'password' => 's0m34ardPa55w0rd',
                     'password_confirmation' => 's0m34ardPa55w0rd'
                 ),
@@ -170,17 +184,17 @@ class UsersControllerTest extends TestCase
             array(
                 array( // Non-existing user
                     'id' => 2,
-                    'email' => 'john.doe@example.com',
+                    'email' => 'shehi@imanov.me',
                     'old_password' => 'theWeakestPasswordEver',
                     'password' => 's0m34ardPa55w0rd',
                     'password_confirmation' => 's0m34ardPa55w0rd'
                 ),
-                'UserNotFoundException'
+                'NotFoundHttpException'
             ),
             array(
                 array( // Correct data
                     'id' => 1,
-                    'email' => 'john.doe@example.com',
+                    'email' => 'shehi@imanov.me',
                     'old_password' => 'theWeakestPasswordEver',
                     'password' => 's0m34ardPa55w0rd',
                     'password_confirmation' => 's0m34ardPa55w0rd'
@@ -206,7 +220,7 @@ class UsersControllerTest extends TestCase
         $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
-                case 'UserNotFoundException':
+                case 'NotFoundHttpException':
                     $this->assertResponseStatus(404);
                     break;
                 case 'HttpResponseException':
@@ -224,19 +238,141 @@ class UsersControllerTest extends TestCase
         }
     }
 
+    public function data_testPostEmail()
+    {
+        return array(
+            array(
+                array( // Wrong email
+                    'email' => 'john.doe@example.com'
+                ),
+                'NotFoundHttpException'
+            ),
+            array(
+                array( // Correct data
+                    'email' => 'shehi@imanov.me'
+                ),
+                ''
+            )
+        );
+    }
+
+    /**
+     * @dataProvider data_testPostEmail
+     * @large
+     *
+     * @param array  $userData
+     * @param string $exceptionExpected
+     */
+    public function testPostEmail(array $userData, $exceptionExpected)
+    {
+        $response = $this->call('POST', '/password/email', $userData, array(), array(), !self::$csrfToken ? array() : array('HTTP_X_XSRF_TOKEN' => self::$csrfToken));
+        $responseRaw = $response->getContent();
+        $responseAsObject = json_decode($responseRaw);
+        $this->assertNotEmpty($responseRaw, 'Response needs to be not-empty.');
+        $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
+        if (!empty($exceptionExpected)) {
+            switch ($exceptionExpected) {
+                case 'NotFoundHttpException':
+                    $this->assertResponseStatus(404);
+                    break;
+                case 'HttpResponseException':
+                    $this->assertResponseStatus(422);
+                    break;
+                default:
+                    $this->assertResponseStatus(500);
+                    break;
+            }
+            $this->assertObjectHasAttribute('exception', $responseAsObject, 'Response object needs to have a \'exception\' field.');
+            $this->assertContains($exceptionExpected, $responseAsObject->exception);
+        } else {
+            $this->assertResponseStatus(200);
+            self::$passwordResetToken = $responseAsObject->token;
+        }
+    }
+
+    /**
+     * @depends testPostEmail
+     */
+    public function data_testPostReset()
+    {
+        return array(
+            array( // Validation fail: 'token' missing
+                array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0'),
+                'HttpResponseException'
+            ),
+            array( // Validation fail: Password confirmation mismatch
+                array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rd', 'token' => self::$passwordResetToken),
+                'HttpResponseException'
+            ),
+            array( // Validation fail: Password confirmation missing
+                array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'token' => self::$passwordResetToken),
+                'HttpResponseException'
+            ),
+            array( // Wrong email/account supplied
+                array('id' => 2, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0', 'token' => self::$passwordResetToken),
+                'NotFoundHttpException'
+            ),
+            array( // Wrong token supplied
+                array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0', 'token' => 'wrong-token'),
+                'TokenNotValidException'
+            ),
+            array( // Correct entry
+                array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0', 'token' => self::$passwordResetToken),
+                ''
+            )
+        );
+    }
+
+    /**
+     * @dataProvider data_testPostReset
+     *
+     * @param array  $userData
+     * @param string $exceptionExpected
+     */
+    public function testPostReset(array $userData, $exceptionExpected)
+    {
+        // Fixing data with valid tokens
+        if ($exceptionExpected != 'TokenNotValidException' and array_key_exists('token', $userData)) {
+            $userData['token'] = self::$passwordResetToken;
+        }
+
+        $response = $this->call('POST', '/password/reset', $userData, array(), array(), !self::$csrfToken ? array() : array('HTTP_X_XSRF_TOKEN' => self::$csrfToken));
+        $responseRaw = $response->getContent();
+        $responseAsObject = json_decode($responseRaw);
+        $this->assertNotEmpty($responseRaw, 'Response needs to be not-empty.');
+        $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
+        if (!empty($exceptionExpected)) {
+            switch ($exceptionExpected) {
+                case 'NotFoundHttpException':
+                    $this->assertResponseStatus(404);
+                    break;
+                case 'HttpResponseException':
+                    $this->assertResponseStatus(422);
+                    break;
+                default:
+                    $this->assertResponseStatus(500);
+                    break;
+            }
+            $this->assertObjectHasAttribute('exception', $responseAsObject, 'Response object needs to have a \'exception\' field.');
+            $this->assertContains($exceptionExpected, $responseAsObject->exception);
+        } else {
+            $this->assertResponseStatus(200);
+        }
+    }
+
     public function data_testDestroy()
     {
         return array(
             array(
-                array('id' => 1, 'email' => 'john.doe@example.com', 'password' => 'someWrongPassword'),
+                array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rd'),
                 'PasswordNotValidException'
             ),
             array(
-                array('id' => 2, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'),
-                'UserNotFoundException'
+                array('id' => 2, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rd'),
+                'NotFoundHttpException'
             ),
             array(
-                array('id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'),
+                array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0'),
                 ''
             )
         );

@@ -1,10 +1,10 @@
 <?php namespace App\Http\Controllers;
 
-use App\Exceptions\Users\UserNotFoundException;
 use App\Exceptions\Users\PasswordNotValidException;
 use Illuminate\Http\Exception\HttpResponseException;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UsersController extends Controller
 {
@@ -84,8 +84,8 @@ class UsersController extends Controller
                 return response()->json(['message' => 'Found', 'data' => $user->toJson()]);
             }
 
-            throw new UserNotFoundException('Not found');
-        } catch (UserNotFoundException $e) {
+            throw new NotFoundHttpException;
+        } catch (NotFoundHttpException $e) {
             return response()->json([
                 'exception' => get_class($e),
                 'message' => $e->getMessage()
@@ -112,8 +112,8 @@ class UsersController extends Controller
                 return response()->json(['message' => 'Ready', 'data' => $user->toJson()]);
             }
 
-            throw new UserNotFoundException;
-        } catch (UserNotFoundException $e) {
+            throw new NotFoundHttpException;
+        } catch (NotFoundHttpException $e) {
             return response()->json([
                 'exception' => get_class($e),
                 'message' => $e->getMessage()
@@ -129,7 +129,7 @@ class UsersController extends Controller
      *
      * @return \Response
      *
-     * @throws UserNotFoundException
+     * @throws NotFoundHttpException
      * @throws PasswordNotValidException
      */
     public function update(Request $request, $id)
@@ -139,7 +139,7 @@ class UsersController extends Controller
              * @var User $user
              */
             if (!($user = User::find($id))) {
-                throw new UserNotFoundException;
+                throw new NotFoundHttpException;
             }
 
             $validator = \Validator::make($request->all(), [
@@ -163,7 +163,7 @@ class UsersController extends Controller
             $user->save();
 
             return response()->json(['message' => 'Updated'])->setStatusCode(200);
-        } catch (UserNotFoundException $e) {
+        } catch (NotFoundHttpException $e) {
             return response()->json([
                 'exception' => get_class($e),
                 'message' => $e->getMessage()
@@ -196,7 +196,7 @@ class UsersController extends Controller
              * @var User $user
              */
             if (!($user = User::find($id))) {
-                throw new UserNotFoundException;
+                throw new NotFoundHttpException;
             }
 
             if (!\Hash::check($request->input("password"), $user->password)) {
