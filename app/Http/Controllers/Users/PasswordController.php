@@ -84,6 +84,8 @@ class PasswordController extends Controller
                     return response()->json(['message' => trans($attemptSendResetLink)])->setStatusCode(200);
                 case PasswordBroker::INVALID_USER:
                     throw new NotFoundHttpException;
+                default:
+                    throw new \Exception;
             }
         } catch (NotFoundHttpException $e) {
             return response()->json([
