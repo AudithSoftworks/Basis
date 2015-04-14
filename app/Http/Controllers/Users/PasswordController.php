@@ -1,9 +1,10 @@
 <?php namespace App\Http\Controllers\Users;
 
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Http\Request;
+use Illuminate\Mail\Message;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Exceptions\Users\TokenNotValidException;
 use App\Http\Controllers\Controller;
@@ -69,8 +70,8 @@ class PasswordController extends Controller
                 $this->throwValidationException($request, $validator);
             }
 
-            $attemptSendResetLink = $this->passwords->sendResetLink($request->only('email'), function ($m) {
-                $m->subject($this->getEmailSubject());
+            $attemptSendResetLink = $this->passwords->sendResetLink($request->only('email'), function (Message $message) {
+                $message->subject($this->getEmailSubject());
             });
 
             switch ($attemptSendResetLink) {
@@ -192,7 +193,7 @@ class PasswordController extends Controller
      *
      * @return string
      */
-    protected function getEmailSubject()
+    private function getEmailSubject()
     {
         return trans('passwords.reset_email_subject');
     }

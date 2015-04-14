@@ -47,6 +47,10 @@ class UsersControllerTest extends TestCase
             case 'testPostReset with data set #6':
                 $handshakeRequestEndpointUrl = '/password/reset/' . self::$passwordResetToken;
                 break;
+            case 'testLogin with data set #0':
+            case 'testLogin with data set #1':
+                $handshakeRequestEndpointUrl = '/auth/login';
+                break;
             default:
                 return;
         }
@@ -309,7 +313,13 @@ class UsersControllerTest extends TestCase
                 'HttpResponseException'
             ),
             array( // Wrong email/account supplied
-                array('id' => 2, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0', 'token' => self::$passwordResetToken),
+                array(
+                    'id' => 2,
+                    'email' => 'john.doe@example.com',
+                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
+                    'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
+                    'token' => self::$passwordResetToken
+                ),
                 'NotFoundHttpException'
             ),
             array( // Wrong token supplied
@@ -317,7 +327,13 @@ class UsersControllerTest extends TestCase
                 'TokenNotValidException'
             ),
             array( // Correct entry
-                array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0', 'token' => self::$passwordResetToken),
+                array(
+                    'id' => 1,
+                    'email' => 'shehi@imanov.me',
+                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
+                    'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
+                    'token' => self::$passwordResetToken
+                ),
                 ''
             )
         );
@@ -358,6 +374,65 @@ class UsersControllerTest extends TestCase
         } else {
             $this->assertResponseStatus(200);
         }
+    }
+
+    public function data_testLogin()
+    {
+        return array(
+            array(
+                array('email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rd'),
+                'LoginNotValidException'
+            ),
+            array(
+                array('email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0'),
+                ''
+            )
+        );
+    }
+
+    /**
+     * @dataProvider data_testLogin
+     *
+     * @param array  $user
+     * @param string $exceptionExpected
+     */
+    public function testLogin(array $user, $exceptionExpected)
+    {
+        $response = $this->call('POST', '/auth/login', $user, array(), array(), !self::$csrfToken ? array() : array('HTTP_X_XSRF_TOKEN' => self::$csrfToken));
+        $responseRaw = $response->getContent();
+        $responseAsObject = json_decode($responseRaw);
+        if (!empty($exceptionExpected)) {
+            $this->assertResponseStatus(422);
+            $this->assertNotEmpty($responseRaw, 'Response needs to be not-empty.');
+            $this->assertObjectHasAttribute('exception', $responseAsObject, 'Response object needs to have a \'exception\' field.');
+            $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
+            $this->assertContains($exceptionExpected, $responseAsObject->exception);
+            $this->assertFalse(Auth::check());
+        } else {
+            $this->assertResponseStatus(200);
+            $this->assertEmpty($responseRaw, 'Response needs to be empty.');
+            $this->assertNull($responseAsObject);
+            $this->assertTrue(Auth::check());
+        }
+    }
+
+    /**
+     * @depends testLogin
+     */
+    public function testLogout()
+    {
+        Auth::loginUsingId(1);
+        $this->assertTrue(Auth::check());
+
+        $response = $this->call('GET', '/auth/logout');
+        $responseRaw = $response->getContent();
+        $responseAsObject = json_decode($responseRaw);
+
+        $this->assertResponseStatus(200);
+        $this->assertEmpty($responseRaw, 'Response needs to be empty.');
+        $this->assertNull($responseAsObject);
+
+        $this->assertFalse(Auth::check());
     }
 
     public function data_testDestroy()
