@@ -63,10 +63,6 @@ class Handler extends ExceptionHandler
     {
         if ($request->ajax() or $request->wantsJson()) {
             $exceptionClass = get_class($e);
-            $response = response()->json([
-                'exception' => $exceptionClass,
-                'message' => $e->getMessage()
-            ]);
 
             //---------------------------------------------------------------------------------------
             // Since we have custom ValidationException class, only validation-related exceptions
@@ -78,11 +74,12 @@ class Handler extends ExceptionHandler
                 case 'App\Exceptions\Users\LoginNotValidException':
                 case 'App\Exceptions\Users\PasswordNotValidException':
                 case 'Illuminate\Http\Exception\HttpResponseException':
-                    $response = $response->setStatusCode(422);
-                    break;
+                    return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(422);
+                case 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException':
+                    //return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(404);
+                default:
+                    return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode());
             }
-
-            return $response;
         }
 
         return parent::render($request, $e);

@@ -147,7 +147,7 @@ class UsersControllerTest extends TestCase
         $this->assertNotEmpty($responseRaw, 'Response needs to be not-empty.');
         $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
         if (!empty($exceptionExpected)) {
-            $this->assertResponseStatus(200); // TODO Should be 404
+            $this->assertResponseStatus(404);
             $this->assertObjectHasAttribute('exception', $responseAsObject, 'Response object needs to have a \'exception\' field.');
             $this->assertContains($exceptionExpected, $responseAsObject->exception);
         } else {
@@ -229,7 +229,7 @@ class UsersControllerTest extends TestCase
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
                 case 'NotFoundHttpException':
-                    $this->assertResponseStatus(200); // TODO Should be 404
+                    $this->assertResponseStatus(404);
                     break;
                 case 'PasswordNotValidException':
                 case 'ValidationException':
@@ -481,7 +481,7 @@ class UsersControllerTest extends TestCase
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
                 case 'NotFoundHttpException':
-                    $this->assertResponseStatus(200);  // TODO Should be 404
+                    $this->assertResponseStatus(404);
                     break;
                 case 'PasswordNotValidException':
                     $this->assertResponseStatus(422);
