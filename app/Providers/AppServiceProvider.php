@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('Illuminate\Contracts\Auth\Registrar', 'App\Services\Registrar');
+        $this->app->bind('Audith\Contracts\Registrar', 'App\Services\Registrar');
 
         $this->app->singleton('Audith\Contracts\File', function ($app) {
             return new File($app['config']['file']);
@@ -46,7 +46,7 @@ class AppServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'Illuminate\Contracts\Auth\Registrar',
+            'Audith\Contracts\Registrar',
             'Audith\Contracts\File'
         ];
     }

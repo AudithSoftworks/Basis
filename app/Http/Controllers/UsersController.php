@@ -1,17 +1,53 @@
 <?php namespace App\Http\Controllers;
 
 use App\Exceptions\Users\PasswordNotValidException;
-use Illuminate\Http\Exception\HttpResponseException;
 use App\Models\User;
+use Audith\Contracts\Registrar;
+use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UsersController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * The Guard implementation.
      *
-     * @return \Response
+     * @var Guard
+     */
+    protected $auth;
+
+    /**
+     * The registrar implementation.
+     *
+     * @var Registrar
+     */
+    protected $registrar;
+
+    /**
+     * Request instance.
+     *
+     * @var Request
+     */
+    protected $request;
+
+    /**
+     * Create a new authentication controller instance.
+     *
+     * @param  Guard     $auth
+     * @param  Registrar $registrar
+     * @param  Request   $request
+     */
+    public function __construct(Guard $auth, Registrar $registrar, Request $request)
+    {
+        $this->auth = $auth;
+        $this->registrar = $registrar;
+        $this->request = $request;
+
+        $this->middleware('guest', ['except' => ['edit', 'update', 'destroy']]);
+    }
+
+    /**
+     * Display a listing of the resource.
      *
      * @throws \BadMethodCallException
      */
@@ -23,51 +59,33 @@ class UsersController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Response
+     * @return array
      */
     public function create()
     {
-        return response()->json(['message' => 'Ready']);
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return ['message' => 'Ready'];
+        }
+
+        return view('auth.register');
     }
 
     /**
      * Store a newly created resource in storage.
      *
-     * @param Request $request
-     *
-     * @return \Response
+     * @return array
      */
-    public function store(Request $request)
+    public function store()
     {
-        try {
-            $validator = \Validator::make($request->all(), [
-                'name' => 'sometimes|required|max:255',
-                'email' => 'required|email|max:255|unique:users',
-                'password' => 'required|confirmed|min:' . \Config::get('auth.password.min-length'),
-            ]);
+        $user = $this->registrar->register();
 
-            if ($validator->fails()) {
-                $this->throwValidationException($request, $validator);
-            }
-
-            $user = new User();
-            $request->has('name') && $user->name = $request->input("name");
-            $user->email = $request->input("email");
-            $user->password = \Hash::make($request->input("password"));
-            $user->save();
-
-            return response()->json(['message' => 'Created'])->setStatusCode(201); // HTTP/1.1 201 Created
-        } catch (HttpResponseException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(500);
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return ['message' => 'Created'];
         }
+
+        $this->auth->login($user);
+
+        return redirect($this->redirectPath());
     }
 
     /**
@@ -75,27 +93,20 @@ class UsersController extends Controller
      *
      * @param  int $id
      *
-     * @return \Response
+     * @return array
      */
     public function show($id)
     {
-        try {
-            if ($user = User::find($id)) {
-                return response()->json(['message' => 'Found', 'data' => $user->toJson()]);
-            }
-
-            throw new NotFoundHttpException;
-        } catch (NotFoundHttpException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(404);
-        } catch (\Exception $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(500);
+        /**
+         * @var User $user
+         */
+        $user = $this->registrar->get($id);
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return ['message' => 'Found', 'data' => $user->toJson()];
         }
+
+        // TODO Create appropriate Views for non-JSON requests
+        return;
     }
 
     /**
@@ -107,24 +118,18 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
-        try {
-            if ($user = User::find($id)) {
-                return response()->json(['message' => 'Ready', 'data' => $user->toJson()]);
-            }
-
-            throw new NotFoundHttpException;
-        } catch (NotFoundHttpException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(404);
+        $user = $this->registrar->get($id);
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return ['message' => 'Ready', 'data' => $user->toJson()];
         }
+
+        // TODO Create appropriate Views for non-JSON requests
+        return;
     }
 
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
      * @param int     $id
      *
      * @return \Response
@@ -132,85 +137,46 @@ class UsersController extends Controller
      * @throws NotFoundHttpException
      * @throws PasswordNotValidException
      */
-    public function update(Request $request, $id)
+    public function update($id)
     {
-        try {
-            /**
-             * @var User $user
-             */
-            if (!($user = User::find($id))) {
-                throw new NotFoundHttpException;
-            }
-
-            $validator = \Validator::make($request->all(), [
-                'name' => 'sometimes|required|max:255',
-                'email' => 'required|email|max:255|unique:users,email,' . $id,
-                'password' => 'required|confirmed|min:' . \Config::get('auth.password.min-length'),
-                'old_password' => 'required|min:' . \Config::get('auth.password.min-length'),
-            ]);
-
-            if ($validator->fails()) {
-                $this->throwValidationException($request, $validator);
-            }
-
-            if (!\Hash::check($request->input("old_password"), $user->password)) {
-                throw new PasswordNotValidException;
-            }
-
-            $request->has('name') && $user->name = $request->input("name");
-            $user->email = $request->input("email");
-            $user->password = \Hash::make($request->input("password"));
-            $user->save();
-
-            return response()->json(['message' => 'Updated'])->setStatusCode(200);
-        } catch (NotFoundHttpException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(404);
-        } catch (HttpResponseException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(500);
+        $this->registrar->update($id);
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return ['message' => 'Updated'];
         }
+
+        // TODO Create appropriate Views for non-JSON requests
+        return;
     }
 
     /**
      * Remove the specified resource from storage.
      *
-     * @param Request $request
-     * @param int     $id
+     * @param int $id
      *
-     * @return \Response
+     * @return array
      */
-    public function destroy(Request $request, $id)
+    public function destroy($id)
     {
-        try {
-            /**
-             * @var User $user
-             */
-            if (!($user = User::find($id))) {
-                throw new NotFoundHttpException;
-            }
+        $this->registrar->delete($id);
 
-            if (!\Hash::check($request->input("password"), $user->password)) {
-                throw new PasswordNotValidException;
-            }
-
-            $user->destroy($id);
-
-            return response()->json(['message' => 'Deleted'])->setStatusCode(200);
-        } catch (\Exception $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(500);
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return ['message' => 'Deleted'];
         }
+
+        return redirect($this->redirectPath()); // TODO Redirection path might need a fix.
+    }
+
+    /**
+     * Get the post register / login redirect path.
+     *
+     * @return string
+     */
+    private function redirectPath()
+    {
+        if (property_exists($this, 'redirectPath')) {
+            return $this->redirectPath;
+        }
+
+        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
     }
 }

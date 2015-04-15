@@ -61,6 +61,30 @@ class Handler extends ExceptionHandler
      */
     public function render($request, \Exception $e)
     {
+        if ($request->ajax() or $request->wantsJson()) {
+            $exceptionClass = get_class($e);
+            $response = response()->json([
+                'exception' => $exceptionClass,
+                'message' => $e->getMessage()
+            ]);
+
+            //---------------------------------------------------------------------------------------
+            // Since we have custom ValidationException class, only validation-related exceptions
+            // should be listed here. Laravel handles exceptions correctly, status-code wise.
+            //---------------------------------------------------------------------------------------
+
+            switch ($exceptionClass) {
+                case 'App\Exceptions\Common\ValidationException':
+                case 'App\Exceptions\Users\LoginNotValidException':
+                case 'App\Exceptions\Users\PasswordNotValidException':
+                case 'Illuminate\Http\Exception\HttpResponseException':
+                    $response = $response->setStatusCode(422);
+                    break;
+            }
+
+            return $response;
+        }
+
         return parent::render($request, $e);
     }
 }

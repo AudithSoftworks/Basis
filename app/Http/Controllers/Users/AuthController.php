@@ -1,9 +1,8 @@
 <?php namespace App\Http\Controllers\Users;
 
-use App\Exceptions\Users\LoginNotValidException;
 use App\Http\Controllers\Controller;
+use Audith\Contracts\Registrar;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\Registrar;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
@@ -24,15 +23,24 @@ class AuthController extends Controller
     protected $registrar;
 
     /**
+     * Request instance.
+     *
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * Create a new authentication controller instance.
      *
      * @param  Guard     $auth
      * @param  Registrar $registrar
+     * @param  Request   $request
      */
-    public function __construct(Guard $auth, Registrar $registrar)
+    public function __construct(Guard $auth, Registrar $registrar, Request $request)
     {
         $this->auth = $auth;
         $this->registrar = $registrar;
+        $this->request = $request;
 
         $this->middleware('guest', ['except' => 'getLogout']);
     }
@@ -44,56 +52,33 @@ class AuthController extends Controller
      */
     public function getLogin()
     {
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return ['message' => 'Ready'];
+        }
+
         return view('auth.login');
     }
 
     /**
      * Handle a login request to the application.
      *
-     * @param  Request $request
-     *
      * @return Response
      */
-    public function postLogin(Request $request)
+    public function postLogin()
     {
-        try {
-            $validator = \Validator::make($request->all(), [
-                'email' => 'required|email',
-                'password' => 'required',
-            ]);
-
-            if ($validator->fails()) {
-                $this->throwValidationException($request, $validator);
+        if ($this->registrar->login()) {
+            if ($this->request->ajax() or $this->request->wantsJson()) {
+                return ['message' => 'Login successful'];
             }
 
-            $credentials = $request->only('email', 'password');
-
-            if ($this->auth->attempt($credentials, $request->has('remember'))) {
-                return response('', 200);
-
-                //return redirect()->intended($this->redirectPath());
-            }
-
-            throw new LoginNotValidException;
-
-            /*
-            return redirect($this->loginPath())
-                ->withInput($request->only('email', 'remember'))
-                ->withErrors([
-                    'email' => $this->getFailedLoginMessage(),
-                ]);
-            */
-        } catch (LoginNotValidException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(500);
+            return redirect()->intended($this->redirectPath());
         }
+
+        return redirect($this->loginPath())
+            ->withInput($this->request->only('email', 'remember'))
+            ->withErrors([
+                'email' => $this->getFailedLoginMessage(),
+            ]);
     }
 
     /**
@@ -103,11 +88,13 @@ class AuthController extends Controller
      */
     public function getLogout()
     {
-        $this->auth->logout();
+        $this->registrar->logout();
 
-        return response('', 200);
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return ['message' => 'Logout successful'];
+        }
 
-        //return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
     }
 
     /**
