@@ -1,10 +1,19 @@
 <?php
 
-Route::resource('files', 'FilesController');
-Route::get('/php-info', 'HomeController@phpInfo');
-Route::controller('/', 'HomeController');
+Route::get('/php-info', function () {
+    ob_start();
+    phpinfo();
+
+    return ob_get_clean();
+});
+
+Route::resources([
+    'files' => 'FilesController',
+    'users' => 'UsersController'
+]);
 
 Route::controllers([
-    'auth' => 'Auth\AuthController',
-    'password' => 'Auth\PasswordController',
+    'auth' => 'Users\AuthController',
+    'password' => 'Users\PasswordController',
+    '' => 'HomeController'
 ]);

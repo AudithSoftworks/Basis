@@ -1,7 +1,7 @@
 <?php namespace App\Services;
 
-use Audith\Contracts\File as FileContract,
-    App\Exceptions\File as FileExceptions;
+use Audith\Contracts\File as FileContract;
+use App\Exceptions\File as FileExceptions;
 
 class File implements FileContract
 {

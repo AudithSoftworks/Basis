@@ -1,7 +1,7 @@
 <?php
 
-use \Illuminate\Database\Schema\Blueprint;
-use \Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Migrations\Migration;
 
 class CreateNestedEntities extends Migration
 {
@@ -12,7 +12,7 @@ class CreateNestedEntities extends Migration
      */
     public function up()
     {
-        Schema::create('nested_entities', function (Blueprint $table) {
+        \Schema::create('nested_entities', function (Blueprint $table) {
             $table->engine = 'InnoDb';
 
             $table->mediumInteger('id', true, true);
@@ -34,6 +34,6 @@ class CreateNestedEntities extends Migration
      */
     public function down()
     {
-        Schema::drop('nested_entities');
+        \Schema::drop('nested_entities');
     }
 }

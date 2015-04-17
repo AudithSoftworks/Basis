@@ -1,7 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use \Audith\Contracts\File,
-    \Response;
+use Audith\Contracts\File;
 
 class FilesController extends Controller
 {
@@ -29,14 +28,14 @@ class FilesController extends Controller
         $key = ini_get("session.upload_progress.prefix") . "myForm";
         $session = $_SESSION;
         $session2 = \Session::all();
-        echo Response::json($_SESSION);
+        echo \Response::json($_SESSION);
         return ob_get_clean();
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return \Response
      */
     public function create()
     {
@@ -50,7 +49,7 @@ class FilesController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
+     * @return \Response
      */
     public function store()
     {
@@ -73,7 +72,7 @@ class FilesController extends Controller
      *
      * @param  int $id
      *
-     * @return Response
+     * @return \Response
      */
     public function show($id)
     {
@@ -88,7 +87,7 @@ class FilesController extends Controller
      *
      * @param  int $id
      *
-     * @return Response
+     * @return \Response
      */
     public function edit($id)
     {
@@ -101,7 +100,7 @@ class FilesController extends Controller
      *
      * @param  int $id
      *
-     * @return Response
+     * @return \Response
      */
     public function update($id)
     {
@@ -117,7 +116,7 @@ class FilesController extends Controller
      *
      * @param integer[]|string[] $ids Collection of numeric ids or Md5-hashes of the files to be deleted.
      *
-     * @return Response
+     * @return \Response
      */
     public function destroy(array $ids)
     {
