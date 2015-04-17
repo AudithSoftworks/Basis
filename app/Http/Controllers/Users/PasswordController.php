@@ -56,7 +56,7 @@ class PasswordController extends Controller
      */
     public function getEmail()
     {
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return [];
         }
 
@@ -71,7 +71,7 @@ class PasswordController extends Controller
     public function postEmail()
     {
         if ($this->registrar->sendResetPasswordLinkViaEmail()) {
-            if ($this->request->ajax() or $this->request->wantsJson()) {
+            if ($this->request->ajax() || $this->request->wantsJson()) {
                 $return = ['message' => 'Password reset link sent'];
                 if (\App::environment() == 'testing') {
                     $return = array_merge($return, ['token' => \DB::table('password_resets')->where('email', '=', 'shehi@imanov.me')->pluck('token')]);
@@ -101,7 +101,7 @@ class PasswordController extends Controller
             throw new NotFoundHttpException;
         }
 
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['token' => $token];
         }
 
@@ -118,7 +118,7 @@ class PasswordController extends Controller
         try {
             $this->registrar->resetPassword();
 
-            if ($this->request->ajax() or $this->request->wantsJson()) {
+            if ($this->request->ajax() || $this->request->wantsJson()) {
                 return ['message' => 'Password successfully reset'];
             }
 
@@ -129,7 +129,7 @@ class PasswordController extends Controller
             $response = PasswordBroker::INVALID_TOKEN;
         }
 
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             throw $e;
         }
 

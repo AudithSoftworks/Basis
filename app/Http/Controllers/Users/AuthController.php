@@ -52,7 +52,7 @@ class AuthController extends Controller
      */
     public function getLogin()
     {
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Ready'];
         }
 
@@ -67,7 +67,7 @@ class AuthController extends Controller
     public function postLogin()
     {
         if ($this->registrar->login()) {
-            if ($this->request->ajax() or $this->request->wantsJson()) {
+            if ($this->request->ajax() || $this->request->wantsJson()) {
                 return ['message' => 'Login successful'];
             }
 
@@ -90,7 +90,7 @@ class AuthController extends Controller
     {
         $this->registrar->logout();
 
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Logout successful'];
         }
 

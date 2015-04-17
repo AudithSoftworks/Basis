@@ -1,6 +1,7 @@
 <?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Query\JoinClause;
 
 class NestedEntity extends \Eloquent
 {
@@ -229,21 +230,21 @@ class NestedEntity extends \Eloquent
     public function fetch($flag = self::SELECT_ALL_WITH_MINIMUM_INFO, $id = null)
     {
         # Error scenarios
-        if ($flag & self::SELECT_ALL_WITH_MINIMUM_INFO and ($flag & self::SELECT_WITH_DEPTH_INFO or $flag & self::SELECT_SINGLE_PATH_ONLY)) {
+        if ($flag & self::SELECT_ALL_WITH_MINIMUM_INFO && ($flag & self::SELECT_WITH_DEPTH_INFO || $flag & self::SELECT_SINGLE_PATH_ONLY)) {
             throw new \InvalidArgumentException("SELECT_ALL_WITH_MINIMUM_INFO bit isn't compatible with other bits. Use it alone!");
-        } elseif ($flag & self::SELECT_SINGLE_PATH_ONLY and empty($id)) {
+        } elseif ($flag & self::SELECT_SINGLE_PATH_ONLY && empty($id)) {
             throw new \InvalidArgumentException("SELECT_SINGLE_PATH_ONLY requires leaf category ID!");
-        } elseif ($flag & self::SELECT_SINGLE_PATH_ONLY and $flag & self::SELECT_WITH_DEPTH_INFO) {
+        } elseif ($flag & self::SELECT_SINGLE_PATH_ONLY && $flag & self::SELECT_WITH_DEPTH_INFO) {
             throw new \InvalidArgumentException("SELECT_SINGLE_PATH_ONLY bit isn't compatible with SELECT_WITH_DEPTH_INFO - their results are mutually restrictive from opposing ends!");
         }
 
         # Prelim
-        empty($id) and $id = 1;
+        empty($id) && $id = 1;
         $nestedEntities = \DB::table($this->table . ' as node')
             ->select('node.id', 'node.name')
             ->leftJoin(
                 $this->table . ' as parent',
-                function (\Illuminate\Database\Query\JoinClause $join) {
+                function (JoinClause $join) {
                     $join->on('node.left_range', '<=', 'parent.right_range')
                         ->on('node.left_range', '>=', 'parent.left_range');
                 });
@@ -252,14 +253,14 @@ class NestedEntity extends \Eloquent
         $flag == self::SELECT_SINGLE_PATH_ONLY && $nestedEntities->select('parent.id', 'parent.name')->where('node.id', '=', $id)->orderBy('parent.left_range');
 
         # Scenario-2: Select'ing *descendents* of provided parent-entity, with the bare minumum
-        $flag == self::SELECT_ALL_WITH_MINIMUM_INFO and $nestedEntities->where('parent.id', '=', $id)->orderBy('node.left_range');
+        $flag == self::SELECT_ALL_WITH_MINIMUM_INFO && $nestedEntities->where('parent.id', '=', $id)->orderBy('node.left_range');
 
         # Scenario-3: Select'ing *everything* with depth information
-        $flag == self::SELECT_WITH_DEPTH_INFO and $nestedEntities->addSelect('node.name', \DB::raw('(COUNT(parent.name)-1) as depth'))->groupBy('node.id')->orderBy('node.left_range');
+        $flag == self::SELECT_WITH_DEPTH_INFO && $nestedEntities->addSelect('node.name', \DB::raw('(COUNT(parent.name)-1) as depth'))->groupBy('node.id')->orderBy('node.left_range');
 
         # Scenario-4: Fetches leaves only
-        $flag == self::SELECT_LEAVES_ONLY and $nestedEntities = \DB::table($this->table)->select('id', 'name')->where('right_range', '=', \DB::raw('left_range + 1'))->orderBy('left_range');
-        if ($flag == self::SELECT_LEAVES_ONLY and $id !== 1) {
+        $flag == self::SELECT_LEAVES_ONLY && $nestedEntities = \DB::table($this->table)->select('id', 'name')->where('right_range', '=', \DB::raw('left_range + 1'))->orderBy('left_range');
+        if ($flag == self::SELECT_LEAVES_ONLY && $id !== 1) {
             $parentEntity = \DB::table($this->table)->select('left_range', 'right_range')->where('id', $id)->first();
             $nestedEntities->whereBetween('left_range', array($parentEntity->left_range, $parentEntity->right_range));
         }

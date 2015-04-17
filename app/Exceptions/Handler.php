@@ -61,7 +61,7 @@ class Handler extends ExceptionHandler
      */
     public function render($request, \Exception $e)
     {
-        if ($request->ajax() or $request->wantsJson()) {
+        if ($request->ajax() || $request->wantsJson()) {
             $exceptionClass = get_class($e);
 
             //---------------------------------------------------------------------------------------

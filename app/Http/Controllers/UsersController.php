@@ -63,7 +63,7 @@ class UsersController extends Controller
      */
     public function create()
     {
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Ready'];
         }
 
@@ -79,7 +79,7 @@ class UsersController extends Controller
     {
         $user = $this->registrar->register();
 
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Created'];
         }
 
@@ -101,7 +101,7 @@ class UsersController extends Controller
          * @var User $user
          */
         $user = $this->registrar->get($id);
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Found', 'data' => $user->toJson()];
         }
 
@@ -119,7 +119,7 @@ class UsersController extends Controller
     public function edit($id)
     {
         $user = $this->registrar->get($id);
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Ready', 'data' => $user->toJson()];
         }
 
@@ -140,7 +140,7 @@ class UsersController extends Controller
     public function update($id)
     {
         $this->registrar->update($id);
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Updated'];
         }
 
@@ -159,7 +159,7 @@ class UsersController extends Controller
     {
         $this->registrar->delete($id);
 
-        if ($this->request->ajax() or $this->request->wantsJson()) {
+        if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Deleted'];
         }
 
