@@ -3,11 +3,14 @@
 use App\Exceptions\Common\ValidationException;
 use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
+use App\Exceptions\Users\TokenNotValidException;
 use App\Models\User;
 use Audith\Contracts\Registrar as RegistrarContract;
 use Illuminate\Auth\Guard;
+use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Mail\Message;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Registrar implements RegistrarContract
@@ -28,10 +31,18 @@ class Registrar implements RegistrarContract
      */
     protected $auth;
 
-    public function __construct(Request $request, Guard $auth)
+    /**
+     * The password broker implementation.
+     *
+     * @var PasswordBroker
+     */
+    protected $passwords;
+
+    public function __construct(Request $request, Guard $auth, PasswordBroker $password)
     {
         $this->request = $request;
         $this->auth = $auth;
+        $this->passwords = $password;
     }
 
     /**
@@ -130,6 +141,7 @@ class Registrar implements RegistrarContract
         $this->request->has('name') && $user->name = $this->request->input("name");
         $user->email = $this->request->input("email");
         $user->password = \Hash::make($this->request->input("password"));
+
         return $user->save();
     }
 
@@ -166,5 +178,87 @@ class Registrar implements RegistrarContract
         $this->auth->logout();
 
         return true;
+    }
+
+    /**
+     * @return boolean
+     *
+     * @throws NotFoundHttpException
+     * @throws \UnexpectedValueException
+     */
+    public function sendResetPasswordLinkViaEmail()
+    {
+        $validator = \Validator::make($this->request->all(), [
+            'email' => 'required|email|max:255'
+        ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        $attemptSendResetLink = $this->passwords->sendResetLink($this->request->only('email'), function (Message $message) {
+            $message->subject($this->getPasswordResetEmailSubject());
+        });
+
+        switch ($attemptSendResetLink) {
+            case PasswordBroker::RESET_LINK_SENT:
+                return true;
+            case PasswordBroker::INVALID_USER:
+                throw new NotFoundHttpException;
+            default:
+                throw new \UnexpectedValueException;
+        }
+    }
+
+    /**
+     * @return boolean
+     *
+     * @throws ValidationException
+     * @throws NotFoundHttpException
+     * @throws TokenNotValidException
+     * @throws \UnexpectedValueException
+     */
+    public function resetPassword()
+    {
+        $validator = \Validator::make($this->request->all(), [
+            'token' => 'required',
+            'email' => 'required|email|max:255',
+            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min-length')
+        ]);
+
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        $credentials = $this->request->only('email', 'password', 'password_confirmation', 'token');
+
+        $attemptReset = $this->passwords->reset($credentials, function ($user, $password) {
+            /**
+             * @var \App\Models\User $user
+             */
+            $user->password = \Hash::make($password);
+            $user->save();
+        });
+
+        switch ($attemptReset) {
+            case PasswordBroker::PASSWORD_RESET:
+                return true;
+            case PasswordBroker::INVALID_USER:
+                throw new NotFoundHttpException;
+            case PasswordBroker::INVALID_TOKEN:
+                throw new TokenNotValidException;
+            default:
+                throw new \UnexpectedValueException(trans($attemptReset));
+        }
+    }
+
+    /**
+     * Get the e-mail subject line to be used for the reset link email.
+     *
+     * @return string
+     */
+    private function getPasswordResetEmailSubject()
+    {
+        return trans('passwords.reset_email_subject');
     }
 }

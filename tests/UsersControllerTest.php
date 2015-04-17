@@ -36,6 +36,7 @@ class UsersControllerTest extends TestCase
                 break;
             case 'testPostEmail with data set #0':
             case 'testPostEmail with data set #1':
+            case 'testPostEmail with data set #2':
                 $handshakeRequestEndpointUrl = '/password/email';
                 break;
             case 'testPostReset with data set #0':
@@ -251,6 +252,12 @@ class UsersControllerTest extends TestCase
     {
         return array(
             array(
+                array( // Invalid email
+                    'email' => 'john.doe@'
+                ),
+                'ValidationException'
+            ),
+            array(
                 array( // Wrong email
                     'email' => 'john.doe@example.com'
                 ),
@@ -284,7 +291,7 @@ class UsersControllerTest extends TestCase
                 case 'NotFoundHttpException':
                     $this->assertResponseStatus(404);
                     break;
-                case 'HttpResponseException':
+                case 'ValidationException':
                     $this->assertResponseStatus(422);
                     break;
                 default:
@@ -295,7 +302,7 @@ class UsersControllerTest extends TestCase
             $this->assertContains($exceptionExpected, $responseAsObject->exception);
         } else {
             $this->assertResponseStatus(200);
-            self::$passwordResetToken = $responseAsObject->token;
+            $this->assertNotEmpty(self::$passwordResetToken = $responseAsObject->token, 'Response must include non-empty password reset token.');
         }
     }
 
@@ -307,15 +314,15 @@ class UsersControllerTest extends TestCase
         return array(
             array( // Validation fail: 'token' missing
                 array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0'),
-                'HttpResponseException'
+                'ValidationException'
             ),
             array( // Validation fail: Password confirmation mismatch
                 array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rd', 'token' => self::$passwordResetToken),
-                'HttpResponseException'
+                'ValidationException'
             ),
             array( // Validation fail: Password confirmation missing
                 array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'token' => self::$passwordResetToken),
-                'HttpResponseException'
+                'ValidationException'
             ),
             array( // Wrong email/account supplied
                 array(
@@ -328,7 +335,12 @@ class UsersControllerTest extends TestCase
                 'NotFoundHttpException'
             ),
             array( // Wrong token supplied
-                array('id' => 1, 'email' => 'shehi@imanov.me', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0', 'token' => 'wrong-token'),
+                array(
+                    'id' => 1,
+                    'email' => 'shehi@imanov.me',
+                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
+                    'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
+                    'token' => 'wrong-token'),
                 'TokenNotValidException'
             ),
             array( // Correct entry
@@ -367,7 +379,8 @@ class UsersControllerTest extends TestCase
                 case 'NotFoundHttpException':
                     $this->assertResponseStatus(404);
                     break;
-                case 'HttpResponseException':
+                case 'ValidationException':
+                case 'TokenNotValidException':
                     $this->assertResponseStatus(422);
                     break;
                 default:

@@ -73,10 +73,9 @@ class Handler extends ExceptionHandler
                 case 'App\Exceptions\Common\ValidationException':
                 case 'App\Exceptions\Users\LoginNotValidException':
                 case 'App\Exceptions\Users\PasswordNotValidException':
+                case 'App\Exceptions\Users\TokenNotValidException':
                 case 'Illuminate\Http\Exception\HttpResponseException':
                     return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(422);
-                case 'Symfony\Component\HttpKernel\Exception\NotFoundHttpException':
-                    //return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(404);
                 default:
                     return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode());
             }

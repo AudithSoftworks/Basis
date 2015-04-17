@@ -1,13 +1,12 @@
 <?php namespace App\Http\Controllers\Users;
 
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Contracts\Auth\PasswordBroker;
-use Illuminate\Http\Exception\HttpResponseException;
-use Illuminate\Http\Request;
-use Illuminate\Mail\Message;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use App\Exceptions\Users\TokenNotValidException;
 use App\Http\Controllers\Controller;
+use Audith\Contracts\Registrar;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PasswordController extends Controller
 {
@@ -26,14 +25,25 @@ class PasswordController extends Controller
     protected $passwords;
 
     /**
+     * Request instance.
+     *
+     * @var Request
+     */
+    protected $request;
+
+    /**
      * Create a new password controller instance.
      *
      * @param  \Illuminate\Contracts\Auth\Guard          $auth
+     * @param  Registrar                                 $registrar
+     * @param  Request                                   $request
      * @param  \Illuminate\Contracts\Auth\PasswordBroker $passwords
      */
-    public function __construct(Guard $auth, PasswordBroker $passwords)
+    public function __construct(Guard $auth, Registrar $registrar, Request $request, PasswordBroker $passwords)
     {
         $this->auth = $auth;
+        $this->registrar = $registrar;
+        $this->request = $request;
         $this->passwords = $passwords;
 
         $this->middleware('guest');
@@ -46,64 +56,34 @@ class PasswordController extends Controller
      */
     public function getEmail()
     {
-        return response('', 200);
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return [];
+        }
 
-        // @todo
-        // return view('auth.password');
+        return view('auth.password');
     }
 
     /**
      * Send a reset link to the given user.
      *
-     * @param  Request $request
-     *
      * @return \Response
      */
-    public function postEmail(Request $request)
+    public function postEmail()
     {
-        try {
-            $validator = \Validator::make($request->all(), [
-                'email' => 'required|email|max:255'
-            ]);
+        if ($this->registrar->sendResetPasswordLinkViaEmail()) {
+            if ($this->request->ajax() or $this->request->wantsJson()) {
+                $return = ['message' => 'Password reset link sent'];
+                if (\App::environment() == 'testing') {
+                    $return = array_merge($return, ['token' => \DB::table('password_resets')->where('email', '=', 'shehi@imanov.me')->pluck('token')]);
+                }
 
-            if ($validator->fails()) {
-                $this->throwValidationException($request, $validator);
+                return $return;
             }
 
-            $attemptSendResetLink = $this->passwords->sendResetLink($request->only('email'), function (Message $message) {
-                $message->subject($this->getEmailSubject());
-            });
-
-            switch ($attemptSendResetLink) {
-                case PasswordBroker::RESET_LINK_SENT:
-                    if (\App::environment() == 'testing') {
-                        $token = \DB::table('password_resets')->where('email', '=', 'shehi@imanov.me')->pluck('token');
-
-                        return response()->json(['message' => trans($attemptSendResetLink), 'token' => $token])->setStatusCode(200);
-                    }
-
-                    return response()->json(['message' => trans($attemptSendResetLink)])->setStatusCode(200);
-                case PasswordBroker::INVALID_USER:
-                    throw new NotFoundHttpException;
-                default:
-                    throw new \Exception;
-            }
-        } catch (NotFoundHttpException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(404);
-        } catch (HttpResponseException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(500);
+            return redirect()->back()->with('status', trans(PasswordBroker::RESET_LINK_SENT));
         }
+
+        return redirect()->back()->withErrors(['email' => trans(PasswordBroker::INVALID_USER)]);
     }
 
     /**
@@ -121,80 +101,54 @@ class PasswordController extends Controller
             throw new NotFoundHttpException;
         }
 
-        return response()->json(['token' => $token])->setStatusCode(200);
-        //return view('auth.reset')->with('token', $token);
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            return ['token' => $token];
+        }
+
+        return view('auth.reset')->with('token', $token);
     }
 
     /**
      * Reset the given user's password.
      *
-     * @param  Request $request
-     *
      * @return \Response
-     *
-     * @throws NotFoundHttpException
-     * @throws TokenNotValidException
-     * @throws HttpResponseException
-     * @throws \Exception
      */
-    public function postReset(Request $request)
+    public function postReset()
     {
         try {
-            $validator = \Validator::make($request->all(), [
-                'token' => 'required',
-                'email' => 'required|email|max:255',
-                'password' => 'required|confirmed|min:' . \Config::get('auth.password.min-length')
-            ]);
+            $this->registrar->resetPassword();
 
-            if ($validator->fails()) {
-                $this->throwValidationException($request, $validator);
+            if ($this->request->ajax() or $this->request->wantsJson()) {
+                return ['message' => 'Password successfully reset'];
             }
 
-            $credentials = $request->only('email', 'password', 'password_confirmation', 'token');
-
-            $attemptReset = $this->passwords->reset($credentials, function ($user, $password) {
-                /**
-                 * @var \App\Models\User $user
-                 */
-                $user->password = \Hash::make($password);
-                $user->save();
-            });
-
-            switch ($attemptReset) {
-                case PasswordBroker::PASSWORD_RESET:
-                    return response()->json(['message' => 'Password successfully reset'])->setStatusCode(200);
-                case PasswordBroker::INVALID_USER:
-                    throw new NotFoundHttpException;
-                case PasswordBroker::INVALID_TOKEN:
-                    throw new TokenNotValidException;
-                default:
-                    throw new \Exception(['email' => trans($attemptReset)]);
-            }
+            return redirect($this->redirectPath());
         } catch (NotFoundHttpException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(404);
-        } catch (HttpResponseException $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(422);
-        } catch (\Exception $e) {
-            return response()->json([
-                'exception' => get_class($e),
-                'message' => $e->getMessage()
-            ])->setStatusCode(500);
+            $response = PasswordBroker::INVALID_USER;
+        } catch (TokenNotValidException $e) {
+            $response = PasswordBroker::INVALID_TOKEN;
         }
+
+        if ($this->request->ajax() or $this->request->wantsJson()) {
+            throw $e;
+        }
+
+        return redirect()->back()
+            ->withInput($this->request->only('email'))
+            ->withErrors(['email' => trans($response)]);
     }
 
     /**
-     * Get the e-mail subject line to be used for the reset link email.
+     * Get the post register / login redirect path.
      *
      * @return string
      */
-    private function getEmailSubject()
+    private function redirectPath()
     {
-        return trans('passwords.reset_email_subject');
+        if (property_exists($this, 'redirectPath')) {
+            return $this->redirectPath;
+        }
+
+        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
     }
 }
