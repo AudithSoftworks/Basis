@@ -14,6 +14,22 @@
             <directory>./tests/</directory>
         </testsuite>
     </testsuites>
+    <filter>
+        <blacklist>
+            <directory suffix=".php">./vendor</directory>
+        </blacklist>
+    </filter>
+    <logging>
+        <log type="coverage-html" target="./storage/coverage/report" lowUpperBound="35" highLowerBound="70"/>
+        <log type="coverage-clover" target="./storage/coverage/coverage.xml"/>
+        <log type="coverage-php" target="./storage/coverage/coverage.serialized"/>
+        <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
+        <log type="json" target="./storage/coverage/logfile.json"/>
+        <log type="tap" target="./storage/coverage/logfile.tap"/>
+        <log type="junit" target="./storage/coverage/logfile.xml" logIncompleteSkipped="false"/>
+        <log type="testdox-html" target="./storage/coverage/testdox.html"/>
+        <log type="testdox-text" target="./storage/coverage/testdox.txt"/>
+    </logging>
     <php>
         <env name="APP_ENV" value="testing"/>
         <env name="CACHE_DRIVER" value="array"/>

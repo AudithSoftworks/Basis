@@ -19,11 +19,4 @@ class HomeController extends Controller
     {
         return view('home');
     }
-
-    public function phpInfo()
-    {
-        ob_start();
-        phpinfo();
-        return ob_get_clean();
-    }
 }

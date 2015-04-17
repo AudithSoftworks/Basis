@@ -36,14 +36,13 @@ class PasswordController extends Controller
      *
      * @param  \Illuminate\Contracts\Auth\Guard          $auth
      * @param  Registrar                                 $registrar
-     * @param  Request                                   $request
      * @param  \Illuminate\Contracts\Auth\PasswordBroker $passwords
      */
-    public function __construct(Guard $auth, Registrar $registrar, Request $request, PasswordBroker $passwords)
+    public function __construct(Guard $auth, Registrar $registrar, PasswordBroker $passwords)
     {
         $this->auth = $auth;
         $this->registrar = $registrar;
-        $this->request = $request;
+        $this->request = \Route::getCurrentRequest();
         $this->passwords = $passwords;
 
         $this->middleware('guest');
