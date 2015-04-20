@@ -11,13 +11,13 @@ class NestedEntity extends \Eloquent
 
     protected $guarded = array("left_range", "right_range");
 
-    const SELECT_ALL_WITH_MINIMUM_INFO = 0;
+    const SELECT_ALL_WITH_MINIMUM_INFO = 1;
 
-    const SELECT_SINGLE_PATH_ONLY = 1;
+    const SELECT_SINGLE_PATH_ONLY = 2;
 
-    const SELECT_WITH_DEPTH_INFO = 2;
+    const SELECT_WITH_DEPTH_INFO = 4;
 
-    const SELECT_LEAVES_ONLY = 4;
+    const SELECT_LEAVES_ONLY = 8;
 
 
     protected function getDateFormat()
@@ -190,6 +190,9 @@ class NestedEntity extends \Eloquent
     {
         # Round up delete-ables
         $referenceEntity = \DB::table($this->table)->select('left_range', 'right_range', \DB::raw('right_range - left_range + 1 as range_width'))->where('id', $id)->first();
+        if (is_null($referenceEntity)) {
+            throw new \InvalidArgumentException("Reference entity with id: " . $id . "not found!");
+        }
         $completeListOfEntitiesToDeleteIncludingOrphans = \DB::table($this->table)
             ->where('left_range', '>=', $referenceEntity->left_range)
             ->where('left_range', '<=', $referenceEntity->right_range);

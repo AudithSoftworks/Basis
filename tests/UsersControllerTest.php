@@ -12,6 +12,15 @@ class UsersControllerTest extends TestCase
         'HTTP_ACCEPT' => 'application/json'
     ];
 
+    public static function setUpBeforeClass()
+    {
+        // static::createApplication(); TODO Facilitate this method @see https://github.com/laravel/framework/pull/8496
+        $app = require __DIR__ . '/../bootstrap/app.php';
+        $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+
+        Artisan::call("migrate:refresh");
+    }
+
     public function setUp()
     {
         parent::setUp();
