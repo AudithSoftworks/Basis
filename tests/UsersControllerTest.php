@@ -18,7 +18,7 @@ class UsersControllerTest extends TestCase
         $app = require __DIR__ . '/../bootstrap/app.php';
         $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
-        Artisan::call("migrate:refresh");
+        Artisan::call('migrate:refresh');
     }
 
     public function setUp()

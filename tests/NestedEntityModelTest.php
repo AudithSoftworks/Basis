@@ -10,8 +10,8 @@ class NestedEntityModelTest extends TestCase
         $app = require __DIR__ . '/../bootstrap/app.php';
         $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
 
-        Artisan::call("migrate:refresh");
-        Artisan::call("db:seed");
+        Artisan::call('migrate:refresh');
+        Artisan::call('db:seed');
     }
 
     public function data_testInsertForException()
