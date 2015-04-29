@@ -2,6 +2,27 @@
 
 use Illuminate\Database\Eloquent\SoftDeletes;
 
+/**
+ * App\Models\File
+ *
+ * @property integer $id
+ * @property string $hash
+ * @property string $mime
+ * @property integer $size
+ * @property string $metadata
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property \Carbon\Carbon $deleted_at
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\File whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\File whereHash($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\File whereMime($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\File whereSize($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\File whereMetadata($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\File whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\File whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\File whereDeletedAt($value)
+ * @method static \App\Models\File ofType($type = 'image')
+ */
 class File extends \Eloquent
 {
     use SoftDeletes;

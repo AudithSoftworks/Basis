@@ -3,6 +3,24 @@
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\JoinClause;
 
+/**
+ * App\Models\NestedEntity
+ *
+ * @property integer $id
+ * @property string $name
+ * @property integer $left_range
+ * @property integer $right_range
+ * @property \Carbon\Carbon $created_at
+ * @property \Carbon\Carbon $updated_at
+ * @property integer $deleted_at
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereId($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereName($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereLeftRange($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereRightRange($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereCreatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereDeletedAt($value)
+ */
 class NestedEntity extends \Eloquent
 {
     use SoftDeletes;
