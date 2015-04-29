@@ -1,3 +1,52 @@
+/*
+ |----------
+ | Colors
+ |----------
+ */
+
+// Common colors
+var $redActive = "#FF7878",
+    $blueActive = "#706AF4",
+    $greenActive = "#71AD70",
+    $brownActive = "#B16666",
+    $lightBlueActive = "#269abc",
+    $yellowActive = "#AAA900",
+    $orangeActive = "#F8BC88",
+    $violetActive = "#C29DE7",
+    $textColor = "#565656",
+    $defultColor = "#1fb5ad",
+    $defultBorder = "#E3DFD8",
+    $lightGreen = "#1fb5ad",
+    $gridBorder = "#DEDEDE",
+    $black = '#3F414D',
+    $success = '#5CB85C',
+    $info = '#5bc0de';
+
+// Chart colors
+var $fillColor1 = "rgba(220,220,220,0.5)",
+    $fillColor2 = "rgba(93, 184, 92, 0.35)",
+    $fillColor3 = "rgba(255, 120, 120, 0.35)",
+    $fillColor4 = "rgba(93, 184, 92, 0.35)",
+    $fillColor5 = "rgba(255, 120, 120, 0.76)",
+    $fillColor6 = "rgba(91, 194, 222, 0.9)",
+    $fillColor7 = "rgba(239, 174, 77, 0.71)",
+    $blueFillColor = "rgba(38, 156, 188, 0.5)",
+    $lightGreenFillColor = "rgba(31, 181, 174, 0.5)",
+    $strokeColor = "rgba(220,220,220,1)",
+    strokeColor2 = "rgba(204, 204, 204, 0.91)";
+
+// Chat colors
+var $isOnline = '#2ecc71',
+    $isIdle = '#F7D227',
+    $isBusy = '#FF7878',
+    $isOffline = '#A0A0A0';
+
+/*
+ |------------------
+ | DOM Essentials
+ |------------------
+ */
+
 var headerSettingsSidebarControl = $('.settings-sidebar > button');
 var headerNavigationControl = $('header > nav > ul > li.menu-control > button');
 var leftColumn = $('body > aside');
@@ -336,3 +385,89 @@ function detectIE() {
     // other browser
     return false;
 }
+
+/*
+ |------------------------
+ | Multiple-accordion
+ |------------------------
+ */
+
+(function ($) {
+    $.fn.extend({
+        multiAccordion: function (options) {
+            var defaults = {
+                multiAccordion: 'true',
+                speed: 300,
+                closedSign: '[+]',
+                openedSign: '[-]'
+            };
+
+            // Extend our default options with those provided.
+            var opts = $.extend(defaults, options);
+            //Assign current element to variable, in this case is UL element
+            var $this = $(this);
+
+            //add a mark [+] to a multilevel menu
+            $this.find("li").each(function () {
+                if ($(this).find("ul").size() != 0) {
+                    if ($(this).hasClass('active')) {
+                        //add the multilevel sign next to the link
+                        $(this).find("a:first").append("<b>" + opts.openedSign + "</b>");
+                    } else {
+                        //add the multilevel sign next to the link
+                        $(this).find("a:first").append("<b>" + opts.closedSign + "</b>");
+                    }
+                    //avoid jumping to the top of the page when the href is an #
+                    if ($(this).find("a:first").attr('href') == "#") {
+                        $(this).find("a:first").click(function () {
+                            return false;
+                        });
+                    }
+                }
+            });
+
+            //open active level
+            $this.find("li.active").each(function () {
+                $(this).parents("ul").slideDown(opts.speed);
+                $(this).parents("ul").parent("li").find("b:first").html(opts.openedSign);
+            });
+
+            $this.find("li a").click(function () {
+                if ($(this).parent().find("ul").size() != 0) {
+                    if (opts.multiAccordion) {
+                        //Do nothing when the list is open
+                        if (!$(this).parent().find("ul").is(':visible')) {
+                            parents = $(this).parent().parents("ul");
+                            visible = $this.find("ul:visible");
+                            visible.each(function (visibleIndex) {
+                                var close = true;
+                                parents.each(function (parentIndex) {
+                                    if (parents[parentIndex] == visible[visibleIndex]) {
+                                        close = false;
+                                        return false;
+                                    }
+                                });
+                                if (close) {
+                                    if ($(this).parent().find("ul") != visible[visibleIndex]) {
+                                        $(visible[visibleIndex]).slideUp(opts.speed, function () {
+                                            $(this).parent("li").find("b:first").html(opts.closedSign);
+                                        });
+                                    }
+                                }
+                            });
+                        }
+                    }
+                    if ($(this).parent().find("ul:first").is(":visible")) {
+                        $(this).parent().find("ul:first").slideUp(opts.speed, function () {
+                            $(this).parent("li").find("b:first").delay(opts.speed).html(opts.closedSign);
+                        });
+                    } else {
+                        $(this).parent().find("ul:first").slideDown(opts.speed, function () {
+                            $(this).parent("li").find("b:first").delay(opts.speed).html(opts.openedSign);
+                        });
+                    }
+                }
+            });
+        }
+    });
+})(jQuery);

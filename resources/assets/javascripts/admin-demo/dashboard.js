@@ -561,8 +561,6 @@ function plotAccordingToChoices(event, state) {
             }
         });
     }
-    console.log(event);
-    console.log(state);
     $(".switchCheckBox").bootstrapSwitch();
 }
 function plotAccordingToChoicesToggle() {

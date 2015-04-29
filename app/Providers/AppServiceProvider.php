@@ -2,6 +2,7 @@
 
 use Illuminate\Support\ServiceProvider;
 use App\Services\File;
+use App\Services\Assetic;
 
 class AppServiceProvider extends ServiceProvider
 {

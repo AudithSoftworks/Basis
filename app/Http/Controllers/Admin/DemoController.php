@@ -11,11 +11,11 @@ class DemoController extends Controller
 
     public function anyDashboard()
     {
-        return view('admin-demo.index');
+        return view('admin-demo/dashboard');
     }
 
     public function getNotifications()
     {
-        return view('admin-demo.notifications');
+        return view('admin-demo/notifications');
     }
 }

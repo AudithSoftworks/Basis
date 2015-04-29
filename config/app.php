@@ -135,6 +135,7 @@ return [
         /*
          * Custom Service Providers...
          */
+        'TwigBridge\ServiceProvider',
         'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider'
     ],
 
@@ -181,5 +182,9 @@ return [
         'URL' => 'Illuminate\Support\Facades\URL',
         'Validator' => 'Illuminate\Support\Facades\Validator',
         'View' => 'Illuminate\Support\Facades\View',
+        /*
+         * Custom Facades...
+         */
+        'Twig' => 'TwigBridge\Facade\Twig',
     ],
 ];

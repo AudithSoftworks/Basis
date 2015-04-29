@@ -1,4 +1,13 @@
-@section('document-body-main-section-content')
+{% extends "admin/master" %}
+
+{% use "admin/master/head" %}
+{% use "admin/master/body/header" %}
+{% use "admin/master/body/main" %}
+{% use "admin/master/body/footer" %}
+
+{% block document_head_title %}<title>Dashboard - Audith.Basis</title>{% endblock %}
+
+{% block document_body_main_section_content %}
             <h2>Dashboard</h2>
             <aside class="row">
                 <nav class="col-md-12">
@@ -476,6 +485,4 @@
                     </div>
                 </div>
             </section>
-@stop
-
-@include('admin.master')
+{% endblock %}

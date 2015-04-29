@@ -1,5 +1,4 @@
-@section('document-body-header')
-        <header class="navigation container-fluid">
+{% block document_body_header %}<header class="navigation container-fluid">
             <h1><a href="" title="">Audith.Basis</a></h1>
 
             <nav class="top-navigation">
@@ -102,14 +101,14 @@
                                 </li>
                                 <li>
                                     <a href="javascript:void(0)">
-                                        <span class="label label-lightBlue"><i class="fa fa-shopping-cart"></i></span>
+                                        <span class="label label-light-blue"><i class="fa fa-shopping-cart"></i></span>
                                         New order received with
                                         <span class="date">45 min</span>
                                     </a>
                                 </li>
                                 <li>
                                     <a href="javascript:void(0)">
-                                        <span class="label label-lightBlue"><i class="fa fa-user"></i></span>
+                                        <span class="label label-light-blue"><i class="fa fa-user"></i></span>
                                         5 pending membership
                                         <span class="date">50 min</span>
                                     </a>
@@ -258,4 +257,4 @@
                 </ul>
             </nav>
         </header>
-@stop
+{% endblock %}

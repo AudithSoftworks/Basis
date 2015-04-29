@@ -1,5 +1,4 @@
-@section('document-body-main')
-        <aside id="left-navigation">
+{% block document_body_main %}<aside id="left-navigation">
             <!-- Left navigation user details -->
             <figure class="user-image">
                 <img src="/media_assets/images/fickle/demo/avatar-80.png" alt="User is Online.">
@@ -214,7 +213,7 @@
         </aside>
 
         <main id="main-container" class="container-fluid">
-            @yield('document-body-main-section-content')
+            {% block document_body_main_section_content %}{% endblock %}
         </main>
 
         <div id="change-color">
@@ -232,4 +231,4 @@
                 </ul>
             </div>
         </div>
-@stop
+{% endblock %}

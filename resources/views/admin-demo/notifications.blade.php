@@ -255,4 +255,4 @@
             <!-- Main Content Element  End-->
 @stop
 
-@include('admin.master')
+@include('admin.master2')
