@@ -59,7 +59,7 @@ class PasswordController extends Controller
             return [];
         }
 
-        return view('auth.password');
+        return view('auth/password');
     }
 
     /**
@@ -104,7 +104,7 @@ class PasswordController extends Controller
             return ['token' => $token];
         }
 
-        return view('auth.reset')->with('token', $token);
+        return view('auth/reset')->with('token', $token);
     }
 
     /**

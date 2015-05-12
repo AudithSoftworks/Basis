@@ -55,7 +55,7 @@ class AuthController extends Controller
             return ['message' => 'Ready'];
         }
 
-        return view('auth.login');
+        return view('auth/login');
     }
 
     /**

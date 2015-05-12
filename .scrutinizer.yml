@@ -5,14 +5,11 @@ build:
     dependencies:
         before:
             - sudo apt-get install -y -qq sendmail
-        override:
-            - composer install --no-interaction
-        after: []
+            - sudo npm install -g gulp
     project-setup:
         before:
             - mysql -uroot -e 'CREATE DATABASE basis'
-        override: []
-        after:
+        override:
             - php artisan migrate --force --no-interaction
     tests:
         override:
