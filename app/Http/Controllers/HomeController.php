@@ -2,13 +2,6 @@
 
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct()
-    {
-        //$this->middleware('auth');
-    }
 
     /**
      * Show the application dashboard to the user.
@@ -17,6 +10,6 @@ class HomeController extends Controller
      */
     public function index()
     {
-        return view('home');
+        redirect('admin-demo/dashboard');
     }
 }

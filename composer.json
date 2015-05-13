@@ -27,6 +27,7 @@
         "audithsoftworks/contracts": "dev-master",
         "barryvdh/laravel-ide-helper": "~2.0",
         "laravel/framework": "~5.0",
+        "laravel/socialite": "~2.0",
         "mrclay/minify": "~3.0@dev",
         "predis/predis": "~1.0",
         "rcrowe/twigbridge": "~0.7"

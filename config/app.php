@@ -136,6 +136,7 @@ return [
          * Custom Service Providers...
          */
         'TwigBridge\ServiceProvider',
+        'Laravel\Socialite\SocialiteServiceProvider',
         'Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider'
     ],
 
@@ -186,5 +187,6 @@ return [
          * Custom Facades...
          */
         'Twig' => 'TwigBridge\Facade\Twig',
+        'Socialite' => 'Laravel\Socialite\Facades\Socialite'
     ],
 ];
