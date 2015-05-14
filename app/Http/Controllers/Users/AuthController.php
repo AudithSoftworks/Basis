@@ -1,11 +1,12 @@
 <?php namespace App\Http\Controllers\Users;
 
+use App\Contracts\Registrar;
 use App\Http\Controllers\Controller;
-use Audith\Contracts\Registrar;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Laravel\Socialite\Contracts\Factory as SocialiteContract;
+use Laravel\Socialite\AbstractUser as SocialiteUser;
 
 class AuthController extends Controller
 {
@@ -62,10 +63,20 @@ class AuthController extends Controller
     public function getLogin($provider = null)
     {
         if (!is_null($provider)) {
-            if (!$this->request->exists('code')) {
-                return $this->socialite->driver($provider)->redirect();
+            switch ($provider) {
+                case 'google':
+                    if ($this->request->exists('code')) {
+                        break;
+                    }
+                case 'twitter':
+                    if ($this->request->exists('oauth_token') && $this->request->exists('oauth_verifier')) {
+                        break;
+                    }
+                default:
+                    return $this->socialite->driver($provider)->redirect();
             }
 
+            /** @var SocialiteUser $userInfo */
             $userInfo = $this->socialite->driver($provider)->user();
             if ($this->registrar->loginViaOAuth($userInfo, $provider)) {
                 if ($this->request->ajax() || $this->request->wantsJson()) {
@@ -90,19 +101,13 @@ class AuthController extends Controller
      */
     public function postLogin()
     {
-        if ($this->registrar->login()) {
-            if ($this->request->ajax() || $this->request->wantsJson()) {
-                return ['message' => 'Login successful'];
-            }
+        $this->registrar->login();
 
-            return redirect()->intended($this->redirectPath());
+        if ($this->request->ajax() || $this->request->wantsJson()) {
+            return ['message' => 'Login successful'];
         }
 
-        return redirect($this->loginPath())
-            ->withInput($this->request->only('email', 'remember'))
-            ->withErrors([
-                'email' => $this->getFailedLoginMessage(),
-            ]);
+        return redirect()->intended($this->redirectPath());
     }
 
     /**
@@ -122,16 +127,6 @@ class AuthController extends Controller
     }
 
     /**
-     * Get the failed login message.
-     *
-     * @return string
-     */
-    private function getFailedLoginMessage()
-    {
-        return 'These credentials do not match our records.';
-    }
-
-    /**
      * Get the post register / login redirect path.
      *
      * @return string
@@ -143,15 +138,5 @@ class AuthController extends Controller
         }
 
         return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
-    }
-
-    /**
-     * Get the path to the login route.
-     *
-     * @return string
-     */
-    private function loginPath()
-    {
-        return property_exists($this, 'loginPath') ? $this->loginPath : '/auth/login';
     }
 }

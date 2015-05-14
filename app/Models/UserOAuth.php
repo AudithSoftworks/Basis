@@ -43,7 +43,7 @@ class UserOAuth extends \Eloquent
      *
      * @var array
      */
-    protected $guarded = array('*');
+    protected $guarded = ['*'];
 
     protected function getDateFormat()
     {

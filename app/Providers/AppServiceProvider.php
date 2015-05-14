@@ -32,9 +32,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->bind('Audith\Contracts\Registrar', 'App\Services\Registrar');
+        $this->app->bind('App\Contracts\Registrar', 'App\Services\Registrar');
 
-        $this->app->singleton('Audith\Contracts\File', function ($app) {
+        $this->app->singleton('App\Contracts\File', function ($app) {
             return new File($app['config']['file']);
         });
     }
@@ -47,8 +47,8 @@ class AppServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'Audith\Contracts\Registrar',
-            'Audith\Contracts\File'
+            'App\Contracts\Registrar',
+            'App\Contracts\File'
         ];
     }
 }

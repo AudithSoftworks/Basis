@@ -24,7 +24,6 @@
         "ext-mbstring": "*",
         "ext-mcrypt": "*",
         "ext-openssl": "*",
-        "audithsoftworks/contracts": "dev-master",
         "barryvdh/laravel-ide-helper": "~2.0",
         "laravel/framework": "~5.0",
         "laravel/socialite": "~2.0",

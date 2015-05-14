@@ -1,6 +1,11 @@
 {
-  "devDependencies": {
-    "gulp": "^3.8.8",
-    "laravel-elixir": "*"
-  }
+    "private": true,
+    "devDependencies": {
+        "gulp": "^3.8.8",
+        "laravel-elixir": "^1.0.0"
+    },
+    "engines": {
+        "node": "0.11.x",
+        "npm": "2.10.x"
+    }
 }

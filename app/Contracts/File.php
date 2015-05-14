@@ -1,31 +1,41 @@
-<?php namespace App\Services;
+<?php namespace App\Contracts;
 
-use App\Contracts\File as FileContract;
-use App\Exceptions\File as FileExceptions;
+use App\Exceptions\File\FileNotFoundException;
 
-class File implements FileContract
+/**
+ * @author Shahriyar Imanov <shehi@imanov.me>
+ */
+interface File
 {
+    /**
+     * The public visibility setting.
+     *
+     * @var string
+     */
+    const VISIBILITY_PUBLIC = 'public';
+
+    /**
+     * The private visibility setting.
+     *
+     * @var string
+     */
+    const VISIBILITY_PRIVATE = 'private';
+
     /**
      * @param integer|string $id Numeric id or Md5-hash of the file.
      *
      * @return boolean
      */
-    public function exists($id)
-    {
-        //
-    }
+    public function exists($id);
 
     /**
      * Get the metadata information of the file.
      *
      * @param integer|string $id Numeric id or Md5-hash of the file.
      *
-     * @return FileContract\Metadata
+     * @return File\Metadata
      */
-    public function getMetadata($id)
-    {
-        //
-    }
+    public function getMetadata($id);
 
     /**
      * Get the contents of the file.
@@ -33,20 +43,9 @@ class File implements FileContract
      * @param integer|string $id Numeric id or Md5-hash of the file.
      *
      * @return string
-     * @throws FileContract\Exception\FileNotFoundException
+     * @throws FileNotFoundException
      */
-    public function get($id)
-    {
-        return "test";
-
-        //
-
-        /*
-        return Cache::rememberForever('file-' . $id, function ($id) {
-            return File::where(is_numeric($id) ? 'id' : 'hash', '=', $id)->get();
-        });
-        */
-    }
+    public function get($id);
 
     /**
      * Create a new file record and writes its content.
@@ -55,18 +54,8 @@ class File implements FileContract
      * @param string|null $visibility File visibility setting.
      *
      * @return boolean
-     * @throws FileExceptions\SessionUploadProgress\NotEnabledException
-     * @throws FileExceptions\SessionUploadProgress\NameNotSetException
      */
-    public function post($contents, $visibility = self::VISIBILITY_PRIVATE)
-    {
-        if (!ini_get('session.upload_progress.enabled')) {
-            throw new FileExceptions\SessionUploadProgress\NotEnabledException();
-        }
-        if (!($sessionUploadProgressName = ini_get('session.upload_progress.name'))) {
-            throw new FileExceptions\SessionUploadProgress\NameNotSetException();
-        }
-    }
+    public function post($contents, $visibility = self::VISIBILITY_PRIVATE);
 
     /**
      * Update the file with new content and (optionally) visibility setting.
@@ -77,10 +66,7 @@ class File implements FileContract
      *
      * @return boolean
      */
-    public function put($id, $contents, $visibility = self::VISIBILITY_PRIVATE)
-    {
-        //
-    }
+    public function put($id, $contents, $visibility = self::VISIBILITY_PRIVATE);
 
     /**
      * Get the file visibility setting.
@@ -89,10 +75,7 @@ class File implements FileContract
      *
      * @return string
      */
-    public function getVisibility($id)
-    {
-        //
-    }
+    public function getVisibility($id);
 
     /**
      * Set new file visibility setting to the file.
@@ -102,10 +85,7 @@ class File implements FileContract
      *
      * @return boolean
      */
-    public function setVisibility($id, $visibility = self::VISIBILITY_PRIVATE)
-    {
-
-    }
+    public function setVisibility($id, $visibility = self::VISIBILITY_PRIVATE);
 
     /**
      * Soft-delete selected files.
@@ -114,10 +94,7 @@ class File implements FileContract
      *
      * @return boolean
      */
-    public function delete($ids)
-    {
-        //
-    }
+    public function delete($ids);
 
     /**
      * Get the file size in bytes.
@@ -126,10 +103,7 @@ class File implements FileContract
      *
      * @return integer
      */
-    public function size($id)
-    {
-        //
-    }
+    public function size($id);
 
     /**
      * Get the file modification time.
@@ -138,8 +112,5 @@ class File implements FileContract
      *
      * @return \Carbon\Carbon
      */
-    public function lastModified($id)
-    {
-        //
-    }
+    public function lastModified($id);
 }

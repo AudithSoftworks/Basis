@@ -43,7 +43,7 @@ class User extends \Eloquent implements AuthenticatableContract, CanResetPasswor
      *
      * @var array
      */
-    protected $guarded = array('*');
+    protected $guarded = ['*'];
 
     /**
      * Soft-deletes enabled.

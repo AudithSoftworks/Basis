@@ -81,6 +81,6 @@ class Handler extends ExceptionHandler
             }
         }
 
-        return parent::render($request, $e);
+        return redirect()->back()->withInput($request->all())->withErrors($e->getMessage());
     }
 }

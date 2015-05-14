@@ -1,8 +1,7 @@
 <?php namespace App\Http\Controllers\Users;
 
-use App\Exceptions\Users\TokenNotValidException;
+use App\Contracts\Registrar;
 use App\Http\Controllers\Controller;
-use Audith\Contracts\Registrar;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Request;
@@ -69,20 +68,18 @@ class PasswordController extends Controller
      */
     public function postEmail()
     {
-        if ($this->registrar->sendResetPasswordLinkViaEmail()) {
-            if ($this->request->ajax() || $this->request->wantsJson()) {
-                $return = ['message' => 'Password reset link sent'];
-                if (\App::environment() == 'testing') {
-                    $return = array_merge($return, ['token' => \DB::table('password_resets')->where('email', '=', 'shehi@imanov.me')->pluck('token')]);
-                }
+        $this->registrar->sendResetPasswordLinkViaEmail();
 
-                return $return;
+        if ($this->request->ajax() || $this->request->wantsJson()) {
+            $return = ['message' => trans(PasswordBroker::RESET_LINK_SENT)];
+            if (\App::environment() == 'testing') {
+                $return = array_merge($return, ['token' => \DB::table('password_resets')->where('email', '=', 'shehi@imanov.me')->pluck('token')]);
             }
 
-            return redirect()->back()->with('status', trans(PasswordBroker::RESET_LINK_SENT));
+            return $return;
         }
 
-        return redirect()->back()->withErrors(['email' => trans(PasswordBroker::INVALID_USER)]);
+        return redirect()->back()->with('status', trans(PasswordBroker::RESET_LINK_SENT));
     }
 
     /**
@@ -114,31 +111,17 @@ class PasswordController extends Controller
      */
     public function postReset()
     {
-        try {
-            $this->registrar->resetPassword();
-
-            if ($this->request->ajax() || $this->request->wantsJson()) {
-                return ['message' => 'Password successfully reset'];
-            }
-
-            return redirect($this->redirectPath());
-        } catch (NotFoundHttpException $e) {
-            $response = PasswordBroker::INVALID_USER;
-        } catch (TokenNotValidException $e) {
-            $response = PasswordBroker::INVALID_TOKEN;
-        }
+        $this->registrar->resetPassword();
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            throw $e;
+            return ['message' => 'Password successfully reset'];
         }
 
-        return redirect()->back()
-            ->withInput($this->request->only('email'))
-            ->withErrors(['email' => trans($response)]);
+        return redirect($this->redirectPath());
     }
 
     /**
-     * Get the post register / login redirect path.
+     * Get the post-register/-login redirect path.
      *
      * @return string
      */

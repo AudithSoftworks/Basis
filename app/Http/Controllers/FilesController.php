@@ -1,6 +1,6 @@
 <?php namespace App\Http\Controllers;
 
-use Audith\Contracts\File;
+use App\Contracts\File;
 
 class FilesController extends Controller
 {
@@ -17,19 +17,9 @@ class FilesController extends Controller
         $this->file = $file;
     }
 
-    /**
-     *
-     */
     public function index()
     {
-        ob_start();
-        session_id($_COOKIE["PHPSESSID"]);
-        session_start();
-        $key = ini_get("session.upload_progress.prefix") . "myForm";
-        $session = $_SESSION;
-        $session2 = \Session::all();
-        echo \Response::json($_SESSION);
-        return ob_get_clean();
+        //
     }
 
     /**
@@ -39,10 +29,7 @@ class FilesController extends Controller
      */
     public function create()
     {
-        session_id($_COOKIE["PHPSESSID"]);
-        session_start();
-
-        return \View::make("/file/create");
+        //
     }
 
 
@@ -53,17 +40,7 @@ class FilesController extends Controller
      */
     public function store()
     {
-        session_id($_COOKIE["PHPSESSID"]);
-        session_start();
-
-
-        /*
-
-        $contents = "test";
-
-        return $this->file->post($contents, File::VISIBILITY_PUBLIC);
-
-        */
+        //
     }
 
 
@@ -76,9 +53,7 @@ class FilesController extends Controller
      */
     public function show($id)
     {
-        $id = preg_match('/^[a-z0-9]{32}$/i', $id) ? strtolower($id) : intval($id);
-
-        return $this->file->get($id);
+        //
     }
 
 
@@ -104,10 +79,7 @@ class FilesController extends Controller
      */
     public function update($id)
     {
-        $id = preg_match('/^[a-z0-9]{32}$/i', $id) ? strtolower($id) : intval($id);
-        $contents = "test";
-
-        return $this->file->put($id, $contents, File::VISIBILITY_PUBLIC);
+        //
     }
 
 

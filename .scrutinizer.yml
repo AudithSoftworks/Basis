@@ -1,16 +1,28 @@
 build:
     environment:
+        php: '5.4.28'
+        node: '0.11.13'
         hosts:
             audith.basis: '127.0.0.1'
     dependencies:
         before:
+            - cp .env.example .env
             - sudo apt-get install -y -qq sendmail
-            - sudo npm install -g gulp
+        override:
+            - node -v
+            - npm -v
+            - npm install -g npm@latest
+            - npm install -g gulp bower
+            - composer install --no-interaction
     project-setup:
         before:
             - mysql -uroot -e 'CREATE DATABASE basis'
         override:
             - php artisan migrate --force --no-interaction
+            - bower install
+            -
+                command: 'gulp'
+                only_if: 'npm install'
     tests:
         override:
             -

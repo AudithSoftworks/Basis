@@ -12,10 +12,8 @@
 | loading of any our classes "manually". Feels great to relax.
 |
 */
-
-require __DIR__.'/bootstrap/autoload.php';
-
-$app = require_once __DIR__.'/bootstrap/app.php';
+require __DIR__ . '/bootstrap/autoload.php';
+$app = require_once __DIR__ . '/bootstrap/app.php';
 
 /*
 |--------------------------------------------------------------------------
@@ -27,12 +25,10 @@ $app = require_once __DIR__.'/bootstrap/app.php';
 | or another output device for the developers. Here goes nothing!
 |
 */
-
 $kernel = $app->make('Illuminate\Contracts\Console\Kernel');
-
 $status = $kernel->handle(
-	$input = new Symfony\Component\Console\Input\ArgvInput,
-	new Symfony\Component\Console\Output\ConsoleOutput
+    $input = new Symfony\Component\Console\Input\ArgvInput,
+    new Symfony\Component\Console\Output\ConsoleOutput
 );
 
 /*
@@ -45,7 +41,5 @@ $status = $kernel->handle(
 | down the process. This is the last thing to happen to the request.
 |
 */
-
 $kernel->terminate($input, $status);
-
 exit($status);

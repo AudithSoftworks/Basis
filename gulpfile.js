@@ -21,6 +21,7 @@ elixir(function (mix) {
         'jquery_ui': ['public/bower_components/jquery-ui/jquery-ui.js'],
         'nanoscroller': ['public/bower_components/nanoscroller/bin/javascripts/jquery.nanoscroller.js'],
         'notifyjs': ['public/bower_components/notifyjs/dist/notify.js'],
+        'requirejs': ['public/bower_components/requirejs/require.js'],
         'skycons_html5': ['public/bower_components/skycons-html5/skycons.js'],
         'transitionize': ['public/bower_components/transitionize/dist/transitionize.js'],
         'switchery': ['public/bower_components/switchery/dist/switchery.js']

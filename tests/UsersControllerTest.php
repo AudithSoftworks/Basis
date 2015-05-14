@@ -341,7 +341,7 @@ class UsersControllerTest extends TestCase
                     'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
                     'token' => self::$passwordResetToken
                 ),
-                'NotFoundHttpException'
+                'UserNotFoundException'
             ),
             array( // Wrong token supplied
                 array(
@@ -385,6 +385,7 @@ class UsersControllerTest extends TestCase
         $this->assertObjectHasAttribute('message', $responseAsObject, 'Response object needs to have a \'message\' field.');
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
+                case 'UserNotFoundException':
                 case 'NotFoundHttpException':
                     $this->assertResponseStatus(404);
                     break;

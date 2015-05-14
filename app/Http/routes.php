@@ -13,11 +13,12 @@ Route::controllers([
     'auth' => 'Users\AuthController',
     'password' => 'Users\PasswordController',
     'admin' => 'AdminController',
-    'admin-demo' => 'Admin\DemoController',
-    '' => 'HomeController'
+    'admin-demo' => 'Admin\DemoController'
 ]);
 
 Route::resources([
     'files' => 'FilesController',
     'users' => 'UsersController'
 ]);
+
+Route::controller('', 'HomeController');

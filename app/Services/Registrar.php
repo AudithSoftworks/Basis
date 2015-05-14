@@ -1,18 +1,20 @@
 <?php namespace App\Services;
 
+use App\Contracts\Registrar as RegistrarContract;
 use App\Exceptions\Common\ValidationException;
 use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Exceptions\Users\TokenNotValidException;
+use App\Exceptions\Users\UserNotFoundException;
 use App\Models\User;
 use App\Models\UserOAuth;
-use Audith\Contracts\Registrar as RegistrarContract;
 use Illuminate\Auth\Guard;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
-use Laravel\Socialite\AbstractUser as SocialiteAbstractUser;
+use Laravel\Socialite\AbstractUser as SocialiteUser;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Registrar implements RegistrarContract
@@ -50,7 +52,7 @@ class Registrar implements RegistrarContract
     /**
      * Create a new user instance after a valid registration.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @return Authenticatable
      */
     public function register()
     {
@@ -71,6 +73,36 @@ class Registrar implements RegistrarContract
         $user->save();
 
         return $user;
+    }
+
+    /**
+     * @param SocialiteUser $oauthUserData
+     * @param string        $provider
+     *
+     * @return Authenticatable|bool
+     */
+    public function registerViaOAuth(SocialiteUser $oauthUserData, $provider)
+    {
+        if (!($ownerAccount = User::withTrashed()->whereEmail($oauthUserData->email)->first())) {
+            $ownerAccount = \Eloquent::unguarded(function () use ($oauthUserData) {
+                return User::create([
+                    'name' => $oauthUserData->name,
+                    'email' => $oauthUserData->email,
+                    'password' => \Hash::make(uniqid("", true))
+                ]);
+            });
+        }
+
+        # If user account is soft-deleted, restore it.
+        $ownerAccount->trashed() && $ownerAccount->restore();
+
+        # Update missing user name.
+        if (!$ownerAccount->name) {
+            $ownerAccount->name = $oauthUserData->name;
+            $ownerAccount->save();
+        }
+
+        return $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount);
     }
 
     /**
@@ -102,7 +134,7 @@ class Registrar implements RegistrarContract
     /**
      * @param integer $id
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @return Authenticatable
      */
     public function get($id)
     {
@@ -169,7 +201,26 @@ class Registrar implements RegistrarContract
             return true;
         }
 
-        throw new LoginNotValidException;
+        throw new LoginNotValidException($this->getFailedLoginMessage());
+    }
+
+    /**
+     * @param SocialiteUser $oauthUserData
+     * @param string        $provider
+     *
+     * @return bool
+     */
+    public function loginViaOAuth(SocialiteUser $oauthUserData, $provider)
+    {
+        /** @var UserOAuth $owningOAuthAccount */
+        if ($owningOAuthAccount = UserOAuth::whereEmail($oauthUserData->email)->first()) {
+            $ownerAccount = $owningOAuthAccount->owner;
+            $this->auth->login($ownerAccount, true);
+
+            return true;
+        }
+
+        return !$this->registerViaOAuth($oauthUserData, $provider) ? false : true;
     }
 
     /**
@@ -246,7 +297,7 @@ class Registrar implements RegistrarContract
             case PasswordBroker::PASSWORD_RESET:
                 return true;
             case PasswordBroker::INVALID_USER:
-                throw new NotFoundHttpException;
+                throw new UserNotFoundException;
             case PasswordBroker::INVALID_TOKEN:
                 throw new TokenNotValidException;
             default:
@@ -254,40 +305,14 @@ class Registrar implements RegistrarContract
         }
     }
 
-    public function loginViaOAuth(SocialiteAbstractUser $oauthUserData, $provider)
-    {
-        /** @var UserOAuth $owningOAuthAccount */
-        if ($owningOAuthAccount = UserOAuth::whereEmail($oauthUserData->email)->first()) {
-            $ownerAccount = $owningOAuthAccount->owner;
-            $this->auth->login($ownerAccount, true);
-
-            return true;
-        }
-
-        return !$this->registerViaOAuth($oauthUserData, $provider) ? false : true;
-    }
-
-    public function registerViaOAuth(SocialiteAbstractUser $oauthUserData, $provider)
-    {
-        if (!($ownerAccount = User::whereEmail($oauthUserData->email)->first())) {
-            $ownerAccount = User::create([
-                'name' => $oauthUserData->name,
-                'email' => $oauthUserData->email,
-                'password' => \Hash::make(uniqid("", true))
-            ]);
-        }
-
-        return $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount);
-    }
-
     /**
-     * @param SocialiteAbstractUser $oauthUserData
-     * @param string                $provider
-     * @param User                  $ownerAccount
+     * @param SocialiteUser $oauthUserData
+     * @param string        $provider
+     * @param User          $ownerAccount
      *
-     * @return User|bool
+     * @return Authenticatable|bool
      */
-    private function linkOAuthAccount(SocialiteAbstractUser $oauthUserData, $provider, $ownerAccount)
+    private function linkOAuthAccount(SocialiteUser $oauthUserData, $provider, $ownerAccount)
     {
         /** @var UserOAuth[] $linkedAccounts */
         $linkedAccounts = $ownerAccount->linkedAccounts()->{$provider}()->get();
@@ -323,5 +348,15 @@ class Registrar implements RegistrarContract
     private function getPasswordResetEmailSubject()
     {
         return trans('passwords.reset_email_subject');
+    }
+
+    /**
+     * Get the failed login message.
+     *
+     * @return string
+     */
+    private function getFailedLoginMessage()
+    {
+        return 'These credentials do not match our records.';
     }
 }

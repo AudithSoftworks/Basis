@@ -1,8 +1,8 @@
 <?php namespace App\Http\Controllers;
 
+use App\Contracts\Registrar;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Models\User;
-use Audith\Contracts\Registrar;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -66,7 +66,7 @@ class UsersController extends Controller
             return ['message' => 'Ready'];
         }
 
-        return view('auth.register');
+        return view('auth/register');
     }
 
     /**

@@ -2,6 +2,10 @@
 
 class HomeController extends Controller
 {
+    public function getIndex()
+    {
+        return redirect('admin-demo/index');
+    }
 
     /**
      * Show the application dashboard to the user.
