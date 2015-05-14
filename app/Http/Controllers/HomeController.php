@@ -8,8 +8,17 @@ class HomeController extends Controller
      *
      * @return \Response
      */
-    public function index()
+    public function getHome()
     {
-        redirect('admin-demo/dashboard');
+        $name = "Guest";
+        $link = '<a href="/auth/login">Login</a>';
+
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $name = $user->name;
+            $link = '<a href="/auth/logout">Logout</a>';
+        }
+
+        return 'Welcome, '.$name.'! '.$link;
     }
 }

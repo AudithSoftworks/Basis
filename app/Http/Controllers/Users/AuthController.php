@@ -5,6 +5,7 @@ use Audith\Contracts\Registrar;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Laravel\Socialite\Contracts\Factory as SocialiteContract;
 
 class AuthController extends Controller
 {
@@ -23,6 +24,11 @@ class AuthController extends Controller
     protected $registrar;
 
     /**
+     * @var SocialiteContract
+     */
+    protected $socialite;
+
+    /**
      * Request instance.
      *
      * @var Request
@@ -32,14 +38,16 @@ class AuthController extends Controller
     /**
      * Create a new authentication controller instance.
      *
-     * @param  Guard     $auth
-     * @param  Registrar $registrar
+     * @param  Guard             $auth
+     * @param  Registrar         $registrar
+     * @param  SocialiteContract $socialite
      */
-    public function __construct(Guard $auth, Registrar $registrar)
+    public function __construct(Guard $auth, Registrar $registrar, SocialiteContract $socialite)
     {
         $this->auth = $auth;
         $this->registrar = $registrar;
         $this->request = \Route::getCurrentRequest();
+        $this->socialite = $socialite;
 
         $this->middleware('guest', ['except' => 'getLogout']);
     }
@@ -47,10 +55,27 @@ class AuthController extends Controller
     /**
      * Show the application login form.
      *
+     * @param string $provider
+     *
      * @return Response
      */
-    public function getLogin()
+    public function getLogin($provider = null)
     {
+        if (!is_null($provider)) {
+            if (!$this->request->exists('code')) {
+                return $this->socialite->driver($provider)->redirect();
+            }
+
+            $userInfo = $this->socialite->driver($provider)->user();
+            if ($this->registrar->loginViaOAuth($userInfo, $provider)) {
+                if ($this->request->ajax() || $this->request->wantsJson()) {
+                    return ['message' => 'Login successful'];
+                }
+
+                return redirect('/home');
+            }
+        }
+
         if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Ready'];
         }
@@ -93,7 +118,7 @@ class AuthController extends Controller
             return ['message' => 'Logout successful'];
         }
 
-        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/');
+        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/home');
     }
 
     /**

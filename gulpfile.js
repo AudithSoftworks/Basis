@@ -27,6 +27,7 @@ elixir(function (mix) {
     };
 
     var jsMaps = {
+        'auth/*': ['pace'],
         'admin-demo/*': ['pace', 'jquery', 'bootstrap', 'bootstrap_breakpoints', 'amaranjs', ['resources/assets/javascripts/admin-demo.js']],
         'admin-demo/dashboard': [
             'jquery_easing', 'jquery_easy_pie_chart', 'bower_jvectormap_2', 'skycons_html5', 'count_up', 'nanoscroller', 'bootstrap_switch', 'switchery',
@@ -35,20 +36,21 @@ elixir(function (mix) {
     };
 
     mix
+        .scripts(resolveJsMapToActualFilePaths('auth'), 'public/javascripts/auth.js', './')
         .scripts(resolveJsMapToActualFilePaths('admin-demo/dashboard'), 'public/javascripts/admin-demo/dashboard.js', './')
-        .version("public/javascripts/admin-demo/dashboard.js");
+        .version(['public/javascripts/auth.js', 'public/javascripts/admin-demo/dashboard.js']);
 
     function resolveJsMapToActualFilePaths(requestPath) {
-        if (!jsMaps.hasOwnProperty(requestPath)) {
-            return [];
-        }
-
         var outputList = [];
         var explodedRequestPath = requestPath.split('/');
         if (explodedRequestPath.length > 1 && jsMaps.hasOwnProperty(explodedRequestPath[0] + '/*')) {
             outputList.push.apply(outputList, jsMaps[explodedRequestPath[0] + '/*']);
+        } else if (explodedRequestPath.length == 1 || !jsMaps.hasOwnProperty(requestPath)) {
+            outputList = jsMaps[explodedRequestPath[0] + '/*']
         }
-        outputList.push.apply(outputList, jsMaps[requestPath]);
+        if (jsMaps.hasOwnProperty(requestPath)) {
+            outputList.push.apply(outputList, jsMaps[requestPath]);
+        }
 
         var resolvedList = [];
         for (var item in outputList) {

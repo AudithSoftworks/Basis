@@ -5,12 +5,14 @@ use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Exceptions\Users\TokenNotValidException;
 use App\Models\User;
+use App\Models\UserOAuth;
 use Audith\Contracts\Registrar as RegistrarContract;
 use Illuminate\Auth\Guard;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Illuminate\Mail\Message;
+use Laravel\Socialite\AbstractUser as SocialiteAbstractUser;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Registrar implements RegistrarContract
@@ -250,6 +252,67 @@ class Registrar implements RegistrarContract
             default:
                 throw new \UnexpectedValueException(trans($attemptReset));
         }
+    }
+
+    public function loginViaOAuth(SocialiteAbstractUser $oauthUserData, $provider)
+    {
+        /** @var UserOAuth $owningOAuthAccount */
+        if ($owningOAuthAccount = UserOAuth::whereEmail($oauthUserData->email)->first()) {
+            $ownerAccount = $owningOAuthAccount->owner;
+            $this->auth->login($ownerAccount, true);
+
+            return true;
+        }
+
+        return !$this->registerViaOAuth($oauthUserData, $provider) ? false : true;
+    }
+
+    public function registerViaOAuth(SocialiteAbstractUser $oauthUserData, $provider)
+    {
+        if (!($ownerAccount = User::whereEmail($oauthUserData->email)->first())) {
+            $ownerAccount = User::create([
+                'name' => $oauthUserData->name,
+                'email' => $oauthUserData->email,
+                'password' => \Hash::make(uniqid("", true))
+            ]);
+        }
+
+        return $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount);
+    }
+
+    /**
+     * @param SocialiteAbstractUser $oauthUserData
+     * @param string                $provider
+     * @param User                  $ownerAccount
+     *
+     * @return User|bool
+     */
+    private function linkOAuthAccount(SocialiteAbstractUser $oauthUserData, $provider, $ownerAccount)
+    {
+        /** @var UserOAuth[] $linkedAccounts */
+        $linkedAccounts = $ownerAccount->linkedAccounts()->{$provider}()->get();
+
+        foreach ($linkedAccounts as $linkedAccount) {
+            if ($linkedAccount->remote_id === $oauthUserData->id || $linkedAccount->email === $oauthUserData->email) {
+                $linkedAccount->remote_id = $oauthUserData->id;
+                $linkedAccount->nickname = $oauthUserData->nickname;
+                $linkedAccount->name = $oauthUserData->name;
+                $linkedAccount->email = $oauthUserData->email;
+                $linkedAccount->avatar = $oauthUserData->avatar;
+
+                return $linkedAccount->save() ? $ownerAccount : false;
+            }
+        }
+
+        $linkedAccount = new UserOAuth();
+        $linkedAccount->remote_provider = $provider;
+        $linkedAccount->remote_id = $oauthUserData->id;
+        $linkedAccount->nickname = $oauthUserData->nickname;
+        $linkedAccount->name = $oauthUserData->name;
+        $linkedAccount->email = $oauthUserData->email;
+        $linkedAccount->avatar = $oauthUserData->avatar;
+
+        return $ownerAccount->linkedAccounts()->save($linkedAccount) ? $ownerAccount : false;
     }
 
     /**

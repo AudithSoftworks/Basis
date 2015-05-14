@@ -7,10 +7,7 @@ Route::get('/php-info', function () {
     return ob_get_clean();
 });
 
-Route::resources([
-    'files' => 'FilesController',
-    'users' => 'UsersController'
-]);
+Route::get('auth/login/{provider?}', 'Users\AuthController@getLogin');
 
 Route::controllers([
     'auth' => 'Users\AuthController',
@@ -18,4 +15,9 @@ Route::controllers([
     'admin' => 'AdminController',
     'admin-demo' => 'Admin\DemoController',
     '' => 'HomeController'
+]);
+
+Route::resources([
+    'files' => 'FilesController',
+    'users' => 'UsersController'
 ]);

@@ -33,5 +33,10 @@ return [
         'room' => '1257206',
         'name' => 'Dev Debug', // Note: HipChat's v1 API supports names up to 15 UTF-8 characters.
         'level' => \Monolog\Logger::DEBUG
+    ],
+    'google' => [
+        'client_id' => env('GOOGLE_CLIENT_ID'),
+        'client_secret' => env('GOOGLE_CLIENT_SECRET'),
+        'redirect' => env('GOOGLE_REDIRECT_URI')
     ]
 ];

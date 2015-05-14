@@ -5,64 +5,63 @@
 {% use "master/body/main" %}
 {% use "master/body/footer" %}
 
+{% block document_head_javascripts %}
+    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}" defer="defer"></script>{% endblock %}
+
 {% block document_body_main %}
     <main class="container-fluid">
-        <div class="row">
-            <div class="col-md-8 col-md-offset-2">
-                <div class="panel panel-default">
-                    <div class="panel-heading">Login</div>
-                    <div class="panel-body">
-                        {% if errors %}
-                        <div class="alert alert-danger">
-                            <strong>Whoops!</strong> There were some problems with your input.<br><br>
-                            <ul>
-                                {% for error in errors %}
-                                <li>{{ error }}</li>
-                                {% endfor %}
-                            </ul>
-                        </div>
-                        {% endif %}
+        {% if errors.any %}
+            <div class="alert alert-danger">
+                <strong>Whoops!</strong> There were some problems with your input.<br><br>
+                <ul>
+                    {% for error in errors %}
+                        <li>{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+        {% endif %}
 
-                        <form class="form-horizontal" role="form" method="POST" action="/auth/login">
-                            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <a href="/auth/login/google">Google Login</a>
+        <a href="/auth/login/github">Github Login</a>
 
-                            <div class="form-group">
-                                <label class="col-md-4 control-label">E-Mail Address</label>
-                                <div class="col-md-6">
-                                    <input type="email" class="form-control" name="email" value="{{ old('email') }}">
-                                </div>
-                            </div>
+        <form class="form-horizontal" role="form" method="POST" action="/auth/login">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-                            <div class="form-group">
-                                <label class="col-md-4 control-label">Password</label>
-                                <div class="col-md-6">
-                                    <input type="password" class="form-control" name="password">
-                                </div>
-                            </div>
+            <fieldset class="form-group">
+                <label class="col-md-4 control-label">E-Mail Address</label>
 
-                            <div class="form-group">
-                                <div class="col-md-6 col-md-offset-4">
-                                    <div class="checkbox">
-                                        <label>
-                                            <input type="checkbox" name="remember"> Remember Me
-                                        </label>
-                                    </div>
-                                </div>
-                            </div>
+                <div class="col-md-6">
+                    <input type="email" class="form-control" name="email" value="{{ old('email') }}">
+                </div>
+            </fieldset>
 
-                            <div class="form-group">
-                                <div class="col-md-6 col-md-offset-4">
-                                    <button type="submit" class="btn btn-primary" style="margin-right: 15px;">
-                                        Login
-                                    </button>
+            <fieldset class="form-group">
+                <label class="col-md-4 control-label">Password</label>
 
-                                    <a href="/password/email">Forgot Your Password?</a>
-                                </div>
-                            </div>
-                        </form>
+                <div class="col-md-6">
+                    <input type="password" class="form-control" name="password">
+                </div>
+            </fieldset>
+
+            <fieldset class="form-group">
+                <div class="col-md-6 col-md-offset-4">
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="remember"> Remember Me
+                        </label>
                     </div>
                 </div>
-            </div>
-        </div>
+            </fieldset>
+
+            <fieldset class="form-group">
+                <div class="col-md-6 col-md-offset-4">
+                    <button type="submit" class="btn btn-primary" style="margin-right: 15px;">
+                        Login
+                    </button>
+
+                    <a href="/password/email">Forgot Your Password?</a>
+                </div>
+            </fieldset>
+        </form>
     </main>
 {% endblock %}
