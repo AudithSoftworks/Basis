@@ -64,4 +64,16 @@ class UserOAuth extends \Eloquent
     {
         return $query->where('remote_provider', '=', 'google');
     }
+
+
+
+    /**
+     * @param Builder $query
+     *
+     * @return mixed
+     */
+    public function scopeTwitter($query)
+    {
+        return $query->where('remote_provider', '=', 'twitter');
+    }
 }
