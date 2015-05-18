@@ -24,7 +24,7 @@ elixir(function (mix) {
         'requirejs': ['public/bower_components/requirejs/require.js'],
         'skycons_html5': ['public/bower_components/skycons-html5/skycons.js'],
         'transitionize': ['public/bower_components/transitionize/dist/transitionize.js'],
-        'switchery': ['public/bower_components/switchery/dist/switchery.js']
+        'switchery': ['public/bower_components/switchery/dist/switchery.min.js']
     };
 
     var jsMaps = {

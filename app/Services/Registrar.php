@@ -5,6 +5,7 @@ use App\Exceptions\Common\ValidationException;
 use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Exceptions\Users\TokenNotValidException;
+use App\Exceptions\Users\OAuthProviderDoesNotProvideUserEmailException;
 use App\Exceptions\Users\UserNotFoundException;
 use App\Models\User;
 use App\Models\UserOAuth;
@@ -212,6 +213,9 @@ class Registrar implements RegistrarContract
      */
     public function loginViaOAuth(SocialiteUser $oauthUserData, $provider)
     {
+        if (!$oauthUserData->email) {
+            throw new OAuthProviderDoesNotProvideUserEmailException;
+        }
         /** @var UserOAuth $owningOAuthAccount */
         if ($owningOAuthAccount = UserOAuth::whereEmail($oauthUserData->email)->first()) {
             $ownerAccount = $owningOAuthAccount->owner;

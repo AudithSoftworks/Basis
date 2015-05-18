@@ -68,12 +68,14 @@ class AuthController extends Controller
                     if ($this->request->exists('code')) {
                         break;
                     }
+                    return $this->socialite->driver($provider)->redirect();
                 case 'twitter':
                     if ($this->request->exists('oauth_token') && $this->request->exists('oauth_verifier')) {
                         break;
                     }
-                default:
                     return $this->socialite->driver($provider)->redirect();
+                default:
+                    return redirect()->back();
             }
 
             /** @var SocialiteUser $userInfo */

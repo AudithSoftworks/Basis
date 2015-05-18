@@ -3,7 +3,7 @@ build:
         php: '5.4.28'
         node: '0.11.13'
         hosts:
-            audith.basis: '127.0.0.1'
+            basis.audith.org: '127.0.0.1'
     dependencies:
         before:
             - cp .env.example .env
