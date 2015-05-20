@@ -1,6 +1,6 @@
 build:
     environment:
-        php: '5.4.28'
+        php: '5.4.30'
         node: '0.11.13'
         hosts:
             basis.audith.org: '127.0.0.1'
@@ -26,7 +26,7 @@ build:
     tests:
         override:
             -
-                command: './vendor/bin/phpunit'
+                command: 'APP_ENV=testing ./vendor/bin/phpunit'
                 coverage:
                     file: './storage/coverage/coverage.xml'
                     format: 'php-clover'

@@ -69,15 +69,21 @@ class Handler extends ExceptionHandler
             // should be listed here. Laravel handles exceptions correctly, status-code wise.
             //---------------------------------------------------------------------------------------
 
+            $response = response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()]);
             switch ($exceptionClass) {
                 case 'App\Exceptions\Common\ValidationException':
                 case 'App\Exceptions\Users\LoginNotValidException':
                 case 'App\Exceptions\Users\PasswordNotValidException':
                 case 'App\Exceptions\Users\TokenNotValidException':
                 case 'Illuminate\Http\Exception\HttpResponseException':
-                    return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(422);
+                    return $response->setStatusCode(422);
                 default:
-                    return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode());
+                    $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
+                    if (!empty($statusCode)) {
+                        $response->setStatusCode($statusCode);
+                    }
+
+                    return $response;
             }
         }
 

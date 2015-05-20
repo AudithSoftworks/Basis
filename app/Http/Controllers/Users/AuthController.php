@@ -77,6 +77,9 @@ class AuthController extends Controller
                     if ($this->request->exists('oauth_token') && $this->request->exists('oauth_verifier')) {
                         break;
                     }
+                    if ($this->request->exists('denied')) {
+                        return redirect('/auth/login')->withErrors(trans('passwords.oauth_cancelled'));
+                    }
                     return $this->socialite->driver($provider)->redirect();
                 default:
                     return redirect()->back();
