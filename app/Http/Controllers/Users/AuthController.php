@@ -65,6 +65,7 @@ class AuthController extends Controller
         if (!is_null($provider)) {
             switch ($provider) {
                 case 'google':
+                case 'facebook':
                     if ($this->request->exists('code')) {
                         break;
                     }
