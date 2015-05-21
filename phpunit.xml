@@ -16,6 +16,7 @@
     </testsuites>
     <filter>
         <blacklist>
+            <directory suffix=".php">./database</directory>
             <directory suffix=".php">./vendor</directory>
         </blacklist>
     </filter>

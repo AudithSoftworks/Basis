@@ -42,9 +42,13 @@ class Registrar implements RegistrarContract
      */
     protected $passwords;
 
-    public function __construct(Request $request, Guard $auth, PasswordBroker $password)
+    /**
+     * @param Guard          $auth
+     * @param PasswordBroker $password
+     */
+    public function __construct(Guard $auth, PasswordBroker $password)
     {
-        $this->request = $request;
+        $this->request = \Route::getCurrentRequest();
         $this->auth = $auth;
         $this->passwords = $password;
     }

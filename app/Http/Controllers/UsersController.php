@@ -117,6 +117,7 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
+        /** @var \App\Models\User $user */
         $user = $this->registrar->get($id);
         if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Ready', 'data' => $user->toJson()];
@@ -172,10 +173,10 @@ class UsersController extends Controller
      */
     private function redirectPath()
     {
-        if (property_exists($this, 'redirectPath')) {
+        if (isset($this->redirectPath)) {
             return $this->redirectPath;
         }
 
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+        return isset($this->redirectTo) ? $this->redirectTo : '/home';
     }
 }

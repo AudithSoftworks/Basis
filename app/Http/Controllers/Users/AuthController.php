@@ -4,7 +4,6 @@ use App\Contracts\Registrar;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Laravel\Socialite\Contracts\Factory as SocialiteContract;
 use Laravel\Socialite\AbstractUser as SocialiteUser;
 
@@ -58,7 +57,7 @@ class AuthController extends Controller
      *
      * @param string $provider
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\View\View
      */
     public function getLogin($provider = null)
     {
@@ -72,6 +71,7 @@ class AuthController extends Controller
                     if ($this->request->exists('error') && $this->request->get('error') == 'access_denied') {
                         return redirect('/auth/login')->withErrors(trans('passwords.oauth_cancelled'));
                     }
+
                     return $this->socialite->driver($provider)->redirect();
                 case 'twitter':
                     if ($this->request->exists('oauth_token') && $this->request->exists('oauth_verifier')) {
@@ -80,6 +80,7 @@ class AuthController extends Controller
                     if ($this->request->exists('denied')) {
                         return redirect('/auth/login')->withErrors(trans('passwords.oauth_cancelled'));
                     }
+
                     return $this->socialite->driver($provider)->redirect();
                 default:
                     return redirect()->back();
@@ -89,7 +90,7 @@ class AuthController extends Controller
             $userInfo = $this->socialite->driver($provider)->user();
             if ($this->registrar->loginViaOAuth($userInfo, $provider)) {
                 if ($this->request->ajax() || $this->request->wantsJson()) {
-                    return ['message' => 'Login successful'];
+                    return ['message' => 'Login successful']; // TODO: Move to API app (Lumen based?)
                 }
 
                 return redirect('/home');
@@ -106,7 +107,7 @@ class AuthController extends Controller
     /**
      * Handle a login request to the application.
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function postLogin()
     {
@@ -122,7 +123,7 @@ class AuthController extends Controller
     /**
      * Log the user out of the application.
      *
-     * @return Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function getLogout()
     {
@@ -132,7 +133,7 @@ class AuthController extends Controller
             return ['message' => 'Logout successful'];
         }
 
-        return redirect(property_exists($this, 'redirectAfterLogout') ? $this->redirectAfterLogout : '/home');
+        return redirect(isset($this->redirectAfterLogout) ? $this->redirectAfterLogout : '/home');
     }
 
     /**
@@ -142,10 +143,10 @@ class AuthController extends Controller
      */
     private function redirectPath()
     {
-        if (property_exists($this, 'redirectPath')) {
+        if (isset($this->redirectPath)) {
             return $this->redirectPath;
         }
 
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+        return isset($this->redirectTo) ? $this->redirectTo : '/home';
     }
 }

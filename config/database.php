@@ -41,13 +41,11 @@ return [
     |
     */
     'connections' => [
-        /*
         'sqlite' => [
             'driver' => 'sqlite',
             'database' => storage_path() . '/database.sqlite',
             'prefix' => '',
         ],
-        */
         'mysql' => [
             'driver' => 'mysql',
             'host' => env('DB_HOST', 'localhost'),
@@ -69,16 +67,14 @@ return [
             'prefix' => '',
             'schema' => 'public',
         ],
-        /*
         'sqlsrv' => [
             'driver' => 'sqlsrv',
             'host' => env('DB_HOST', 'localhost'),
-            'database' => env('DB_DATABASE', 'forge'),
-            'username' => env('DB_USERNAME', 'forge'),
+            'database' => env('DB_DATABASE', 'basis'),
+            'username' => env('DB_USERNAME', 'basis'),
             'password' => env('DB_PASSWORD', ''),
             'prefix' => '',
-        ],
-        */
+        ]
     ],
 
     /*

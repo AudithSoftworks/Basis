@@ -9,11 +9,10 @@ use Laravel\Socialite\AbstractUser as SocialiteUser;
 interface Registrar
 {
     /**
-     * @param Request        $request
      * @param Guard          $auth
      * @param PasswordBroker $password
      */
-    public function __construct(Request $request, Guard $auth, PasswordBroker $password);
+    public function __construct(Guard $auth, PasswordBroker $password);
 
     /**
      * @return \Illuminate\Contracts\Auth\Authenticatable

@@ -17,6 +17,13 @@ class PasswordController extends Controller
     protected $auth;
 
     /**
+     * Registrar service instance.
+     *
+     * @var Registrar
+     */
+    protected $registrar;
+
+    /**
      * The password broker implementation.
      *
      * @var PasswordBroker
@@ -127,10 +134,10 @@ class PasswordController extends Controller
      */
     private function redirectPath()
     {
-        if (property_exists($this, 'redirectPath')) {
+        if (isset($this->redirectPath)) {
             return $this->redirectPath;
         }
 
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+        return isset($this->redirectTo) ? $this->redirectTo : '/home';
     }
 }
