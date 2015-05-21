@@ -1,42 +1,16 @@
-build:
-    environment:
-        php: '5.4.30'
-        node: '0.11.13'
-        hosts:
-            basis.audith.org: '127.0.0.1'
-    dependencies:
-        before:
-            - cp .env.example .env
-            - sudo apt-get install -y -qq sendmail
-        override:
-            - node -v
-            - npm -v
-            - npm install -g npm@latest
-            - npm install -g gulp bower
-            - composer install --no-interaction
-    project-setup:
-        before:
-            - mysql -uroot -e 'CREATE DATABASE basis'
-        override:
-            - php artisan migrate --force --no-interaction
-            - bower install
-            -
-                command: 'gulp'
-                only_if: 'npm install'
-    tests:
-        override:
-            -
-                command: 'APP_ENV=testing ./vendor/bin/phpunit'
-                coverage:
-                    file: './storage/coverage/coverage.xml'
-                    format: 'php-clover'
+checks:
+    php: true
 filter:
-    excluded_paths: [vendor/*, tests/*]
+    excluded_paths:
+        - tests/*
 tools:
+    external_code_coverage:
+        timeout: 1200
+    php_code_sniffer:
+        config:
+            standard: "PSR2"
     php_mess_detector: true
-    php_code_sniffer: true
     sensiolabs_security_checker: true
-    php_code_coverage: true
     php_pdepend: true
     php_loc:
         enabled: true
