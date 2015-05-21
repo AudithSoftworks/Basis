@@ -12,7 +12,6 @@
     <main class="container-fluid">
         {% if errors.any %}
             <div class="alert alert-danger">
-                <strong>Whoops!</strong> There were some problems with your input.<br><br>
                 <ul>
                     {% for error in errors.all %}
                         <li>{{ error }}</li>
