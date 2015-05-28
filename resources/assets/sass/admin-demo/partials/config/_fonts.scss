@@ -60,6 +60,12 @@
         '/fonts/pt_sans/PT_Sans-Web-BoldItalic.eot', 700, italic
 );
 
+@include font-face(
+        'Pontano Sans',
+        font-files('/fonts/pontano_sans/PontanoSans-Regular.woff2', '/fonts/pontano_sans/PontanoSans-Regular.woff', '/fonts/pontano_sans/PontanoSans-Regular.ttf'),
+        '/fonts/pontano_sans/PontanoSans-Regular.eot', 400, normal
+);
+
 body {
     font-family: 'PT Sans', sans-serif;
 }

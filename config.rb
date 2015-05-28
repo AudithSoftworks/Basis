@@ -1,6 +1,5 @@
 require 'compass/import-once/activate'
 require 'bootstrap-sass'
-require 'font-awesome-sass'
 require 'autoprefixer-rails'
 
 # Require any additional compass plugins here.

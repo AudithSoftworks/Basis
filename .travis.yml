@@ -47,7 +47,7 @@ before_install:
   - npm update -g
   - npm install -g bower gulp ttf2eot
   - composer self-update
-  - gem install compass bootstrap-sass sass sass-globbing autoprefixer-rails fontcustom font-awesome-sas
+  - gem install compass bootstrap-sass sass sass-globbing autoprefixer-rails fontcustom
 
 install:
   - travis_retry composer install --no-interaction --prefer-source
@@ -67,10 +67,12 @@ before_script:
   - cp -r public/bower_components/fontawesome/fonts  public/fonts/font_awesome
   - cp -r public/bower_components/google-fonts/ofl/armata public/fonts/armata
   - cp -r public/bower_components/google-fonts/ofl/ptsans public/fonts/pt_sans
+  - cp -r public/bower_components/google-fonts/ofl/pontanosans public/fonts/pontano_sans
   - cp -r public/bower_components/google-fonts/ofl/montserrat public/fonts/montserrat
   - export PATH=$PATH:`pwd`/storage/build_tools/sfnt2woff:`pwd`/storage/build_tools/woff2
   - ./storage/build_tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf
   - ./storage/build_tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pt_sans/stylesheet.css public/fonts/pt_sans/*.ttf
+  - ./storage/build_tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pontano_sans/stylesheet.css public/fonts/pontano_sans/*.ttf
   - ./storage/build_tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf
   - compass compile
   - gulp
