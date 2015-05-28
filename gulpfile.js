@@ -12,12 +12,13 @@ elixir(function (mix) {
         var assetMap = typeOfAsset == 'js' ? jsMaps : cssMaps;
         var assetAliases = typeOfAsset == 'js' ? jsAliases : cssAliases;
         var explodedRequestPath = requestPath.split('/');
+
         if (explodedRequestPath.length > 1 && assetMap.hasOwnProperty(explodedRequestPath[0] + '/*')) {
             outputList.push.apply(outputList, assetMap[explodedRequestPath[0] + '/*']);
         } else if (explodedRequestPath.length == 1 || !assetMap.hasOwnProperty(requestPath)) {
             outputList = assetMap[explodedRequestPath[0] + '/*']
         }
-        if (jsMaps.hasOwnProperty(requestPath)) {
+        if (assetMap.hasOwnProperty(requestPath)) {
             outputList.push.apply(outputList, assetMap[requestPath]);
         }
 
@@ -67,12 +68,14 @@ elixir(function (mix) {
     };
 
     var jsMaps = {
-        'auth/*': ['pace'],
+        '/*': ['pace'],
+        '/login': ['switchery', 'humane_js'],
         'admin-demo/*': ['pace', 'jquery', 'bootstrap', 'bootstrap_breakpoints', 'amaranjs', ['resources/assets/javascripts/admin-demo.js']],
         'admin-demo/dashboard': [
             'jquery_easing', 'jquery_easy_pie_chart', 'bower_jvectormap_2', 'skycons_html5', 'count_up', 'nanoscroller', 'bootstrap_switch', 'switchery',
             'bootstrap_progressbar', 'jquery_flot', ['resources/assets/javascripts/admin-demo/dashboard.js']
-        ]
+        ],
+        'admin-demo/notifications': []
     };
 
     var cssAliases = {
@@ -80,21 +83,31 @@ elixir(function (mix) {
         'bower_jvectormap_2': ['public/bower_components/bower-jvectormap-2/jquery-jvectormap-2.0.0.css'],
         'nanoscroller': ['public/bower_components/nanoscroller/bin/css/nanoscroller.css'],
         'pace': ['public/bower_components/pace/themes/orange/pace-theme-minimal.css'],
-        'switchery': ['public/bower_components/switchery/switchery.css']
-
+        'switchery': ['public/bower_components/switchery/switchery.css'],
+        'humane_js': [
+            'public/bower_components/humane-js/themes/bigbox.css',
+            'public/bower_components/humane-js/themes/boldlight.css',
+            'public/bower_components/humane-js/themes/jackedup.css',
+            'public/bower_components/humane-js/themes/libnotify.css',
+            'public/bower_components/humane-js/themes/original.css'
+        ]
     };
 
     var cssMaps = {
+        '/*': ['pace'],
+        '/login': ['switchery', 'humane_js', ['resources/assets/stylesheets/login.css']],
         'admin-demo/*': [
             ['resources/assets/stylesheets/admin-demo.css'], 'pace', 'bootstrap_switch', 'nanoscroller', 'switchery',
             ['public/stylesheets/fickle.css', 'public/stylesheets/fickle_responsive.css']
         ],
-        'admin-demo/dashboard': ['bower_jvectormap_2', ['resources/assets/stylesheets/admin-demo/dashboard.css']]
+        'admin-demo/dashboard': ['bower_jvectormap_2', ['resources/assets/stylesheets/admin-demo/dashboard.css']],
+        'admin-demo/notifications': ['humane_js']
     };
 
-    mix.scripts(resolveAssetMapToActualFilePaths('auth', 'js'), 'public/javascripts/auth.js', './');
+    mix.scripts(resolveAssetMapToActualFilePaths('/login', 'js'), 'public/javascripts/login.js', './');
     mix.scripts(resolveAssetMapToActualFilePaths('admin-demo/dashboard', 'js'), 'public/javascripts/admin-demo/dashboard.js', './');
 
+    mix.styles(resolveAssetMapToActualFilePaths('/login', 'css'), 'public/stylesheets/login.css', './');
     mix.styles(resolveAssetMapToActualFilePaths('admin-demo/dashboard', 'css'), 'public/stylesheets/admin-demo/dashboard.css', './');
 
     /*---------------

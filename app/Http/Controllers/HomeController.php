@@ -15,12 +15,12 @@ class HomeController extends Controller
     public function getHome()
     {
         $name = "Guest";
-        $link = '<a href="/auth/login">Login</a>';
+        $link = '<a href="/login">Login</a>';
 
         if (\Auth::check()) {
             $user = \Auth::user();
             $name = $user->name;
-            $link = '<a href="/auth/logout">Logout</a>';
+            $link = '<a href="/logout">Logout</a>';
         }
 
         return 'Welcome, '.$name.'! '.$link;

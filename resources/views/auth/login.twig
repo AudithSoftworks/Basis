@@ -1,65 +1,86 @@
-{% extends "master" %}
+{% extends "layout" %}
 
-{% use "master/head" %}
-{% use "master/body/header" %}
-{% use "master/body/main" %}
-{% use "master/body/footer" %}
+{% use "layout/head" %}
+{% use "layout/body/header" %}
+{% use "layout/body/main" %}
+{% use "layout/body/footer" %}
+
+{% block document_head_title %}<title>Login - Audith Basis</title>{% endblock %}
 
 {% block document_head_javascripts %}
-    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}" defer="defer"></script>{% endblock %}
+    <script type="text/javascript" src="{{ elixir('javascripts/login.js') }}"></script>
+{% endblock %}
+
+{% block document_head_stylesheets %}
+    <link rel="stylesheet" href="{{ elixir('stylesheets/login.css') }}">
+{% endblock %}
+
+{% block document_body_header %}
+    <header class="container-fluid">
+        <h1 class="text-center">Audith Basis</h1>
+    </header>
+{% endblock %}
 
 {% block document_body_main %}
     <main class="container-fluid">
         {% if errors.any %}
-            <div class="alert alert-danger">
-                <ul>
-                    {% for error in errors.all %}
-                        <li>{{ error }}</li>
-                    {% endfor %}
-                </ul>
-            </div>
+            {% for error in errors.all %}
+                <script type="text/javascript">
+                    var jacked = humane.create({baseCls: 'humane-jackedup', addnCls: 'humane-jackedup-error'});
+                    jacked.log("{{ error }}");
+                </script>
+            {% endfor %}
+
         {% endif %}
 
-        <a href="/users/create">Register</a> | <a href="/auth/login/google">Google Login</a> | <a href="/auth/login/twitter">Twitter Login</a> | <a href="/auth/login/facebook">Facebook Login</a>
+        <h2><b>Log in</b> to your account</h2>
 
-        <form class="form-horizontal" role="form" method="POST" action="/auth/login">
+        <form class="form-horizontal" role="form" method="POST" action="/login">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-            <fieldset class="form-group">
-                <label class="col-md-4 control-label">E-Mail Address</label>
+            <fieldset class="col-md-12">
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="E-mail address">
+            </fieldset>
 
+            <fieldset class="col-md-12">
+                <input type="password" name="password" placeholder="Password">
+            </fieldset>
+
+            <fieldset class="submit-button col-md-12">
                 <div class="col-md-6">
-                    <input type="email" class="form-control" name="email" value="{{ old('email') }}">
+                    <label>Remember me <input type="checkbox" name="remember"></label>
+                    <script type="text/javascript">
+                        var elem = document.querySelector("input[name='remember']");
+                        var init = new Switchery(elem, {
+                            size: 'small'
+                        });
+                    </script>
                 </div>
-            </fieldset>
-
-            <fieldset class="form-group">
-                <label class="col-md-4 control-label">Password</label>
-
                 <div class="col-md-6">
-                    <input type="password" class="form-control" name="password">
-                </div>
-            </fieldset>
-
-            <fieldset class="form-group">
-                <div class="col-md-6 col-md-offset-4">
-                    <div class="checkbox">
-                        <label>
-                            <input type="checkbox" name="remember"> Remember Me
-                        </label>
-                    </div>
-                </div>
-            </fieldset>
-
-            <fieldset class="form-group">
-                <div class="col-md-6 col-md-offset-4">
-                    <button type="submit" class="btn btn-primary" style="margin-right: 15px;">
-                        Login
+                    <button type="submit" class="btn btn-primary btn-xs col-md-12">
+                        Log in
                     </button>
-
-                    <a href="/password/email">Forgot Your Password?</a>
                 </div>
+            </fieldset>
+
+            <p>or</p>
+
+            <fieldset class="socialite">
+                <a class="btn btn-primary brand-color-twitter fa-twitter" href="/login/twitter"></a>
+                <a class="btn btn-primary brand-color-googleplus fa-google-plus" href="/login/google"></a>
+                <a class="btn btn-primary brand-color-facebook fa-facebook" href="/login/facebook"></a>
             </fieldset>
         </form>
+
+        <ul class="col-md-12">
+            <li class="col-md-6 text-left"><a href="/users/create">Register</a></li>
+            <li class="col-md-6 text-right"><a href="/password/email">Reset password</a></li>
+        </ul>
     </main>
+{% endblock %}
+
+{% block document_body_footer %}
+    <footer>
+        &copy; 
+    </footer>
 {% endblock %}

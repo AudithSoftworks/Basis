@@ -69,7 +69,7 @@ class AuthController extends Controller
                         break;
                     }
                     if ($this->request->exists('error') && $this->request->get('error') == 'access_denied') {
-                        return redirect('/auth/login')->withErrors(trans('passwords.oauth_cancelled'));
+                        return redirect('/login')->withErrors(trans('passwords.oauth_cancelled'));
                     }
 
                     return $this->socialite->driver($provider)->redirect();
@@ -78,7 +78,7 @@ class AuthController extends Controller
                         break;
                     }
                     if ($this->request->exists('denied')) {
-                        return redirect('/auth/login')->withErrors(trans('passwords.oauth_cancelled'));
+                        return redirect('/login')->withErrors(trans('passwords.oauth_cancelled'));
                     }
 
                     return $this->socialite->driver($provider)->redirect();

@@ -1,12 +1,9 @@
 @import "compass/reset";
 @import "compass/css3";
-
 @import "bootstrap-sprockets";
 @import "bootstrap";
-
 @import "../../_vendor/bootstrap-progressbar";
 @import "../../_vendor/amaranjs";
-
 @import "config/variables";
 @import "config/colors";
 @import "config/fonts";
@@ -73,7 +70,7 @@ a:hover {
 body {
     font-size: 14px;
     height: 100%;
-//    background-color: #f9f9f9;
+    //    background-color: #f9f9f9;
 
     &.single-page {
         background-color: #565656;

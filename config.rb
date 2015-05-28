@@ -26,10 +26,11 @@ end
 add_import_path "public/bower_components"
 
 # Set this to the root of your project when deployed:
-http_path = "/public"
+http_path = "public"
 sass_dir = "resources/assets/sass"
 css_dir = "resources/assets/stylesheets"
-fonts_dir = "public/fonts"
+fonts_path = "public/fonts"
+http_fonts_path = "/fonts"
 javascripts_dir = "public/javascripts"
 images_dir = "public/media_assets/images"
 

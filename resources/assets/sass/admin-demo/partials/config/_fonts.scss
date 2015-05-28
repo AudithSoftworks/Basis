@@ -1,70 +1,8 @@
-@import '../../../_vendor/font_awesome';
-
-@include font-face(
-        'Armata',
-        font-files('/fonts/armata/Armata-Regular.woff2', '/fonts/armata/Armata-Regular.woff', '/fonts/armata/Armata-Regular.ttf'),
-        '/fonts/armata/Armata-Regular.eot', 400, normal
-);
-
-@include font-face(
-        'Montserrat',
-        font-files('/fonts/montserrat/Montserrat-Regular.woff2', '/fonts/montserrat/Montserrat-Regular.woff', '/fonts/montserrat/Montserrat-Regular.ttf'),
-        '/fonts/montserrat/Montserrat-Regular.eot', 400, normal
-);
-
-@include font-face(
-        'Montserrat',
-        font-files('/fonts/montserrat/Montserrat-Bold.woff2', '/fonts/montserrat/Montserrat-Bold.woff', '/fonts/montserrat/Montserrat-Bold.ttf'),
-        '/fonts/montserrat/Montserrat-Bold.eot', 700, normal
-);
-
-@include font-face(
-        'Montserrat',
-        font-files('/fonts/montserrat/Montserrat-Thin.woff2', '/fonts/montserrat/Montserrat-Thin.woff', '/fonts/montserrat/Montserrat-Thin.ttf'),
-        '/fonts/montserrat/Montserrat-Thin.eot', 100, normal
-);
-
-@include font-face(
-        'Montserrat',
-        font-files('/fonts/montserrat/Montserrat-Light.woff2', '/fonts/montserrat/Montserrat-Light.woff', '/fonts/montserrat/Montserrat-Light.ttf'),
-        '/fonts/montserrat/Montserrat-Light.eot', 300, normal
-);
-
-@include font-face(
-        'Montserrat',
-        font-files('/fonts/montserrat/Montserrat-Black.woff2', '/fonts/montserrat/Montserrat-Black.woff', '/fonts/montserrat/Montserrat-Black.ttf'),
-        '/fonts/montserrat/Montserrat-Black.eot', 900, normal
-);
-
-@include font-face(
-        'PT Sans',
-        font-files('/fonts/pt_sans/PT_Sans-Web-Regular.woff2', '/fonts/pt_sans/PT_Sans-Web-Regular.woff', '/fonts/pt_sans/PT_Sans-Web-Regular.ttf'),
-        '/fonts/pt_sans/PT_Sans-Web-Regular.eot', 400, normal
-);
-
-@include font-face(
-        'PT Sans',
-        font-files('/fonts/pt_sans/PT_Sans-Web-Bold.woff2', '/fonts/pt_sans/PT_Sans-Web-Bold.woff', '/fonts/pt_sans/PT_Sans-Web-Bold.ttf'),
-        '/fonts/pt_sans/PT_Sans-Web-Bold.eot', 700, normal
-);
-
-@include font-face(
-        'PT Sans',
-        font-files('/fonts/pt_sans/PT_Sans-Web-Italic.woff2', '/fonts/pt_sans/PT_Sans-Web-Italic.woff', '/fonts/pt_sans/PT_Sans-Web-Italic.ttf'),
-        '/fonts/pt_sans/PT_Sans-Web-Italic.eot', 400, italic
-);
-
-@include font-face(
-        'PT Sans',
-        font-files('/fonts/pt_sans/PT_Sans-Web-BoldItalic.woff2', '/fonts/pt_sans/PT_Sans-Web-BoldItalic.woff', '/fonts/pt_sans/PT_Sans-Web-BoldItalic.ttf'),
-        '/fonts/pt_sans/PT_Sans-Web-BoldItalic.eot', 700, italic
-);
-
-@include font-face(
-        'Pontano Sans',
-        font-files('/fonts/pontano_sans/PontanoSans-Regular.woff2', '/fonts/pontano_sans/PontanoSans-Regular.woff', '/fonts/pontano_sans/PontanoSans-Regular.ttf'),
-        '/fonts/pontano_sans/PontanoSans-Regular.eot', 400, normal
-);
+@import '../../../_partials/_fonts/fontawesome';
+@import '../../../_partials/_fonts/armata';
+@import '../../../_partials/_fonts/montserrat';
+@import '../../../_partials/_fonts/ptsans';
+@import '../../../_partials/_fonts/pontanosans';
 
 body {
     font-family: 'PT Sans', sans-serif;

@@ -7,10 +7,11 @@ Route::get('/php-info', function () {
     return ob_get_clean();
 });
 
-Route::get('auth/login/{provider?}', 'Users\AuthController@getLogin');
+Route::get('login/{provider?}', 'Users\AuthController@getLogin');
+Route::post('login/{provider?}', 'Users\AuthController@postLogin');
+Route::get('logout', 'Users\AuthController@getLogout');
 
 Route::controllers([
-    'auth' => 'Users\AuthController',
     'password' => 'Users\PasswordController',
     'admin' => 'AdminController',
     'admin-demo' => 'Admin\DemoController'
