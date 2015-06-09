@@ -1,10 +1,8 @@
 require 'compass/import-once/activate'
-require 'bootstrap-sass'
 require 'autoprefixer-rails'
 
 # Require any additional compass plugins here.
 sourcemap = (environment == :production) ? false : true
-
 
 on_stylesheet_saved do |file|
   css = File.read(file)

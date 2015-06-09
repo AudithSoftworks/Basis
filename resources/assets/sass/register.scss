@@ -43,7 +43,7 @@ body {
             fieldset {
                 margin-bottom: 15px;
 
-                input[type='email'], input[type='text'], input[type='password'] {
+                input[type='email'], input[type='password'], input[type='text'] {
                     background-color: rgba(255, 255, 255, 0.4);
                     padding: ($grid-gutter-width/3) ($grid-gutter-width/2);
                     font-size: 1em;

@@ -16,7 +16,7 @@ class UsersControllerTest extends TestCase
     {
         // static::createApplication(); TODO Facilitate this method @see https://github.com/laravel/framework/pull/8496
         $app = require __DIR__ . '/../bootstrap/app.php';
-        $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
         Artisan::call('migrate:refresh');
     }
@@ -61,7 +61,7 @@ class UsersControllerTest extends TestCase
             case 'testLogin with data set #1':
             case 'testLogin with data set #2':
             case 'testLogin with data set #3':
-                $handshakeRequestEndpointUrl = '/auth/login';
+                $handshakeRequestEndpointUrl = '/login';
                 break;
             default:
                 return;
@@ -434,7 +434,7 @@ class UsersControllerTest extends TestCase
      */
     public function testLogin(array $user, $exceptionExpected)
     {
-        $response = $this->call('POST', '/auth/login', $user, array(), array(), self::$requestHeaders);
+        $response = $this->call('POST', '/login', $user, array(), array(), self::$requestHeaders);
         $responseRaw = $response->getContent();
         $responseAsObject = json_decode($responseRaw);
         $this->assertNotEmpty($responseRaw, 'Response needs to be not-empty.');
@@ -458,7 +458,7 @@ class UsersControllerTest extends TestCase
         Auth::loginUsingId(1);
         $this->assertTrue(Auth::check());
 
-        $response = $this->call('GET', '/auth/logout', array(), array(), array(), self::$requestHeaders);
+        $response = $this->call('GET', '/logout', array(), array(), array(), self::$requestHeaders);
         $responseRaw = $response->getContent();
         $responseAsObject = json_decode($responseRaw);
 

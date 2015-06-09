@@ -1,6 +1,8 @@
 var gulp = require('gulp'),
     elixir = require('laravel-elixir');
 
+elixir.config.sourcemaps = false;
+
 elixir(function (mix) {
 
     /*------------------------------
@@ -37,7 +39,19 @@ elixir(function (mix) {
     var jsAliases = {
         'pace': ['public/bower_components/pace/pace.js'],
         'jquery': ['public/bower_components/jquery/dist/jquery.js'],
-        'bootstrap': ['public/bower_components/bootstrap/dist/js/bootstrap.js'],
+        'bootstrap': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.min.js'],
+        'bootstrap_affix': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/affix.js'],
+        'bootstrap_alert': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/alert.js'],
+        'bootstrap_button': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/button.js'],
+        'bootstrap_carousel': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/carousel.js'],
+        'bootstrap_collapse': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/collapse.js'],
+        'bootstrap_dropdown': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/dropdown.js'],
+        'bootstrap_modal': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/modal.js'],
+        'bootstrap_popover': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/popover.js'],
+        'bootstrap_scrollspy': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/scrollspy.js'],
+        'bootstrap_tab': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tab.js'],
+        'bootstrap_tooltip': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/tooltip.js'],
+        'bootstrap_transition': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/transition.js'],
         'amaranjs': ['public/bower_components/amaranjs/dist/js/jquery.amaran.js'],
         'bootbox': ['public/bower_components/bootbox/bootbox.js'],
         'bootstrap_breakpoints': ['public/bower_components/bootstrap-breakpoints/src/bootstrap-breakpoints.js'],
@@ -68,8 +82,9 @@ elixir(function (mix) {
     };
 
     var jsMaps = {
-        '/*': ['pace'],
-        '/login': ['switchery', 'humane_js'],
+        '/*': ['pace', 'humane_js', 'jquery', ['resources/assets/javascripts/app.js']],
+        '/login': ['switchery'],
+        '/register': ['switchery'],
         'admin-demo/*': ['pace', 'jquery', 'bootstrap', 'bootstrap_breakpoints', 'amaranjs', ['resources/assets/javascripts/admin-demo.js']],
         'admin-demo/dashboard': [
             'jquery_easing', 'jquery_easy_pie_chart', 'bower_jvectormap_2', 'skycons_html5', 'count_up', 'nanoscroller', 'bootstrap_switch', 'switchery',
@@ -96,6 +111,7 @@ elixir(function (mix) {
     var cssMaps = {
         '/*': ['pace'],
         '/login': ['switchery', 'humane_js', ['resources/assets/stylesheets/login.css']],
+        '/register': ['switchery', 'humane_js', ['resources/assets/stylesheets/register.css']],
         'admin-demo/*': [
             ['resources/assets/stylesheets/admin-demo.css'], 'pace', 'bootstrap_switch', 'nanoscroller', 'switchery',
             ['public/stylesheets/fickle.css', 'public/stylesheets/fickle_responsive.css']
@@ -105,9 +121,11 @@ elixir(function (mix) {
     };
 
     mix.scripts(resolveAssetMapToActualFilePaths('/login', 'js'), 'public/javascripts/login.js', './');
+    mix.scripts(resolveAssetMapToActualFilePaths('/register', 'js'), 'public/javascripts/register.js', './');
     mix.scripts(resolveAssetMapToActualFilePaths('admin-demo/dashboard', 'js'), 'public/javascripts/admin-demo/dashboard.js', './');
 
     mix.styles(resolveAssetMapToActualFilePaths('/login', 'css'), 'public/stylesheets/login.css', './');
+    mix.styles(resolveAssetMapToActualFilePaths('/register', 'css'), 'public/stylesheets/register.css', './');
     mix.styles(resolveAssetMapToActualFilePaths('admin-demo/dashboard', 'css'), 'public/stylesheets/admin-demo/dashboard.css', './');
 
     /*---------------

@@ -24,13 +24,9 @@
 {% block document_body_main %}
     <main class="container-fluid">
         {% if errors.any %}
-            {% for error in errors.all %}
-                <script type="text/javascript">
-                    var jacked = humane.create({baseCls: 'humane-jackedup', addnCls: 'humane-jackedup-error'});
-                    jacked.log("{{ error }}");
-                </script>
-            {% endfor %}
-
+            <script type="text/javascript">
+                appClient.Session.flashMessages({{ errors.all|json_encode|raw }});
+            </script>
         {% endif %}
 
         <h2><b>Log in</b> to your account</h2>
@@ -39,11 +35,13 @@
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
             <fieldset class="col-md-12">
-                <input type="email" name="email" value="{{ old('email') }}" placeholder="E-mail address">
+                <label for="email" class="control-label sr-only">E-mail address</label>
+                <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="E-mail address" class="form-control">
             </fieldset>
 
             <fieldset class="col-md-12">
-                <input type="password" name="password" placeholder="Password">
+                <label for="password" class="control-label sr-only">Password</label>
+                <input type="password" id="password" name="password" placeholder="Password" class="form-control">
             </fieldset>
 
             <fieldset class="submit-button col-md-12">
@@ -81,6 +79,6 @@
 
 {% block document_body_footer %}
     <footer>
-        &copy; 
+        &copy;
     </footer>
 {% endblock %}

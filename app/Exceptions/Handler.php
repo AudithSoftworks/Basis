@@ -1,8 +1,10 @@
 <?php namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Illuminate\Http\Exception\HttpResponseException;
 use Psr\Log\LoggerInterface;
 use Monolog\Handler\HipChatHandler;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -14,7 +16,7 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        'Symfony\Component\HttpKernel\Exception\HttpException'
+        HttpException::class
     ];
 
     /**
@@ -71,11 +73,11 @@ class Handler extends ExceptionHandler
 
             $response = response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()]);
             switch ($exceptionClass) {
-                case 'App\Exceptions\Common\ValidationException':
-                case 'App\Exceptions\Users\LoginNotValidException':
-                case 'App\Exceptions\Users\PasswordNotValidException':
-                case 'App\Exceptions\Users\TokenNotValidException':
-                case 'Illuminate\Http\Exception\HttpResponseException':
+                case Common\ValidationException::class:
+                case Users\LoginNotValidException::class:
+                case Users\PasswordNotValidException::class:
+                case Users\TokenNotValidException::class:
+                case HttpResponseException::class:
                     return $response->setStatusCode(422);
                 default:
                     $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();

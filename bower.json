@@ -22,7 +22,6 @@
   "dependencies": {
     "amaranjs": "*",
     "bootbox": "4.*",
-    "bootstrap": "3.*",
     "bootstrap-breakpoints": "*",
     "bootstrap-progressbar": "*",
     "bootstrap-sass-official": "3.*",
