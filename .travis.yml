@@ -83,7 +83,7 @@ before_script:
 script:
   - cp .env.example .env
   - php artisan migrate --force
-  - vendor/bin/phpunit
+  - vendor/bin/phpunit --debug --verbose
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover ./storage/coverage/coverage.xml
 

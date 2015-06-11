@@ -9,19 +9,19 @@ elixir(function (mix) {
      | Merge assets in view-basis
      *-----------------------------*/
 
-    var resolveAssetMapToActualFilePaths = function (requestPath, typeOfAsset) {
+    var resolveAssetMapToActualFilePaths = function (assetNameSpace, typeOfAsset) {
         var outputList = [];
         var assetMap = typeOfAsset == 'js' ? jsMaps : cssMaps;
         var assetAliases = typeOfAsset == 'js' ? jsAliases : cssAliases;
-        var explodedRequestPath = requestPath.split('/');
+        var explodedRequestPath = assetNameSpace.split('/');
 
         if (explodedRequestPath.length > 1 && assetMap.hasOwnProperty(explodedRequestPath[0] + '/*')) {
             outputList.push.apply(outputList, assetMap[explodedRequestPath[0] + '/*']);
-        } else if (explodedRequestPath.length == 1 || !assetMap.hasOwnProperty(requestPath)) {
+        } else if (explodedRequestPath.length == 1 || !assetMap.hasOwnProperty(assetNameSpace)) {
             outputList = assetMap[explodedRequestPath[0] + '/*']
         }
-        if (assetMap.hasOwnProperty(requestPath)) {
-            outputList.push.apply(outputList, assetMap[requestPath]);
+        if (assetMap.hasOwnProperty(assetNameSpace)) {
+            outputList.push.apply(outputList, assetMap[assetNameSpace]);
         }
 
         var resolvedList = [];
@@ -83,8 +83,7 @@ elixir(function (mix) {
 
     var jsMaps = {
         '/*': ['pace', 'humane_js', 'jquery', ['resources/assets/javascripts/app.js']],
-        '/login': ['switchery'],
-        '/register': ['switchery'],
+        '/auth': ['switchery'],
         'admin-demo/*': ['pace', 'jquery', 'bootstrap', 'bootstrap_breakpoints', 'amaranjs', ['resources/assets/javascripts/admin-demo.js']],
         'admin-demo/dashboard': [
             'jquery_easing', 'jquery_easy_pie_chart', 'bower_jvectormap_2', 'skycons_html5', 'count_up', 'nanoscroller', 'bootstrap_switch', 'switchery',
@@ -109,9 +108,8 @@ elixir(function (mix) {
     };
 
     var cssMaps = {
-        '/*': ['pace'],
-        '/login': ['switchery', 'humane_js', ['resources/assets/stylesheets/login.css']],
-        '/register': ['switchery', 'humane_js', ['resources/assets/stylesheets/register.css']],
+        '/*': ['pace', 'humane_js'],
+        '/auth': ['switchery', ['resources/assets/stylesheets/auth.css']],
         'admin-demo/*': [
             ['resources/assets/stylesheets/admin-demo.css'], 'pace', 'bootstrap_switch', 'nanoscroller', 'switchery',
             ['public/stylesheets/fickle.css', 'public/stylesheets/fickle_responsive.css']
@@ -120,12 +118,10 @@ elixir(function (mix) {
         'admin-demo/notifications': ['humane_js']
     };
 
-    mix.scripts(resolveAssetMapToActualFilePaths('/login', 'js'), 'public/javascripts/login.js', './');
-    mix.scripts(resolveAssetMapToActualFilePaths('/register', 'js'), 'public/javascripts/register.js', './');
+    mix.scripts(resolveAssetMapToActualFilePaths('/auth', 'js'), 'public/javascripts/auth.js', './');
     mix.scripts(resolveAssetMapToActualFilePaths('admin-demo/dashboard', 'js'), 'public/javascripts/admin-demo/dashboard.js', './');
 
-    mix.styles(resolveAssetMapToActualFilePaths('/login', 'css'), 'public/stylesheets/login.css', './');
-    mix.styles(resolveAssetMapToActualFilePaths('/register', 'css'), 'public/stylesheets/register.css', './');
+    mix.styles(resolveAssetMapToActualFilePaths('/auth', 'css'), 'public/stylesheets/auth.css', './');
     mix.styles(resolveAssetMapToActualFilePaths('admin-demo/dashboard', 'css'), 'public/stylesheets/admin-demo/dashboard.css', './');
 
     /*---------------

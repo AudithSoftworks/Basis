@@ -2,7 +2,7 @@
 
 class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
-    protected $baseUrl = '';
+    protected $baseUrl = 'http://basis.audith.org';
 
     /**
      * Creates the application.

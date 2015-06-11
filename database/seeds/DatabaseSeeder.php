@@ -15,5 +15,7 @@ class DatabaseSeeder extends Seeder
 
         $this->call('NestedEntitiesTableSeeder');
         $this->command->info('NestedEntitiesTable seeded.');
+
+        Eloquent::reguard();
     }
 }

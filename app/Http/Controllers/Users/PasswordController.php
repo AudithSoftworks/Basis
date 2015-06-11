@@ -65,7 +65,7 @@ class PasswordController extends Controller
             return [];
         }
 
-        return view('auth/password');
+        return view('password/email');
     }
 
     /**
@@ -78,12 +78,7 @@ class PasswordController extends Controller
         $this->registrar->sendResetPasswordLinkViaEmail();
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            $return = ['message' => trans(PasswordBroker::RESET_LINK_SENT)];
-            if (\App::environment() == 'testing') {
-                $return = array_merge($return, ['token' => \DB::table('password_resets')->where('email', '=', 'shehi@imanov.me')->pluck('token')]);
-            }
-
-            return $return;
+            return ['message' => trans(PasswordBroker::RESET_LINK_SENT)];
         }
 
         return redirect()->back()->with('status', trans(PasswordBroker::RESET_LINK_SENT));
@@ -108,7 +103,7 @@ class PasswordController extends Controller
             return ['token' => $token];
         }
 
-        return view('auth/reset')->with('token', $token);
+        return view('password/reset')->with('token', $token);
     }
 
     /**
@@ -138,6 +133,6 @@ class PasswordController extends Controller
             return $this->redirectPath;
         }
 
-        return isset($this->redirectTo) ? $this->redirectTo : '/home';
+        return isset($this->redirectTo) ? $this->redirectTo : '/login';
     }
 }

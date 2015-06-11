@@ -15,7 +15,6 @@ return [
     |
     */
     'default' => env('QUEUE_DRIVER', 'sync'),
-
     /*
     |--------------------------------------------------------------------------
     | Queue Connections
@@ -59,11 +58,11 @@ return [
         ],
         'redis' => [
             'driver' => 'redis',
+            'connection' => 'default',
             'queue' => 'default',
             'expire' => 60,
         ],
     ],
-
     /*
     |--------------------------------------------------------------------------
     | Failed Queue Jobs
