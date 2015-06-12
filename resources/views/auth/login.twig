@@ -23,12 +23,6 @@
 
 {% block document_body_main %}
     <main class="container-fluid">
-        {% if errors.any %}
-            <script type="text/javascript">
-                appClient.Session.flashMessages({{ errors.all|json_encode|raw }});
-            </script>
-        {% endif %}
-
         <h2><b>Log in</b> to your account</h2>
 
         <form class="form-horizontal" role="form" method="POST" action="/login">

@@ -24,10 +24,10 @@ addons:
 matrix:
   fast_finish: true
   allow_failures:
-    - php: 7.0
+    # - php: 7.0
     - php: hhvm
-      env: DB=pgsql DB_USERNAME=postgres NODE_VERSION=stable
-    - env: DB=mysql DB_USERNAME=root NODE_VERSION=unstable
+    #  env: DB=pgsql DB_USERNAME=postgres NODE_VERSION=stable
+    #- env: DB=mysql DB_USERNAME=root NODE_VERSION=unstable
 
 # sudo: false
 

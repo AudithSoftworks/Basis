@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Users;
 
 use App\Contracts\Registrar;
+use App\Exceptions\Users\TokenNotValidException;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\PasswordBroker;
@@ -81,7 +82,7 @@ class PasswordController extends Controller
             return ['message' => trans(PasswordBroker::RESET_LINK_SENT)];
         }
 
-        return redirect()->back()->with('status', trans(PasswordBroker::RESET_LINK_SENT));
+        return redirect()->back()->with('message', trans(PasswordBroker::RESET_LINK_SENT));
     }
 
     /**
@@ -96,7 +97,11 @@ class PasswordController extends Controller
     public function getReset($token = null)
     {
         if (is_null($token)) {
-            throw new NotFoundHttpException;
+            if ($this->request->ajax() || $this->request->wantsJson()) {
+                throw new TokenNotValidException();
+            }
+
+            return view('password/reset')->withErrors(['token' => trans(PasswordBroker::INVALID_TOKEN)]);
         }
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
@@ -119,7 +124,7 @@ class PasswordController extends Controller
             return ['message' => 'Password successfully reset'];
         }
 
-        return redirect($this->redirectPath());
+        return redirect($this->redirectPath())->with('message', trans(PasswordBroker::PASSWORD_RESET));
     }
 
     /**

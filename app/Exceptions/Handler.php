@@ -89,6 +89,11 @@ class Handler extends ExceptionHandler
             }
         }
 
-        return redirect()->back()->withInput($request->all())->withErrors($e->getMessage());
+        $redirect = redirect()->back();
+        if ($redirect->getTargetUrl() === \Config::get('app.url')) {
+            $redirect = redirect()->refresh();
+        }
+
+        return $redirect->withInput($request->all())->withErrors($e->getMessage());
     }
 }

@@ -49,7 +49,7 @@ return [
     | used globally for all e-mails that are sent by your application.
     |
     */
-    'from' => ['address' => 'hostmaster@audith.net', 'name' => 'Audith Softworks Hostmaster'],
+    'from' => ['address' => env('MAIL_FROM_ADDR', 'mailer@example.com'), 'name' => env('MAIL_FROM_NAME', 'App Admin')],
 
     /*
     |--------------------------------------------------------------------------

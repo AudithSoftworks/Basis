@@ -261,7 +261,7 @@ class Registrar implements RegistrarContract
             case PasswordBroker::RESET_LINK_SENT:
                 return true;
             case PasswordBroker::INVALID_USER:
-                throw new NotFoundHttpException;
+                throw new UserNotFoundException();
             default:
                 throw new \UnexpectedValueException;
         }
@@ -305,7 +305,7 @@ class Registrar implements RegistrarContract
             case PasswordBroker::INVALID_TOKEN:
                 throw new TokenNotValidException;
             default:
-                throw new \UnexpectedValueException(trans($attemptReset));
+                throw new \UnexpectedValueException(trans($attemptReset, ['min_length' => \Config::get('auth.password.min_length')]));
         }
     }
 
@@ -361,6 +361,6 @@ class Registrar implements RegistrarContract
      */
     private function getFailedLoginMessage()
     {
-        return 'These credentials do not match our records.';
+        return 'These credentials do not match our records!';
     }
 }

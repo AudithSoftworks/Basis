@@ -9,7 +9,7 @@ use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class UsersControllerJsonApiTest extends TestCase
+class AuthenticationJsonApiTest extends TestCase
 {
     use WithoutMiddleware;
 
@@ -34,9 +34,11 @@ class UsersControllerJsonApiTest extends TestCase
      */
     public static function setUpBeforeClass()
     {
-        static::createApplication();
+        putenv('APP_ENV=testing');
+        $app = require __DIR__ . '/../../bootstrap/app.php';
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-        Artisan::call('migrate:refresh');
+        \Artisan::call('migrate:refresh');
     }
 
     public function data_testStore()
@@ -67,21 +69,21 @@ class UsersControllerJsonApiTest extends TestCase
      */
     public function testStore(array $credentials, $exceptionExpected = '')
     {
-        $crawler = $this->post('/users', $credentials, self::$requestHeaders);
-        $crawler->shouldReturnJson();
+        $this->post('/users', $credentials, self::$requestHeaders);
+        $this->shouldReturnJson();
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
                 case ValidationException::class:
-                    $crawler->seeStatusCode(422);
+                    $this->seeStatusCode(422);
                     break;
                 default:
-                    $crawler->seeStatusCode(500);
+                    $this->seeStatusCode(500);
                     break;
             }
-            $crawler->seeJson(['exception' => $exceptionExpected]);
+            $this->seeJson(['exception' => $exceptionExpected]);
         } else {
-            $crawler->seeStatusCode(200);
-            $crawler->seeJson(['message' => 'Created']);
+            $this->seeStatusCode(200);
+            $this->seeJson(['message' => 'Created']);
         }
     }
 
@@ -110,15 +112,15 @@ class UsersControllerJsonApiTest extends TestCase
      */
     public function testShow(array $user, $exceptionExpected)
     {
-        $crawler = $this->get('/users/'.$user['id'], self::$requestHeaders);
-        $crawler->shouldReturnJson();
+        $this->get('/users/'.$user['id'], self::$requestHeaders);
+        $this->shouldReturnJson();
         if (!empty($exceptionExpected)) {
-            $crawler->seeStatusCode(404);
-            $crawler->seeJson(['exception' => $exceptionExpected]);
+            $this->seeStatusCode(404);
+            $this->seeJson(['exception' => $exceptionExpected]);
         } else {
-            $crawler->seeStatusCode(200);
-            $crawler->see('data');
-            $crawler->see('john.doe@example.com');
+            $this->seeStatusCode(200);
+            $this->see('data');
+            $this->see('john.doe@example.com');
         }
     }
 
@@ -189,25 +191,25 @@ class UsersControllerJsonApiTest extends TestCase
     {
         $parameters = array_except($user, ['id']);
 
-        $crawl = $this->put('/users/'.$user['id'], $parameters, self::$requestHeaders);
-        $crawl->shouldReturnJson();
+        $this->put('/users/'.$user['id'], $parameters, self::$requestHeaders);
+        $this->shouldReturnJson();
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
                 case NotFoundHttpException::class:
-                    $crawl->seeStatusCode(404);
+                    $this->seeStatusCode(404);
                     break;
                 case PasswordNotValidException::class:
                 case ValidationException::class:
-                    $crawl->seeStatusCode(422);
+                    $this->seeStatusCode(422);
                     break;
                 default:
-                    $crawl->seeStatusCode(500);
+                    $this->seeStatusCode(500);
                     break;
             }
-            $crawl->seeJson(['exception' => $exceptionExpected]);
+            $this->seeJson(['exception' => $exceptionExpected]);
         } else {
-            $crawl->seeStatusCode(200);
-            $crawl->seeJson(['message' => 'Updated']);
+            $this->seeStatusCode(200);
+            $this->seeJson(['message' => 'Updated']);
         }
     }
 
@@ -224,7 +226,7 @@ class UsersControllerJsonApiTest extends TestCase
                 [ // Wrong email
                     'email' => 'jane.doe@example.com'
                 ],
-                NotFoundHttpException::class
+                UserNotFoundException::class
             ],
             [
                 [ // Correct data
@@ -236,7 +238,7 @@ class UsersControllerJsonApiTest extends TestCase
     }
 
     /**
-     * Tests PasswordController::postEmail() controller method.
+     * Tests App\Controllers\Users\PasswordController::postEmail() controller method.
      *
      * @dataProvider data_testPostEmail
      * @depends      testUpdate
@@ -247,27 +249,27 @@ class UsersControllerJsonApiTest extends TestCase
      */
     public function testPostEmail(array $userData, $exceptionExpected)
     {
-        $crawl = $this->post('/password/email', $userData, self::$requestHeaders);
-        $crawl->shouldReturnJson();
-        $crawl->see('message');
+        $this->post('/password/email', $userData, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
-                case NotFoundHttpException::class:
-                    $crawl->seeStatusCode(404);
+                case UserNotFoundException::class:
+                    $this->seeStatusCode(404);
                     break;
                 case ValidationException::class:
-                    $crawl->seeStatusCode(422);
+                    $this->seeStatusCode(422);
                     break;
                 default:
-                    $crawl->seeStatusCode(500);
+                    $this->seeStatusCode(500);
                     break;
             }
-            $crawl->seeJson(['exception' => $exceptionExpected]);
+            $this->seeJson(['exception' => $exceptionExpected]);
         } else {
-            $crawl->seeStatusCode(200);
+            $this->seeStatusCode(200);
 
             self::$passwordResetToken = \DB::table('password_resets')->where('email', '=', 'john.doe@example.com')->value('token');
-            $crawl->seeJson(['message' => trans(PasswordBroker::RESET_LINK_SENT)]);
+            $this->seeJson(['message' => trans(PasswordBroker::RESET_LINK_SENT)]);
         }
     }
 
@@ -320,7 +322,7 @@ class UsersControllerJsonApiTest extends TestCase
     }
 
     /**
-     * Tests PasswordController::postReset() controller method.
+     * Tests App\Controllers\Users\PasswordController::postReset() controller method.
      *
      * @dataProvider data_testPostReset
      * @depends      testPostEmail
@@ -335,26 +337,26 @@ class UsersControllerJsonApiTest extends TestCase
             $userData['token'] = self::$passwordResetToken;
         }
 
-        $crawl = $this->post('/password/reset', $userData, self::$requestHeaders);
-        $crawl->shouldReturnJson();
-        $crawl->see('message');
+        $this->post('/password/reset', $userData, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
                 case UserNotFoundException::class:
                 case NotFoundHttpException::class:
-                    $crawl->seeStatusCode(404);
+                    $this->seeStatusCode(404);
                     break;
                 case ValidationException::class:
                 case TokenNotValidException::class:
-                    $crawl->seeStatusCode(422);
+                    $this->seeStatusCode(422);
                     break;
                 default:
-                    $crawl->seeStatusCode(500);
+                    $this->seeStatusCode(500);
                     break;
             }
-            $crawl->seeJson(['exception' => $exceptionExpected]);
+            $this->seeJson(['exception' => $exceptionExpected]);
         } else {
-            $crawl->seeStatusCode(200);
+            $this->seeStatusCode(200);
         }
     }
 
@@ -381,7 +383,7 @@ class UsersControllerJsonApiTest extends TestCase
     }
 
     /**
-     * Tests AuthController::postLogin() controller method.
+     * Tests App\Controllers\Users\AuthController::postLogin() controller method.
      *
      * @dataProvider data_testLogin
      * @depends      testPostReset
@@ -391,24 +393,24 @@ class UsersControllerJsonApiTest extends TestCase
      */
     public function testLogin(array $user, $exceptionExpected)
     {
-        $crawl = $this->post('/login', $user, self::$requestHeaders);
+        $this->post('/login', $user, self::$requestHeaders);
 
-        $crawl->shouldReturnJson();
+        $this->shouldReturnJson();
 
-        $crawl->see('message');
+        $this->see('message');
 
         if (!empty($exceptionExpected)) {
-            $crawl->seeStatusCode(422);
-            $crawl->seeJson(['exception' => $exceptionExpected]);
+            $this->seeStatusCode(422);
+            $this->seeJson(['exception' => $exceptionExpected]);
             $this->assertFalse(\Auth::check());
         } else {
-            $crawl->seeStatusCode(200);
+            $this->seeStatusCode(200);
             $this->assertTrue(\Auth::check());
         }
     }
 
     /**
-     * Tests AuthController::getLogout() controller method.
+     * Tests App\Controllers\Users\AuthController::getLogout() controller method.
      *
      * @depends testLogin
      */
@@ -417,9 +419,9 @@ class UsersControllerJsonApiTest extends TestCase
         \Auth::loginUsingId(1);
         $this->assertTrue(\Auth::check());
 
-        $crawl = $this->get('logout', self::$requestHeaders);
-        $crawl->shouldReturnJson();
-        $crawl->seeStatusCode(200);
+        $this->get('logout', self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
 
         $this->assertFalse(Auth::check());
     }
@@ -455,25 +457,25 @@ class UsersControllerJsonApiTest extends TestCase
     {
         $parameters = array_except($user, ['email']);
 
-        $crawl = $this->delete('/users/'.$user['id'], $parameters, self::$requestHeaders);
-        $crawl->shouldReturnJson();
-        $crawl->see('message');
+        $this->delete('/users/'.$user['id'], $parameters, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
                 case NotFoundHttpException::class:
-                    $crawl->seeStatusCode(404);
+                    $this->seeStatusCode(404);
                     break;
                 case PasswordNotValidException::class:
-                    $crawl->seeStatusCode(422);
+                    $this->seeStatusCode(422);
                     break;
                 default:
-                    $crawl->seeStatusCode(500);
+                    $this->seeStatusCode(500);
                     break;
             }
-            $crawl->seeJson(['exception' => $exceptionExpected]);
+            $this->seeJson(['exception' => $exceptionExpected]);
         } else {
-            $crawl->seeStatusCode(200);
-            $crawl->seeJson(['message' => 'Deleted']);
+            $this->seeStatusCode(200);
+            $this->seeJson(['message' => 'Deleted']);
         }
     }
 }

@@ -205,11 +205,17 @@ var AppClient = function () {
     };
 
     this.Session = {
-        flashMessages: function (messages) {
+        flashMessages: function (messages, type) {
             if (jQueryInit === true) {
                 jQuery(document).ready(function (/* event */) {
                     var parsedMessages,
-                        humaneJsHandle = humane.create({baseCls: 'humane-jackedup', addnCls: 'humane-jackedup-error'});
+                        humaneJsHandle = humane.create({
+                            baseCls: 'humane-jackedup',
+                            addnCls: 'humane-jackedup-' + type,
+                            timeout: 5000,
+                            waitForMove: true,
+                            timeoutAfterMove: 1500
+                        });
 
                     try {
                         parsedMessages = jQuery.parseJSON(messages);
@@ -222,15 +228,17 @@ var AppClient = function () {
                     } else if (typeof parsedMessages === 'object') {
                         var messageForNotification = "";
                         for (var idx in parsedMessages) {
-                            if (isNaN(idx)) {
-                                jQuery("input[name='" + idx + "']")
-                                    .attr('aria-describedby', 'helpBlock_' + idx)
-                                    .parent()
+                            if (parsedMessages.hasOwnProperty(idx)) {
+                                if (isNaN(idx)) {
+                                    jQuery("input[name='" + idx + "']")
+                                        .attr('aria-describedby', 'helpBlock_' + idx)
+                                        .parent()
                                         .addClass('has-error has-feedback')
                                         .append('<span class="glyphicon glyphicon-remove form-control-feedback" aria-hidden="true"></span>')
                                         .append('<span class="help-block" id="helpBlock_' + idx + '">' + parsedMessages[idx] + '</span>');
+                                }
+                                messageForNotification += "<li>" + parsedMessages[idx] + "</li>";
                             }
-                            messageForNotification += "<li>" + parsedMessages[idx] + "</li>";
                         }
                         humaneJsHandle.log("<ul>" + messageForNotification + "</ul>");
                     }
