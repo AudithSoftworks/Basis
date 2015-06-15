@@ -1,6 +1,13 @@
 <?php namespace App\Services;
 
 use App\Contracts\Registrar as RegistrarContract;
+use App\Events\Users\Deleted;
+use App\Events\Users\LoggedIn;
+use App\Events\Users\LoggedOut;
+use App\Events\Users\Registered;
+use App\Events\Users\RequestedResetPasswordLinkViaEmail;
+use App\Events\Users\ResetPassword;
+use App\Events\Users\Updated;
 use App\Exceptions\Common\ValidationException;
 use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
@@ -13,7 +20,6 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
-use Illuminate\Mail\Message;
 use Laravel\Socialite\AbstractUser as SocialiteUser;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
@@ -63,9 +69,8 @@ class Registrar implements RegistrarContract
         $validator = \Validator::make($this->request->all(), [
             'name' => 'sometimes|required|max:255',
             'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min-length'),
+            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min_length'),
         ]);
-
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
@@ -74,7 +79,7 @@ class Registrar implements RegistrarContract
         $this->request->has('name') && $user->name = $this->request->input('name');
         $user->email = $this->request->input('email');
         $user->password = \Hash::make($this->request->input('password'));
-        $user->save();
+        $user->save() && \Event::fire(new Registered($user)); // Fire the event on success only!
 
         return $user;
     }
@@ -106,6 +111,9 @@ class Registrar implements RegistrarContract
             $ownerAccount->save();
         }
 
+        # Event
+        \Event::fire(new Registered($ownerAccount, $provider));
+
         return $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount);
     }
 
@@ -130,7 +138,7 @@ class Registrar implements RegistrarContract
             throw new PasswordNotValidException;
         }
 
-        $user->destroy($id);
+        $user->destroy($id) && \Event::fire(new Deleted($user)); // Fire the event on success only!
 
         return true;
     }
@@ -164,10 +172,9 @@ class Registrar implements RegistrarContract
         $validator = \Validator::make($this->request->all(), [
             'name' => 'sometimes|required|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min-length'),
-            'old_password' => 'required|min:' . \Config::get('auth.password.min-length'),
+            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min_length'),
+            'old_password' => 'required|min:' . \Config::get('auth.password.min_length'),
         ]);
-
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
@@ -176,11 +183,13 @@ class Registrar implements RegistrarContract
             throw new PasswordNotValidException;
         }
 
+        $userBefore = clone $user;
+
         $this->request->has('name') && $user->name = $this->request->input("name");
         $user->email = $this->request->input("email");
         $user->password = \Hash::make($this->request->input("password"));
 
-        return $user->save();
+        return $user->save() && \Event::fire(new Updated($userBefore, $user)); // Fire the event on success only!
     }
 
     /**
@@ -194,7 +203,6 @@ class Registrar implements RegistrarContract
             'email' => 'required|email',
             'password' => 'required',
         ]);
-
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
@@ -202,6 +210,8 @@ class Registrar implements RegistrarContract
         $credentials = $this->request->only('email', 'password');
 
         if ($this->auth->attempt($credentials, $this->request->has('remember'))) {
+            \Event::fire(new LoggedIn($this->auth->user()));
+
             return true;
         }
 
@@ -221,6 +231,8 @@ class Registrar implements RegistrarContract
             $ownerAccount = $owningOAuthAccount->owner;
             $this->auth->login($ownerAccount, true);
 
+            \Event::fire(new LoggedIn($ownerAccount, $provider));
+
             return true;
         }
 
@@ -232,7 +244,9 @@ class Registrar implements RegistrarContract
      */
     public function logout()
     {
+        $userInfoForEventTrigger = $this->auth->user();
         $this->auth->logout();
+        \Event::fire(new LoggedOut($userInfoForEventTrigger));
 
         return true;
     }
@@ -248,23 +262,18 @@ class Registrar implements RegistrarContract
         $validator = \Validator::make($this->request->all(), [
             'email' => 'required|email|max:255'
         ]);
-
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
 
-        $attemptSendResetLink = $this->passwords->sendResetLink($this->request->only('email'), function (Message $message) {
-            $message->subject($this->getPasswordResetEmailSubject());
-        });
-
-        switch ($attemptSendResetLink) {
-            case PasswordBroker::RESET_LINK_SENT:
-                return true;
-            case PasswordBroker::INVALID_USER:
-                throw new UserNotFoundException();
-            default:
-                throw new \UnexpectedValueException;
+        $user = User::whereEmail($this->request->only('email'))->first();
+        if (is_null($user)) {
+            throw new UserNotFoundException();
         }
+
+        \Event::fire(new RequestedResetPasswordLinkViaEmail($user));
+
+        return true;
     }
 
     /**
@@ -280,7 +289,7 @@ class Registrar implements RegistrarContract
         $validator = \Validator::make($this->request->all(), [
             'token' => 'required',
             'email' => 'required|email|max:255',
-            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min-length')
+            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min_length')
         ]);
 
         if ($validator->fails()) {
@@ -294,7 +303,7 @@ class Registrar implements RegistrarContract
              * @var \App\Models\User $user
              */
             $user->password = \Hash::make($password);
-            $user->save();
+            $user->save() && \Event::fire(new ResetPassword($user));
         });
 
         switch ($attemptReset) {
@@ -342,16 +351,6 @@ class Registrar implements RegistrarContract
         $linkedAccount->avatar = $oauthUserData->avatar;
 
         return $ownerAccount->linkedAccounts()->save($linkedAccount) ? $ownerAccount : false;
-    }
-
-    /**
-     * Get the e-mail subject line to be used for the reset link email.
-     *
-     * @return string
-     */
-    private function getPasswordResetEmailSubject()
-    {
-        return trans('passwords.reset_email_subject');
     }
 
     /**

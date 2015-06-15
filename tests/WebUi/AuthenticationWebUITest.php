@@ -55,6 +55,9 @@ class AuthenticationWebUITest extends TestCase
             [ // Email missing
                 ['name' => 'John Doe', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver']
             ],
+            [ // Short password
+                ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'password' => 'short', 'password_confirmation' => 'short']
+            ],
             [ // Success
                 ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd', 'password_confirmation' => 's0m34ardPa55w0rd']
             ]
@@ -76,9 +79,10 @@ class AuthenticationWebUITest extends TestCase
         $this->see('<h2><b>Create</b> a new account</h2>');
 
         # We shouldn't have flash error messages around.
-        $this->see('The name field is required.', true);
-        $this->see('The email field is required.', true);
-        $this->see('The password field is required.', true);
+        $this->see(trans('validation.required', ['attribute' => 'name']), true);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.required', ['attribute' => 'password']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
 
         # Fill in the form fed by data-provider
         foreach ($credentials as $key => $value) {
@@ -93,15 +97,24 @@ class AuthenticationWebUITest extends TestCase
             case 'testRegister with data set #0':
                 $this->seePageIs('/register');
                 $this->see('The password confirmation does not match.');
-                $this->see('The name field is required.', true);
-                $this->see('The email field is required.', true);
-                $this->see('The password field is required.', true);
+                $this->see(trans('validation.required', ['attribute' => 'name']), true);
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.required', ['attribute' => 'password']), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
                 break;
             case 'testRegister with data set #1':
                 $this->seePageIs('/register');
-                $this->see('The email field is required.');
-                $this->see('The name field is required.', true);
-                $this->see('The password field is required.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']));
+                $this->see(trans('validation.required', ['attribute' => 'name']), true);
+                $this->see(trans('validation.required', ['attribute' => 'password']), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
+                break;
+            case 'testRegister with data set #2':
+                $this->seePageIs('/register');
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.required', ['attribute' => 'name']), true);
+                $this->see(trans('validation.required', ['attribute' => 'password']), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]));
                 break;
             default:
                 $this->seePageIs('/home');
@@ -145,8 +158,8 @@ class AuthenticationWebUITest extends TestCase
         $this->see('<h2><b>Log in</b> to your account</h2>');
 
         # We shouldn't have flash error messages around.
-        $this->see('The email field is required.', true);
-        $this->see('The password field is required.', true);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.required', ['attribute' => 'password']), true);
 
         # Fill in the form fed by data-provider
         foreach ($credentials as $key => $value) {
@@ -160,26 +173,26 @@ class AuthenticationWebUITest extends TestCase
         switch ($this->getName()) {
             case 'testLogin with data set #0':
                 $this->seePageIs('/login');
-                $this->see('The email field is required.');
-                $this->see('The password field is required.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']));
+                $this->see(trans('validation.required', ['attribute' => 'password']), true);
                 $this->see('These credentials do not match our records!', true);
                 break;
             case 'testLogin with data set #1':
                 $this->seePageIs('/login');
-                $this->see('The email field is required.', true);
-                $this->see('The password field is required.');
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.required', ['attribute' => 'password']));
                 $this->see('These credentials do not match our records!', true);
                 break;
             case 'testLogin with data set #2':
                 $this->seePageIs('/login');
-                $this->see('The email field is required.', true);
-                $this->see('The password field is required.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.required', ['attribute' => 'password']), true);
                 $this->see('These credentials do not match our records!');
                 break;
             default:
                 $this->seePageIs('/home');
-                $this->see('The email field is required.', true);
-                $this->see('The password field is required.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.required', ['attribute' => 'password']), true);
                 $this->see('These credentials do not match our records!', true);
                 $this->see('<b>Welcome</b>, John Doe!');
                 break;
@@ -245,8 +258,8 @@ class AuthenticationWebUITest extends TestCase
         $this->see('<h2><b>Reset</b> your password</h2>');
 
         # We shouldn't have flash error messages around.
-        $this->see('The email field is required.', true);
-        $this->see('The email must be a valid email address.', true);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
         $this->see(trans(PasswordBroker::INVALID_USER), true);
         $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
 
@@ -262,26 +275,26 @@ class AuthenticationWebUITest extends TestCase
         $this->seePageIs('/password/email');
         switch ($this->getName()) {
             case 'testPasswordEmail with data set #0':
-                $this->see('The email field is required.');
-                $this->see('The email must be a valid email address.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']));
+                $this->see(trans('validation.email', ['attribute' => 'email']), true);
                 $this->see(trans(PasswordBroker::INVALID_USER), true);
                 $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
                 break;
             case 'testPasswordEmail with data set #1':
-                $this->see('The email field is required.', true);
-                $this->see('The email must be a valid email address.');
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.email', ['attribute' => 'email']));
                 $this->see(trans(PasswordBroker::INVALID_USER), true);
                 $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
                 break;
             case 'testPasswordEmail with data set #2':
-                $this->see('The email field is required.', true);
-                $this->see('The email must be a valid email address.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.email', ['attribute' => 'email']), true);
                 $this->see(trans(PasswordBroker::INVALID_USER));
                 $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
                 break;
             default:
-                $this->see('The email field is required.', true);
-                $this->see('The email must be a valid email address.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.email', ['attribute' => 'email']), true);
                 $this->see(trans(PasswordBroker::INVALID_USER), true);
                 $this->see(trans(PasswordBroker::RESET_LINK_SENT));
                 break;
@@ -301,9 +314,9 @@ class AuthenticationWebUITest extends TestCase
         $this->seePageIs('/password/reset');
         $this->seeStatusCode(200);
         $this->see('<h2><b>Reset</b> your password</h2>');
-        $this->see('The email field is required.', true);
-        $this->see('The email must be a valid email address.', true);
-        $this->see('The password confirmation does not match.', true);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
         $this->see(trans(PasswordBroker::INVALID_USER), true);
         $this->see(trans(PasswordBroker::INVALID_TOKEN));
         $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
@@ -383,9 +396,10 @@ class AuthenticationWebUITest extends TestCase
         $this->seeStatusCode(200);
 
         # We shouldn't have flash error messages around.
-        $this->see('The email field is required.', true);
-        $this->see('The email must be a valid email address.', true);
-        $this->see('The password confirmation does not match.', true);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
         $this->see(trans(PasswordBroker::INVALID_USER), true);
         $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
         $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
@@ -404,9 +418,10 @@ class AuthenticationWebUITest extends TestCase
             case 'testPasswordReset with data set #0':
                 $this->seePageIs($_uri);
                 $this->see('<h2><b>Reset</b> your password</h2>');
-                $this->see('The email field is required.', true);
-                $this->see('The email must be a valid email address.', true);
-                $this->see('The password confirmation does not match.');
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.email', ['attribute' => 'email']), true);
+                $this->see(trans('validation.confirmed', ['attribute' => 'password']));
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
                 $this->see(trans(PasswordBroker::INVALID_USER), true);
                 $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
                 $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
@@ -416,8 +431,9 @@ class AuthenticationWebUITest extends TestCase
                 $this->seePageIs($_uri);
                 $this->see('<h2><b>Reset</b> your password</h2>');
                 $this->see('The email field is required.', true);
-                $this->see('The email must be a valid email address.', true);
-                $this->see('The password confirmation does not match.');
+                $this->see(trans('validation.email', ['attribute' => 'email']), true);
+                $this->see(trans('validation.confirmed', ['attribute' => 'password']));
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
                 $this->see(trans(PasswordBroker::INVALID_USER), true);
                 $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
                 $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
@@ -426,9 +442,10 @@ class AuthenticationWebUITest extends TestCase
             case 'testPasswordReset with data set #2':
                 $this->seePageIs($_uri);
                 $this->see('<h2><b>Reset</b> your password</h2>');
-                $this->see('The email field is required.', true);
-                $this->see('The email must be a valid email address.', true);
-                $this->see('The password confirmation does not match.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.email', ['attribute' => 'email']), true);
+                $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
                 $this->see(trans(PasswordBroker::INVALID_USER));
                 $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
                 $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
@@ -437,9 +454,10 @@ class AuthenticationWebUITest extends TestCase
             case 'testPasswordReset with data set #3':
                 $this->seePageIs($_uri);
                 $this->see('<h2><b>Reset</b> your password</h2>');
-                $this->see('The email field is required.', true);
-                $this->see('The email must be a valid email address.', true);
-                $this->see('The password confirmation does not match.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.email', ['attribute' => 'email']), true);
+                $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
                 $this->see(trans(PasswordBroker::INVALID_USER), true);
                 $this->see(trans(PasswordBroker::INVALID_TOKEN));
                 $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
@@ -448,20 +466,22 @@ class AuthenticationWebUITest extends TestCase
             case 'testPasswordReset with data set #4':
                 $this->seePageIs($_uri);
                 $this->see('<h2><b>Reset</b> your password</h2>');
-                $this->see('The email field is required.', true);
-                $this->see('The email must be a valid email address.', true);
-                $this->see('The password confirmation does not match.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.email', ['attribute' => 'email']), true);
+                $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]));
                 $this->see(trans(PasswordBroker::INVALID_USER), true);
                 $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
                 $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
-                $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]));
+                $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]), true);
                 break;
             default:
                 $this->seePageIs('/login');
                 $this->see('<h2><b>Log in</b> to your account</h2>');
-                $this->see('The email field is required.', true);
-                $this->see('The email must be a valid email address.', true);
-                $this->see('The password confirmation does not match.', true);
+                $this->see(trans('validation.required', ['attribute' => 'email']), true);
+                $this->see(trans('validation.email', ['attribute' => 'email']), true);
+                $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
                 $this->see(trans(PasswordBroker::INVALID_USER), true);
                 $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
                 $this->see(trans(PasswordBroker::PASSWORD_RESET));

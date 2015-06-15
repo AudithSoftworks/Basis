@@ -11,9 +11,14 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        'event.name' => [
-            'EventListener',
+        \App\Events\Users\Deleted::class => [],
+        \App\Events\Users\LoggedIn::class => [],
+        \App\Events\Users\LoggedOut::class => [],
+        \App\Events\Users\Registered::class => [],
+        \App\Events\Users\RequestedResetPasswordLinkViaEmail::class => [
+            \App\Listeners\Users\WhenRequestedResetPasswordLinkViaEmail::class
         ],
+        \App\Events\Users\Updated::class => [],
     ];
 
     /**
