@@ -2,14 +2,10 @@
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exception\HttpResponseException;
-use Psr\Log\LoggerInterface;
-use Monolog\Handler\HipChatHandler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends ExceptionHandler
 {
-
-
     /**
      * A list of the exception types that should not be reported.
      *
@@ -18,27 +14,6 @@ class Handler extends ExceptionHandler
     protected $dontReport = [
         HttpException::class
     ];
-
-    /**
-     * Create a new exception handler instance.
-     *
-     * @param  LoggerInterface $log
-     */
-    public function __construct(LoggerInterface $log)
-    {
-        $hipchatConfig = \Config::get('services.hipchat');
-        $hipchatHandler = new HipChatHandler(
-            $hipchatConfig['token'],
-            $hipchatConfig['room'],
-            $hipchatConfig['name'],
-            false,
-            $hipchatConfig['level']
-        );
-
-        \Log::getMonolog()->pushHandler($hipchatHandler);
-
-        parent::__construct($log);
-    }
 
     /**
      * Report or log an exception.
