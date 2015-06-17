@@ -5,7 +5,7 @@ filter:
         - tests/*
 tools:
     external_code_coverage:
-        timeout: 1200
+        timeout: 1800
     php_code_sniffer:
         config:
             standard: "PSR2"

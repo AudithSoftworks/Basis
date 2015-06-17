@@ -38,14 +38,6 @@ class File implements FileContract
     public function get($id)
     {
         return "test";
-
-        //
-
-        /*
-        return Cache::rememberForever('file-' . $id, function ($id) {
-            return File::where(is_numeric($id) ? 'id' : 'hash', '=', $id)->get();
-        });
-        */
     }
 
     /**
