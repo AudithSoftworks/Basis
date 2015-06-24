@@ -1,0 +1,264 @@
+{% extends "admin/master" %}
+
+{% use "admin/master/head" %}
+{% use "admin/master/body/header" %}
+{% use "admin/master/body/main" %}
+{% use "admin/master/body/footer" %}
+
+{% block document_head_title %}<title>Notifications - Admin Panel UI - Audith.Basis</title>{% endblock %}
+
+{% block document_body_main_section_content %}
+    <div class="row">
+        <div class="col-md-12">
+            <!--Top header start-->
+            <h3 class="ls-top-header">Notification</h3>
+            <!--Top header end -->
+
+            <!--Top breadcrumb start -->
+            <ol class="breadcrumb">
+                <li><a href="#"><i class="fa fa-home"></i></a></li>
+                <li class="active">Notification</li>
+            </ol>
+            <!--Top breadcrumb start -->
+        </div>
+    </div>
+    <!-- Main Content Element  Start-->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Icon & Color</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-success btn-sm successMessage">Success</button>
+                    <button type="button" class="btn btn-danger btn-sm errorMessage">Error</button>
+                    <button type="button" class="btn btn-warning btn-sm warningMessage">Warning</button>
+                    <button type="button" class="btn btn-info btn-sm infoMessage">Info</button>
+                    <button type="button" class="btn btn ls-light-green-btn btn-sm greenMessage">Green</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Position</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn ls-light-green-btn btn-sm bottomRightMessage">Bottom Right</button>
+                    <button type="button" class="btn ls-light-green-btn btn-sm topRightMessage">Top Right</button>
+                    <button type="button" class="btn ls-light-green-btn btn-sm bottomLeftMessage">Bottom Left</button>
+                    <button type="button" class="btn ls-light-green-btn btn-sm topLeftMessage">Top Left</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">In Effect</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-info btn-sm inFadeIn">Fade In (fadeIn)</button>
+                    <button type="button" class="btn btn-info btn-sm inSlideLeft">Slide From Left ( slideLeft )</button>
+                    <button type="button" class="btn btn-info btn-sm inSlideRight">Slide From Right ( slideRight )</button>
+                    <button type="button" class="btn btn-info btn-sm inSlideTop">Slide From Top ( slideTop )</button>
+                    <button type="button" class="btn btn-info btn-sm inSlideBottom">Slide From Bottom ( slideBottom )</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">User Message</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-default btn-sm userMessage">User Message</button>
+                    <button type="button" class="btn ls-light-green-btn btn-sm userGreenMessage">User Green Message</button>
+                    <button type="button" class="btn btn-warning btn-sm userYellowMessage">User Yellow Message</button>
+                    <button type="button" class="btn btn-info btn-sm userBlueMessage">User Blue Message</button>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">User Style</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-default btn-sm readMore">Style 1</button>
+                    <button type="button" class="btn btn-success btn-sm successReadMore">Style 2</button>
+                    <button type="button" class="btn btn-danger btn-sm errorReadMore">Style 3</button>
+                    <button type="button" class="btn btn-warning btn-sm warningReadMore">Style 4</button>
+                    <button type="button" class="btn btn-info btn-sm infoReadMore">Style 5</button>
+                    <button type="button" class="btn btn ls-light-green-btn btn-sm greenReadMore">Style 6</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Out Effect</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-info btn-sm outFadeOut">Fade Out (fadeOut)</button>
+                    <button type="button" class="btn btn-info btn-sm outSlideLeft">Slide From Left ( slideLeft )</button>
+                    <button type="button" class="btn btn-info btn-sm outSlideRight">Slide From Right ( slideRight )</button>
+                    <button type="button" class="btn btn-info btn-sm outSlideTop">Slide From Top ( slideTop )</button>
+                    <button type="button" class="btn btn-info btn-sm outSlideBottom">Slide From Bottom ( slideBottom )</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Options</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-info btn-sm delayStyle">Delay 10s</button>
+                    <button type="button" class="btn btn-info btn-sm stickyStyle">Sticky</button>
+                    <button type="button" class="btn btn-info btn-sm closeOnClickStyle">Close on Click</button>
+                    <button type="button" class="btn btn-info btn-sm closeButtonStyle">Close Button</button>
+                    <button type="button" class="btn btn-info btn-sm createNotificationsStyle">Create Notifications</button>
+                    <button type="button" class="btn btn-info btn-sm clearAllStyle">Clear All</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Press on</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-success btn-sm successNotification">Success Notification
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm errorNotification">Error Notification</button>
+                    <button type="button" class="btn btn-warning btn-sm warningNotification">Warning Notification
+                    </button>
+                    <button type="button" class="btn btn-info btn-sm infoNotification">Info Notification</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Custom</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-success btn-sm successCustomNotification">Custom Success
+                    </button>
+                    <button type="button" class="btn btn-danger btn-sm errorCustomNotification">Custom Error</button>
+                    <button type="button" class="btn btn-warning btn-sm warningCustomNotification">Custom Warning
+                    </button>
+                    <button type="button" class="btn btn-info btn-sm infoCustomNotification">Custom Info</button>
+                    <button type="button" class="btn btn-default btn-sm emailCustomNotification"><span
+                                class="fa fa-envelope"></span> Email Notification
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Position Notification</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-sm ls-light-green-btn topRight">Top Right</button>
+                    <button type="button" class="btn btn-sm ls-light-green-btn middleRight">Middle Right</button>
+                    <button type="button" class="btn btn-sm ls-light-green-btn bottomRight">Bottom Right</button>
+                    <button type="button" class="btn btn-sm ls-light-green-btn centerBottom">Center Bottom</button>
+
+                    <button type="button" class="btn btn-sm ls-light-green-btn bottomLeft">Bottom Left</button>
+                    <button type="button" class="btn btn-sm ls-light-green-btn middleLeft">Middle Left</button>
+                    <button type="button" class="btn btn-sm ls-light-green-btn topLeft">Top Left</button>
+                    <button type="button" class="btn btn-sm ls-light-green-btn topCenter">Top Center</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Dialog boxes</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn ls-light-green-btn btn-sm alertBox">Alert Box</button>
+                    <button type="button" class="btn ls-light-green-btn btn-sm confirmBox">Confirm Box</button>
+                    <button type="button" class="btn ls-light-green-btn btn-sm promptBox">Prompt Box</button>
+                    <button type="button" class="btn ls-light-green-btn btn-sm dialogBox">Dialog Box</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Overflow Notification</h3>
+                </div>
+                <div class="panel-body button-alignment">
+                    <button type="button" class="btn btn-success btn-sm bigTopCenterSuccess">Top Success</button>
+                    <button type="button" class="btn btn-danger btn-sm bigTopCenterError">Top Error</button>
+                    <button type="button" class="btn btn-default btn-sm bigNotification">Big Notification</button>
+                    <button type="button" class="btn btn-default btn-sm bigTopRight">Top Right</button>
+                    <button type="button" class="btn btn-default btn-sm bigSequenceBox">Sequence Box</button>
+                    <button type="button" class="btn btn-danger btn-sm bigError">Big Error</button>
+                    <button type="button" class="btn btn-success btn-sm bigSuccess">Big Success</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Dialog boxes</h3>
+                </div>
+                <div class="panel-body">
+                    <div class="alert alert-success">
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-hidden="true">&times;</button>
+                        <strong>Well done!</strong> You successfully read this important alert message.
+                    </div>
+                    <div class="alert alert-info">
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-hidden="true">&times;</button>
+                        <strong>Heads up!</strong> This alert needs your attention, but it's not super
+                        important.
+                    </div>
+                    <div class="alert alert-warning">
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-hidden="true">&times;</button>
+                        <strong>Warning!</strong> Better check yourself, you're not looking too good.
+                    </div>
+                    <div class="alert alert-danger">
+                        <button type="button" class="close" data-dismiss="alert"
+                                aria-hidden="true">&times;</button>
+                        <strong>Oh snap!</strong> Change a few things up and try submitting again.
+                    </div>
+                    <div>
+                        <ul class="list-group">
+                            <li class="list-group-item list-group-item-success">Dapibus ac facilisis in</li>
+                            <li class="list-group-item list-group-item-info">Cras sit amet nibh libero</li>
+                            <li class="list-group-item list-group-item-warning">Porta ac consectetur ac</li>
+                            <li class="list-group-item list-group-item-danger">Vestibulum at eros</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Main Content Element  End-->
+{% endblock %}

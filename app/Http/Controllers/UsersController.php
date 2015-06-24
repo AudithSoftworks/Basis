@@ -1,8 +1,8 @@
 <?php namespace App\Http\Controllers;
 
+use App\Contracts\Registrar;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Models\User;
-use Audith\Contracts\Registrar;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -66,7 +66,7 @@ class UsersController extends Controller
             return ['message' => 'Ready'];
         }
 
-        return view('auth.register');
+        return view('auth/register');
     }
 
     /**
@@ -117,6 +117,7 @@ class UsersController extends Controller
      */
     public function edit($id)
     {
+        /** @var \App\Models\User $user */
         $user = $this->registrar->get($id);
         if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Ready', 'data' => $user->toJson()];
@@ -172,10 +173,10 @@ class UsersController extends Controller
      */
     private function redirectPath()
     {
-        if (property_exists($this, 'redirectPath')) {
+        if (isset($this->redirectPath)) {
             return $this->redirectPath;
         }
 
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+        return isset($this->redirectTo) ? $this->redirectTo : '/home';
     }
 }

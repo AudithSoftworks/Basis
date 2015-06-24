@@ -1,22 +1,28 @@
 <?php namespace App\Http\Controllers;
 
+use Illuminate\Http\Response;
+
 class HomeController extends Controller
 {
-    /**
-     * Create a new controller instance.
-     */
-    public function __construct()
+    public function getIndex()
     {
-        //$this->middleware('auth');
+        return redirect('/home');
     }
 
     /**
      * Show the application dashboard to the user.
      *
-     * @return \Response
+     * @return Response
      */
-    public function index()
+    public function getHome()
     {
-        return view('home');
+        $name = "Guest";
+
+        if (\Auth::check()) {
+            $user = \Auth::user();
+            $name = $user->name;
+        }
+
+        return view('home', ['name' => $name]);
     }
 }

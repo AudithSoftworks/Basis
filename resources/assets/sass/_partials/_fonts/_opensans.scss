@@ -1,0 +1,61 @@
+@import "compass/css3";
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-BoldItalic.woff2', 'opensans/OpenSans-BoldItalic.woff', 'opensans/OpenSans-BoldItalic.ttf'),
+    'opensans/OpenSans-BoldItalic.eot', 700, italic
+);
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-Bold.woff2', 'opensans/OpenSans-Bold.woff', 'opensans/OpenSans-Bold.ttf'),
+    'opensans/OpenSans-Bold.eot', 700, normal
+);
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-ExtraBoldItalic.woff2', 'opensans/OpenSans-ExtraBoldItalic.woff', 'opensans/OpenSans-ExtraBoldItalic.ttf'),
+    'opensans/OpenSans-ExtraBoldItalic.eot', 800, italic
+);
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-ExtraBold.woff2', 'opensans/OpenSans-ExtraBold.woff', 'opensans/OpenSans-ExtraBold.ttf'),
+    'opensans/OpenSans-ExtraBold.eot', 800, normal
+);
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-Italic.woff2', 'opensans/OpenSans-Italic.woff', 'opensans/OpenSans-Italic.ttf'),
+    'opensans/OpenSans-Italic.eot', 400, italic
+);
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-LightItalic.woff2', 'opensans/OpenSans-LightItalic.woff', 'opensans/OpenSans-LightItalic.ttf'),
+    'opensans/OpenSans-LightItalic.eot', 300, italic
+);
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-Light.woff2', 'opensans/OpenSans-Light.woff', 'opensans/OpenSans-Light.ttf'),
+    'opensans/OpenSans-Light.eot', 300, normal
+);
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-Regular.woff2', 'opensans/OpenSans-Regular.woff', 'opensans/OpenSans-Regular.ttf'),
+    'opensans/OpenSans-Regular.eot', 400, normal
+);
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-SemiboldItalic.woff2', 'opensans/OpenSans-SemiboldItalic.woff', 'opensans/OpenSans-SemiboldItalic.ttf'),
+    'opensans/OpenSans-SemiboldItalic.eot', 600, italic
+);
+
+@include font-face(
+    'Open Sans',
+    font-files('opensans/OpenSans-Semibold.woff2', 'opensans/OpenSans-Semibold.woff', 'opensans/OpenSans-Semibold.ttf'),
+    'opensans/OpenSans-Semibold.eot', 600, normal
+);

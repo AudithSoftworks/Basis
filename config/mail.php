@@ -13,7 +13,7 @@ return [
     | Supported: "smtp", "mail", "sendmail", "mailgun", "mandrill", "log"
     |
     */
-    'driver' => 'sendmail',
+    'driver' => env('MAIL_DRIVER', 'mail'),
 
     /*
     |--------------------------------------------------------------------------
@@ -25,7 +25,7 @@ return [
     | the Mailgun mail service which will provide reliable deliveries.
     |
     */
-    'host' => 'smtp.mailgun.org',
+    'host' => env('MAIL_HOST', 'smtp.mailgun.org'),
 
     /*
     |--------------------------------------------------------------------------
@@ -37,7 +37,7 @@ return [
     | stay compatible with the Mailgun e-mail application by default.
     |
     */
-    'port' => 587,
+    'port' => env('MAIL_PORT', 587),
 
     /*
     |--------------------------------------------------------------------------
@@ -49,7 +49,7 @@ return [
     | used globally for all e-mails that are sent by your application.
     |
     */
-    'from' => ['address' => 'hostmaster@audith.net', 'name' => 'Audith Softworks Hostmaster'],
+    'from' => ['address' => env('MAIL_FROM_ADDR', 'mailer@example.com'), 'name' => env('MAIL_FROM_NAME', 'App Admin')],
 
     /*
     |--------------------------------------------------------------------------
@@ -61,7 +61,7 @@ return [
     | transport layer security protocol should provide great security.
     |
     */
-    'encryption' => 'tls',
+    'encryption' => env('MAIL_ENCRYPTION', 'tls'),
 
     /*
     |--------------------------------------------------------------------------
@@ -73,7 +73,7 @@ return [
     | connection. You may also set the "password" value below this one.
     |
     */
-    'username' => null,
+    'username' => env('MAIL_USERNAME'),
 
     /*
     |--------------------------------------------------------------------------
@@ -85,7 +85,7 @@ return [
     | connection so that the application will be able to send messages.
     |
     */
-    'password' => null,
+    'password' => env('MAIL_PASSWORD'),
 
     /*
     |--------------------------------------------------------------------------

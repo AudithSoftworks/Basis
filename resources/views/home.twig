@@ -1,0 +1,44 @@
+{% extends "layout" %}
+
+{% use "layout/head" %}
+{% use "layout/body/header" %}
+{% use "layout/body/main" %}
+{% use "layout/body/footer" %}
+
+{% block document_head_title %}<title>Home - Audith Basis</title>{% endblock %}
+
+{% block document_head_javascripts %}
+    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
+{% endblock %}
+
+{% block document_head_stylesheets %}
+    <link rel="stylesheet" href="{{ elixir('stylesheets/auth.css') }}">
+{% endblock %}
+
+{% block document_body_header %}
+    <header class="container-fluid">
+        <h1 class="text-center">Audith Basis</h1>
+    </header>
+{% endblock %}
+
+{% block document_body_main %}
+    <main class="container-fluid">
+        <h2><b>Welcome</b>, {{ name }}!</h2>
+
+        <form class="form-horizontal" role="form" method="POST" action="/password/email">
+            <fieldset class="submit-button col-md-12">
+                <div class="col-md-6 col-md-offset-3">
+                    <a href="{% if name == 'Guest' %}/login{% else %}/logout{% endif %}" class="btn btn-primary btn-xs col-md-12">
+                        {% if name == 'Guest' %}Log in{% else %}Log out{% endif %}
+                    </a>
+                </div>
+            </fieldset>
+        </form>
+    </main>
+{% endblock %}
+
+{% block document_body_footer %}
+    <footer>
+        &copy;
+    </footer>
+{% endblock %}

@@ -1,45 +1,89 @@
 language: php
 
 php:
-  - 5.4
   - 5.5
   - 5.6
   - 7.0
   - hhvm
 
+rvm:
+  - head
+
 env:
-  - DB=mysql
-  - DB=pgsql
+  - DB=mysql DB_USERNAME=root NODE_VERSION=stable
+  - DB=pgsql DB_USERNAME=postgres NODE_VERSION=stable
+  - DB=mysql DB_USERNAME=root NODE_VERSION=unstable
 
 addons:
-  postgresql: "9.3"
+  postgresql: "9.4"
+  apt:
+    packages:
+      - fontforge
+      - ttfautohint
 
 matrix:
+  fast_finish: true
   allow_failures:
     - php: 7.0
-      env: DB=mysql
-    - php: 7.0
-      env: DB=pgsql
     - php: hhvm
-      env: DB=pgsql
-  fast_finish: true
+      env: DB=pgsql DB_USERNAME=postgres NODE_VERSION=stable
+    - env: DB=mysql DB_USERNAME=root NODE_VERSION=unstable
 
-sudo: true
+# sudo: false
+
+cache:
+  directories:
+    - ./vendor
+    - ./node_modules
+    - ./public/bower_components
 
 before_install:
+  - sudo apt-get update # @todo To be removed
+  - sudo apt-get install -y fontforge # @todo To be removed
+  - nvm install $NODE_VERSION
+  - npm install -g npm@latest
+  - npm update -g
+  - npm install -g bower gulp ttf2eot
   - composer self-update
-  - sudo apt-get update -qq
-  - sudo apt-get install -y -qq sendmail
+  - gem install compass sass sass-globbing autoprefixer-rails fontcustom
+
+install:
+  - travis_retry composer install --no-interaction --prefer-source
+  - npm install
+  - bower update
 
 before_script:
   - if [[ "$DB" == "mysql" ]]; then mysql -e "CREATE DATABASE IF NOT EXISTS basis;" -uroot; fi
   - if [[ "$DB" == "pgsql" ]]; then psql -c "CREATE DATABASE basis;" -U postgres; fi
-
-install: travis_retry composer install --no-interaction --prefer-source
+#  - git clone --depth=1 https://github.com/google/woff2.git storage/build/tools/woff2
+#  - cd storage/build/tools/woff2
+#  - git submodule init
+#  - git submodule update
+#  - make clean all
+#  - cd $TRAVIS_BUILD_DIR
+  - git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git storage/build/tools/css3_font_converter
+  - cp -r public/bower_components/bootstrap/fonts  public/fonts/glyphicons
+  - cp -r public/bower_components/fontawesome/fonts  public/fonts/font_awesome
+  - cp -r public/bower_components/google-fonts/ofl/armata public/fonts/armata
+  - cp -r public/bower_components/google-fonts/ofl/ptsans public/fonts/pt_sans
+  - cp -r public/bower_components/google-fonts/ofl/marcellus public/fonts/marcellus
+  - cp -r public/bower_components/google-fonts/ofl/pontanosans public/fonts/pontano_sans
+  - cp -r public/bower_components/google-fonts/ofl/montserrat public/fonts/montserrat
+  - cp -r public/bower_components/google-fonts/apache/opensans public/fonts/opensans
+  - export PATH=$PATH:`pwd`/storage/build/tools/sfnt2woff:`pwd`/storage/build/tools/woff2 && chmod -R +x `pwd`/storage/build/tools
+  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf
+  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pt_sans/stylesheet.css public/fonts/pt_sans/*.ttf
+  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pontano_sans/stylesheet.css public/fonts/pontano_sans/*.ttf
+  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf
+  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf
+  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf
+  - compass compile
+  - gulp
 
 script:
+  - cp .env.example .env
   - php artisan migrate --force
-  - vendor/bin/phpunit
+  - vendor/bin/phpunit --debug --verbose
 
 notifications:
   hipchat: f504f9e2e6696c17589a7b49f4ce05@Audith.Basis

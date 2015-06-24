@@ -1,6 +1,6 @@
 <?php namespace App\Services;
 
-use Audith\Contracts\File as FileContract;
+use App\Contracts\File as FileContract;
 use App\Exceptions\File as FileExceptions;
 
 class File implements FileContract
@@ -38,14 +38,6 @@ class File implements FileContract
     public function get($id)
     {
         return "test";
-
-        //
-
-        /*
-        return Cache::rememberForever('file-' . $id, function ($id) {
-            return File::where(is_numeric($id) ? 'id' : 'hash', '=', $id)->get();
-        });
-        */
     }
 
     /**

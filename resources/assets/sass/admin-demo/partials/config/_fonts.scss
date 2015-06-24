@@ -1,0 +1,66 @@
+@import '../../../_partials/_fonts/fontawesome';
+@import '../../../_partials/_fonts/armata';
+@import '../../../_partials/_fonts/montserrat';
+@import '../../../_partials/_fonts/ptsans';
+@import '../../../_partials/_fonts/pontanosans';
+
+body {
+    font-family: 'PT Sans', sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Armata', sans-serif;
+}
+
+header {
+    > h1 > a {
+        font-family: 'Montserrat', sans-serif;
+
+        > span {
+            font-family: 'Montserrat', sans-serif;
+        }
+    }
+
+    > nav {
+        > ul > li {
+            > a, > button {
+                > span.badge {
+                    font-family: 'Pontano Sans', sans-serif;
+                }
+            }
+
+            &.search-box {
+                > form {
+                    > input[type=search] {
+                        font-family: inherit;
+                    }
+                }
+            }
+
+            > .dropdown-menu {
+                > strong {
+                    font-family: "Armata", sans-serif;
+                }
+            }
+        }
+    }
+}
+
+ul.main-nav li a {
+    font-family: 'Armata', sans-serif;
+}
+
+main {
+    > section.row {
+        > article {
+            > ul {
+                > li {
+                    > strong {
+                        font-family: 'Armata', sans-serif;
+                        font-weight: normal;
+                    }
+                }
+            }
+        }
+    }
+}

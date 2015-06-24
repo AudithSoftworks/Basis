@@ -1,0 +1,7 @@
+@import "compass/css3";
+
+@include font-face(
+    'Armata',
+    font-files('armata/Armata-Regular.woff2', 'armata/Armata-Regular.woff', 'armata/Armata-Regular.ttf'),
+    'armata/Armata-Regular.eot', 400, normal
+);

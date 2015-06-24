@@ -1,0 +1,56 @@
+{% extends "layout" %}
+
+{% use "layout/head" %}
+{% use "layout/body/header" %}
+{% use "layout/body/main" %}
+{% use "layout/body/footer" %}
+
+{% block document_head_title %}<title>Login - Audith Basis</title>{% endblock %}
+
+{% block document_head_javascripts %}
+    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
+{% endblock %}
+
+{% block document_head_stylesheets %}
+    <link rel="stylesheet" href="{{ elixir('stylesheets/auth.css') }}">
+{% endblock %}
+
+{% block document_body_header %}
+    <header class="container-fluid">
+        <h1 class="text-center">Audith Basis</h1>
+    </header>
+{% endblock %}
+
+{% block document_body_main %}
+    <main class="container-fluid">
+        <h2><b>Reset</b> your password</h2>
+
+        <form class="form-horizontal" role="form" method="POST" action="/password/email">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+
+            <fieldset class="col-md-12">
+                <label for="email" class="control-label sr-only">E-mail address</label>
+                <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="E-mail address" class="form-control">
+            </fieldset>
+
+            <fieldset class="submit-button col-md-12">
+                <div class="col-md-8 col-md-offset-2">
+                    <button type="submit" class="btn btn-primary btn-xs col-md-12">
+                        Send Password Reset Link
+                    </button>
+                </div>
+            </fieldset>
+        </form>
+
+        <ul class="col-md-12">
+            <li class="col-md-6 text-left"><a href="/login">Sign in</a></li>
+            <li class="col-md-6 text-right"><a href="/register">Register</a></li>
+        </ul>
+    </main>
+{% endblock %}
+
+{% block document_body_footer %}
+    <footer>
+        &copy;
+    </footer>
+{% endblock %}

@@ -1,0 +1,165 @@
+@import "compass/reset";
+@import "compass/css3";
+@import "_partials/variables";
+@import "_partials/_fonts/opensans";
+@import "_partials/_fonts/marcellus";
+@import "_partials/_fonts/fontawesome";
+@import "bootstrap-sass-official/assets/stylesheets/bootstrap";
+
+body {
+    background-image: url('/media_assets/images/background-image-1.jpg');
+    font-family: "Open Sans", sans-serif;
+    font-size: 13px;
+
+    > header {
+        width: 400px;
+        margin-top: 10%;
+        margin-bottom: 1em;
+
+        > h1 {
+            margin: 0 auto;
+            font-family: "Marcellus", serif;
+            font-weight: 400;
+            font-style: normal;
+            font-size: 30px;
+            color: white;
+        }
+    }
+
+    > main {
+        width: 400px;
+        background-color: rgba(255, 255, 255, 0.2);
+        @include border-radius(8px);
+
+        > h2 {
+            color: white;
+            font-size: 1.4em;
+            font-weight: 300;
+            margin-top: 20px;
+            margin-bottom: 15px;
+        }
+
+        > form {
+            fieldset {
+                margin-bottom: 15px;
+
+                input[type='email'], input[type='text'], input[type='password'] {
+                    background-color: rgba(255, 255, 255, 0.4);
+                    padding: ($grid-gutter-width/3) ($grid-gutter-width/2);
+                    font-size: 1em;
+                    color: #333333;
+                }
+
+                button[type='submit'] {
+                    background-color: #416672;
+                }
+
+                label {
+                    float: left;
+                    color: #1e2c46;
+                    font-weight: 300;
+
+                    .switchery {
+                        margin-left: 3px;
+                    }
+                }
+
+                &.socialite {
+                    width: 118px;
+                    margin: 0 auto;
+                    clear: both;
+
+                    a.btn {
+                        width: 35px;
+                        margin-right: 3px;
+                        background: no-repeat left center;
+                        font-weight: 400;
+                        font-size: 1em;
+
+                        &.brand-color-twitter {
+                            background-color: $brand-color-twitter;
+                            border-color: $brand-color-twitter;
+                        }
+
+                        &.brand-color-googleplus {
+                            background-color: $brand-color-googleplus;
+                            border-color: $brand-color-googleplus;
+                        }
+
+                        &.brand-color-facebook {
+                            background-color: $brand-color-facebook;
+                            border-color: $brand-color-facebook;
+                        }
+
+                        &:before {
+                            display: inline-block;
+                            font-family: "FontAwesome", fantasy;
+                        }
+
+                        &:last-child {
+                            margin-right: 0;
+                        }
+                    }
+                }
+
+                &.submit-button {
+                    margin-bottom: 20px;
+                }
+            }
+
+            p {
+                width: 40px;
+                height: 25px;
+                background: rgba(0, 0, 0, 0.2) none repeat scroll 0 0;
+                position: relative;
+                margin: 25px auto;
+                clear: both;
+                text-align: center;
+                line-height: 25px;
+                text-transform: uppercase;
+                color: #FFF;
+
+                &:before {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    width: 0;
+                    height: 0;
+                    top: -10px;
+                    border-left: 20px solid transparent;
+                    border-right: 20px solid transparent;
+                    border-bottom: 10px solid rgba(0, 0, 0, 0.2);
+                }
+
+                &:after {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    width: 0;
+                    height: 0;
+                    bottom: -10px;
+                    border-left: 20px solid transparent;
+                    border-right: 20px solid transparent;
+                    border-top: 10px solid rgba(0, 0, 0, 0.2);
+                }
+            }
+        }
+
+        > ul {
+            margin-top: 20px;
+
+            > li {
+                float: left;
+
+                a {
+                    color: #1e2c46;
+                    font-weight: 300;
+                }
+            }
+        }
+    }
+
+    > footer {
+        width: 400px;
+    }
+}

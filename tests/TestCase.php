@@ -2,6 +2,8 @@
 
 class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
+    protected $baseUrl = 'http://basis.audith.org';
+
     /**
      * Creates the application.
      *
@@ -11,7 +13,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     {
         $app = require __DIR__ . '/../bootstrap/app.php';
 
-        $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
         return $app;
     }

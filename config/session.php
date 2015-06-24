@@ -27,6 +27,7 @@ return [
     |
     */
     'lifetime' => 120,
+    
     'expire_on_close' => false,
 
     /*
@@ -123,7 +124,7 @@ return [
     | available to in your application. A sensible default has been set.
     |
     */
-    'domain' => null,
+    'domain' => env('SESSION_COOKIE_DOMAIN', 'basis.audith.org'),
 
     /*
     |--------------------------------------------------------------------------

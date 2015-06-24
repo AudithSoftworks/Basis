@@ -1,8 +1,8 @@
 <?php namespace App\Http\Controllers\Users;
 
+use App\Contracts\Registrar;
 use App\Exceptions\Users\TokenNotValidException;
 use App\Http\Controllers\Controller;
-use Audith\Contracts\Registrar;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Request;
@@ -16,6 +16,13 @@ class PasswordController extends Controller
      * @var Guard
      */
     protected $auth;
+
+    /**
+     * Registrar service instance.
+     *
+     * @var Registrar
+     */
+    protected $registrar;
 
     /**
      * The password broker implementation.
@@ -59,7 +66,7 @@ class PasswordController extends Controller
             return [];
         }
 
-        return view('auth.password');
+        return view('password/email');
     }
 
     /**
@@ -69,20 +76,13 @@ class PasswordController extends Controller
      */
     public function postEmail()
     {
-        if ($this->registrar->sendResetPasswordLinkViaEmail()) {
-            if ($this->request->ajax() || $this->request->wantsJson()) {
-                $return = ['message' => 'Password reset link sent'];
-                if (\App::environment() == 'testing') {
-                    $return = array_merge($return, ['token' => \DB::table('password_resets')->where('email', '=', 'shehi@imanov.me')->pluck('token')]);
-                }
+        $this->registrar->sendResetPasswordLinkViaEmail();
 
-                return $return;
-            }
-
-            return redirect()->back()->with('status', trans(PasswordBroker::RESET_LINK_SENT));
+        if ($this->request->ajax() || $this->request->wantsJson()) {
+            return ['message' => trans(PasswordBroker::RESET_LINK_SENT)];
         }
 
-        return redirect()->back()->withErrors(['email' => trans(PasswordBroker::INVALID_USER)]);
+        return redirect()->back()->with('message', trans(PasswordBroker::RESET_LINK_SENT));
     }
 
     /**
@@ -97,14 +97,18 @@ class PasswordController extends Controller
     public function getReset($token = null)
     {
         if (is_null($token)) {
-            throw new NotFoundHttpException;
+            if ($this->request->ajax() || $this->request->wantsJson()) {
+                throw new TokenNotValidException();
+            }
+
+            return view('password/reset')->withErrors(['token' => trans(PasswordBroker::INVALID_TOKEN)]);
         }
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['token' => $token];
         }
 
-        return view('auth.reset')->with('token', $token);
+        return view('password/reset')->with('token', $token);
     }
 
     /**
@@ -114,40 +118,26 @@ class PasswordController extends Controller
      */
     public function postReset()
     {
-        try {
-            $this->registrar->resetPassword();
-
-            if ($this->request->ajax() || $this->request->wantsJson()) {
-                return ['message' => 'Password successfully reset'];
-            }
-
-            return redirect($this->redirectPath());
-        } catch (NotFoundHttpException $e) {
-            $response = PasswordBroker::INVALID_USER;
-        } catch (TokenNotValidException $e) {
-            $response = PasswordBroker::INVALID_TOKEN;
-        }
+        $this->registrar->resetPassword();
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            throw $e;
+            return ['message' => 'Password successfully reset'];
         }
 
-        return redirect()->back()
-            ->withInput($this->request->only('email'))
-            ->withErrors(['email' => trans($response)]);
+        return redirect($this->redirectPath())->with('message', trans(PasswordBroker::PASSWORD_RESET));
     }
 
     /**
-     * Get the post register / login redirect path.
+     * Get the post-register/-login redirect path.
      *
      * @return string
      */
     private function redirectPath()
     {
-        if (property_exists($this, 'redirectPath')) {
+        if (isset($this->redirectPath)) {
             return $this->redirectPath;
         }
 
-        return property_exists($this, 'redirectTo') ? $this->redirectTo : '/home';
+        return isset($this->redirectTo) ? $this->redirectTo : '/login';
     }
 }

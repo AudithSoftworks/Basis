@@ -1,42 +1,19 @@
 <?php namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Psr\Log\LoggerInterface;
-use Monolog\Handler\HipChatHandler;
+use Illuminate\Http\Exception\HttpResponseException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends ExceptionHandler
 {
-
-
     /**
      * A list of the exception types that should not be reported.
      *
      * @var array
      */
     protected $dontReport = [
-        'Symfony\Component\HttpKernel\Exception\HttpException'
+        HttpException::class
     ];
-
-    /**
-     * Create a new exception handler instance.
-     *
-     * @param  LoggerInterface $log
-     */
-    public function __construct(LoggerInterface $log)
-    {
-        $hipchatConfig = \Config::get('services.hipchat');
-        $hipchatHandler = new HipChatHandler(
-            $hipchatConfig['token'],
-            $hipchatConfig['room'],
-            $hipchatConfig['name'],
-            false,
-            $hipchatConfig['level']
-        );
-
-        \Log::getMonolog()->pushHandler($hipchatHandler);
-
-        parent::__construct($log);
-    }
 
     /**
      * Report or log an exception.
@@ -57,7 +34,7 @@ class Handler extends ExceptionHandler
      * @param  \Illuminate\Http\Request $request
      * @param  \Exception               $e
      *
-     * @return \Illuminate\Http\Response
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function render($request, \Exception $e)
     {
@@ -69,18 +46,29 @@ class Handler extends ExceptionHandler
             // should be listed here. Laravel handles exceptions correctly, status-code wise.
             //---------------------------------------------------------------------------------------
 
+            $response = response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()]);
             switch ($exceptionClass) {
-                case 'App\Exceptions\Common\ValidationException':
-                case 'App\Exceptions\Users\LoginNotValidException':
-                case 'App\Exceptions\Users\PasswordNotValidException':
-                case 'App\Exceptions\Users\TokenNotValidException':
-                case 'Illuminate\Http\Exception\HttpResponseException':
-                    return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(422);
+                case Common\ValidationException::class:
+                case Users\LoginNotValidException::class:
+                case Users\PasswordNotValidException::class:
+                case Users\TokenNotValidException::class:
+                case HttpResponseException::class:
+                    return $response->setStatusCode(422);
                 default:
-                    return response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()])->setStatusCode(method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode());
+                    $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
+                    if (!empty($statusCode)) {
+                        $response->setStatusCode($statusCode);
+                    }
+
+                    return $response;
             }
         }
 
-        return parent::render($request, $e);
+        $redirect = redirect()->back();
+        if ($redirect->getTargetUrl() === \Config::get('app.url')) {
+            $redirect = redirect()->refresh();
+        }
+
+        return $redirect->withInput($request->all())->withErrors($e->getMessage());
     }
 }

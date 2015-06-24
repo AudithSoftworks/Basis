@@ -9,11 +9,11 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * App\Models\User
  *
- * @property integer $id
- * @property string $name
- * @property string $email
- * @property string $password
- * @property string $remember_token
+ * @property integer        $id
+ * @property string         $name
+ * @property string         $email
+ * @property string         $password
+ * @property string         $remember_token
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
@@ -25,6 +25,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereDeletedAt($value)
+ * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserOAuth[] $linkedAccounts
  */
 class User extends \Eloquent implements AuthenticatableContract, CanResetPasswordContract
 {
@@ -42,7 +43,7 @@ class User extends \Eloquent implements AuthenticatableContract, CanResetPasswor
      *
      * @var array
      */
-    protected $guarded = array('*');
+    protected $guarded = ['*'];
 
     /**
      * Soft-deletes enabled.
@@ -51,13 +52,13 @@ class User extends \Eloquent implements AuthenticatableContract, CanResetPasswor
      */
     protected $dates = ['deleted_at'];
 
-    /**
-     * Model uses Unix-timestamp date-format.
-     *
-     * @return string
-     */
     protected function getDateFormat()
     {
         return 'U';
+    }
+
+    public function linkedAccounts()
+    {
+        return $this->hasMany('App\Models\UserOAuth', 'user_id', 'id');
     }
 }

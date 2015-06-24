@@ -8,7 +8,7 @@ class NestedEntityModelTest extends TestCase
     {
         // static::createApplication(); TODO Facilitate this method @see https://github.com/laravel/framework/pull/8496
         $app = require __DIR__ . '/../bootstrap/app.php';
-        $app->make('Illuminate\Contracts\Console\Kernel')->bootstrap();
+        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
         Artisan::call('migrate:refresh');
         Artisan::call('db:seed');
