@@ -1,5 +1,7 @@
 ## Audith Basis on Laravel 5.1
 
+[![Join the chat at https://gitter.im/AudithSoftworks/Basis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AudithSoftworks/Basis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 [![Build Status](https://circleci.com/gh/AudithSoftworks/Basis.png?circle-token=a8a3c6fee8d17e9a55b9589a53f8cb27b0c180d3)](https://circleci.com/gh/AudithSoftworks/Basis)
 
 [![Circle CI](https://circleci.com/gh/AudithSoftworks/Basis.svg?style=svg&circle-token=a8a3c6fee8d17e9a55b9589a53f8cb27b0c180d3)](https://circleci.com/gh/AudithSoftworks/Basis)
