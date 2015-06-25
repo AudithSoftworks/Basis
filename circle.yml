@@ -9,6 +9,11 @@ general:
   artifacts:
     - "./storage/coverage"
 
+notify:
+  webhooks:
+    - url: https://webhooks.gitter.im/e/251b9f310b8c9e8855f9
+    - url: https://webhooks.gitter.im/e/6dbdffdc3ba4745e2165
+
 dependencies:
   cache_directories:
     - ~/.docker
@@ -48,17 +53,21 @@ dependencies:
     - docker run -ti --name postgres-9.3 -d postgres:9.3 && sleep 15 && psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' postgres-9.3) -U postgres -c "CREATE DATABASE basis;"
     - docker run -ti --name postgres-9.4 -d postgres:9.4 && sleep 15 && psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' postgres-9.4) -U postgres -c "CREATE DATABASE basis;"
 
-    # Docker run: PHP 5.5, 5.6 & PHP-FPM 5.5, 5.6
+    # Docker run: HHVM, PHP 5.5, 5.6 & PHP-FPM 5.5, 5.6
+    - docker run -ti --name hhvm -v `pwd`:/home/basis -d brunoric/hhvm
     - docker run -ti --name php-5.5 -v `pwd`:/home/basis -d audithsoftworks/basis:php_5.5
     - docker run -ti --name php-5.6 -v `pwd`:/home/basis -d audithsoftworks/basis:php_5.6
     - docker run -ti --name php-fpm-5.5 -v `pwd`:/home/basis -d audithsoftworks/basis:php_5.5-fpm
     - docker run -ti --name php-fpm-5.6 -v `pwd`:/home/basis -d audithsoftworks/basis:php_5.6-fpm
 
     # 2x Nginx with separate PHP-FPM versions
+    - cat `pwd`/storage/build/configs/nginx.conf | sed s/\<FPM_IP_ADDR_HERE\>/$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' hhvm)/g | tee /tmp/nginx-hhvm.conf
     - cat `pwd`/storage/build/configs/nginx.conf | sed s/\<FPM_IP_ADDR_HERE\>/$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' php-fpm-5.5)/g | tee /tmp/nginx-php-fpm-5.5.conf
     - cat `pwd`/storage/build/configs/nginx.conf | sed s/\<FPM_IP_ADDR_HERE\>/$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' php-fpm-5.6)/g | tee /tmp/nginx-php-fpm-5.6.conf
+    - docker run -ti --name nginx-for-hhvm -v /tmp/nginx-hhvm.conf:/etc/nginx/conf.d/default.conf:ro -v `pwd`:/home/basis -d audithsoftworks/basis:nginx
     - docker run -ti --name nginx-for-php-fpm-5.5 -v /tmp/nginx-php-fpm-5.5.conf:/etc/nginx/conf.d/default.conf:ro -v `pwd`:/home/basis -d audithsoftworks/basis:nginx
     - docker run -ti --name nginx-for-php-fpm-5.6 -v /tmp/nginx-php-fpm-5.6.conf:/etc/nginx/conf.d/default.conf:ro -v `pwd`:/home/basis -d audithsoftworks/basis:nginx
+    - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' hhvm)" -- /bin/sh -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' nginx-for-hhvm) basis.audith.org | tee -a /etc/hosts"
     - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.5)" -- /bin/sh -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' nginx-for-php-fpm-5.5) basis.audith.org | tee -a /etc/hosts"
     - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.6)" -- /bin/sh -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' nginx-for-php-fpm-5.6) basis.audith.org | tee -a /etc/hosts"
 
@@ -87,21 +96,21 @@ dependencies:
 test:
   override:
     # Testing PHP 5.5 and 5.6 against MySQL 5.5
-    - case $CIRCLE_NODE_INDEX in 0) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.5)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; 1) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.6)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; esac:
+    - case $CIRCLE_NODE_INDEX in 0) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.5)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; 1) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.6)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; 2) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' hhvm)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; esac:
         parallel: true
 
     # Switching to MySQL 5.6
     - cat .env | sed s/DB_HOST=.*/DB_HOST=$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' mysql-5.6)/g | sed s/DB=.*/DB=mysql/g | tee .env
 
     # Testing PHP 5.5 and 5.6 against MySQL 5.6
-    - case $CIRCLE_NODE_INDEX in 0) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.5)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; 1) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.6)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; esac:
+    - case $CIRCLE_NODE_INDEX in 0) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.5)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; 1) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.6)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; 2) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' hhvm)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; esac:
         parallel: true
 
     # Switching to MySQL 5.7
     - cat .env | sed s/DB_HOST=.*/DB_HOST=$(docker inspect -f '{{ .NetworkSettings.IPAddress }}' mysql-5.7)/g | sed s/DB=.*/DB=mysql/g | tee .env
 
     # Testing PHP 5.5 and 5.6 against MySQL 5.6
-    - case $CIRCLE_NODE_INDEX in 0) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.5)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; 1) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.6)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; esac:
+    - case $CIRCLE_NODE_INDEX in 0) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.5)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; 1) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' php-5.6)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; 2) sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' hhvm)" -- /bin/sh -c 'cd /home/basis && ./vendor/bin/phpunit --debug --verbose' ;; esac:
         parallel: true
 
     # Switching to PgSQL 9.2

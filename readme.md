@@ -12,6 +12,7 @@
 [![Dependency Status](https://www.versioneye.com/user/projects/54e4da21d1ec573c99000554/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54e4da21d1ec573c99000554)
 [![Dependency Status](https://www.versioneye.com/user/projects/54e4da25d1ec573c99000562/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54e4da25d1ec573c99000562)
 [![Dependency Status](https://www.versioneye.com/user/projects/54e4da24d1ec5734f4000717/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54e4da24d1ec5734f4000717)
+[![Join the chat at https://gitter.im/AudithSoftworks/Basis](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/AudithSoftworks/Basis?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
 ### License
 
