@@ -47,6 +47,19 @@ phpFpm56:
     - postgres93
     - postgres94
     - redis
+hhvmAsFpm:
+  image: audithsoftworks/basis:hhvm
+  volumes:
+    - .:/home/basis
+  working_dir: /home/basis
+  links:
+    - mysql55
+    - mysql56
+    - mysql57
+    - postgres92
+    - postgres93
+    - postgres94
+    - redis
 nginxForPhpFpm55:
   image: audithsoftworks/basis:nginx
   volumes:
@@ -63,6 +76,14 @@ nginxForPhpFpm56:
   working_dir: /home/basis
   links:
     - phpFpm56
+nginxForHhvm:
+  image: audithsoftworks/basis:nginx
+  volumes:
+    - ./storage/build/configs/nginxForHhvm.conf:/etc/nginx/conf.d/default.conf:ro
+    - .:/home/basis
+  working_dir: /home/basis
+  links:
+    - hhvmAsFpm
 php55:
   image: audithsoftworks/basis:php_5.5
   volumes:
@@ -93,5 +114,21 @@ php56:
     - postgres94
     - redis
     - nginxForPhpFpm56
+  stdin_open: true
+  restart: on-failure[10]
+hhvmAsCli:
+  image: audithsoftworks/basis:hhvm
+  volumes:
+    - .:/home/basis
+  working_dir: /home/basis
+  links:
+    - mysql55
+    - mysql56
+    - mysql57
+    - postgres92
+    - postgres93
+    - postgres94
+    - redis
+    - nginxForHhvm
   stdin_open: true
   restart: on-failure[10]

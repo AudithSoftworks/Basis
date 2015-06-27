@@ -1,10 +1,14 @@
 FROM php:5.6
 MAINTAINER Shahriyar Imanov <shehi@imanov.me>
 
+WORKDIR /home/basis
+
 # Install dependencies
 RUN apt-get update -y \
     && apt-get install -y apt-utils \
     && apt-get install -y \
+        git \
+        fontforge \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
@@ -14,12 +18,11 @@ RUN apt-get update -y \
         libpq-dev \
         libsqlite3-dev \
         libxslt1-dev \
-        fontforge \
-        ruby \
-        ruby-dev \
-        git \
         locales \
         locales-all \
+        openjdk-7-jre \
+        ruby \
+        ruby-dev \
     && docker-php-ext-install \
         bcmath \
         exif \
@@ -45,7 +48,7 @@ RUN pecl install -o -f redis xdebug \
     && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
 
 # Locale
-RUN locale-gen en_US.UTF-8
+RUN locale-gen en_US.UTF-8 && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
