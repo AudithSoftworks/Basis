@@ -59,8 +59,8 @@ dependencies:
     - if [[ ! -e ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar ]]; then docker save audithsoftworks/basis:php_5.6-fpm > ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar; fi
 
     # Docker Compose
-    - docker-compose pull mysql55 mysql56 mysql57 postgres92 postgres93 postgres94 redis
-    - docker-compose up -d
+    - docker-compose pull
+    - docker-compose up -d && docker-compose ps
 
     # Create database for PgSQL 9.2, 9.3, 9.4
     - psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres92_1) -U postgres -c "CREATE DATABASE basis;"
