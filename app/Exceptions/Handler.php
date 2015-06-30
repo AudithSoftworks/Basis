@@ -2,6 +2,7 @@
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exception\HttpResponseException;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends ExceptionHandler
@@ -53,7 +54,7 @@ class Handler extends ExceptionHandler
                 case Users\PasswordNotValidException::class:
                 case Users\TokenNotValidException::class:
                 case HttpResponseException::class:
-                    return $response->setStatusCode(422);
+                    return $response->setStatusCode(SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY);
                 default:
                     $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
                     if (!empty($statusCode)) {

@@ -30,8 +30,8 @@ return [
         'secret' => '',
     ],
     'hipchat' => [
-        'token' => '1c58df69bf93342db66499b35af2f1',
-        'room' => '1257206',
+        'token' => env('HIPCHAT_TOKEN', '1c58df69bf93342db66499b35af2f1'),
+        'room' => env('HIPCHAT_ROOM', '1257206'),
         'name' => 'Dev Debug', // Note: HipChat's v1 API supports names up to 15 UTF-8 characters.
         'level' => \Monolog\Logger::DEBUG
     ],
