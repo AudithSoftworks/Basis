@@ -9,9 +9,9 @@
 [![Latest Stable Version](https://poser.pugx.org/audithsoftworks/basis/v/stable.svg)](https://packagist.org/packages/audithsoftworks/basis)
 [![License](https://poser.pugx.org/audithsoftworks/basis/license.svg)](https://packagist.org/packages/audithsoftworks/basis)
 
-[![Dependency Status](https://www.versioneye.com/user/projects/54e4da21d1ec573c99000554/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54e4da21d1ec573c99000554)
-[![Dependency Status](https://www.versioneye.com/user/projects/54e4da25d1ec573c99000562/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54e4da25d1ec573c99000562)
-[![Dependency Status](https://www.versioneye.com/user/projects/54e4da24d1ec5734f4000717/badge.svg?style=flat)](https://www.versioneye.com/user/projects/54e4da24d1ec5734f4000717)
+[![Dependency Status](https://www.versioneye.com/user/projects/559127ee396561002000000a/badge.svg?style=flat)](https://www.versioneye.com/user/projects/559127ee396561002000000a)
+[![Dependency Status](https://www.versioneye.com/user/projects/559127ef3965610029000177/badge.svg?style=flat)](https://www.versioneye.com/user/projects/559127ef3965610029000177)
+[![Dependency Status](https://www.versioneye.com/user/projects/559128153965610020000024/badge.svg?style=flat)](https://www.versioneye.com/user/projects/559128153965610020000024)
 
 ### License
 
