@@ -12,7 +12,7 @@ class CreateUsersTable extends Migration
      */
     public function up()
     {
-        \Schema::create('users', function (Blueprint $table) {
+        Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
             $table->string('email')->unique()->nullable(); // Unique constraints can be Nullable, its SQL-92 compatible
@@ -31,6 +31,6 @@ class CreateUsersTable extends Migration
      */
     public function down()
     {
-        \Schema::drop('users');
+        Schema::drop('users');
     }
 }

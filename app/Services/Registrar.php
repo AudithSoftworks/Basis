@@ -114,7 +114,11 @@ class Registrar implements RegistrarContract
         # Event
         \Event::fire(new Registered($ownerAccount, $provider));
 
-        return $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount);
+        ($doLinkOAuthAccount = $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount)) && $this->auth->login($ownerAccount, true);
+
+        \Event::fire(new LoggedIn($ownerAccount, $provider));
+
+        return $doLinkOAuthAccount;
     }
 
     /**
@@ -328,7 +332,7 @@ class Registrar implements RegistrarContract
     private function linkOAuthAccount(SocialiteUser $oauthUserData, $provider, $ownerAccount)
     {
         /** @var UserOAuth[] $linkedAccounts */
-        $linkedAccounts = $ownerAccount->linkedAccounts()->{$provider}()->get();
+        $linkedAccounts = $ownerAccount->linkedAccounts()->ofProvider($provider)->get();
 
         foreach ($linkedAccounts as $linkedAccount) {
             if ($linkedAccount->remote_id === $oauthUserData->id || $linkedAccount->email === $oauthUserData->email) {

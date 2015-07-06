@@ -1,20 +1,20 @@
 <?php namespace App\Models;
 
-use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Eloquent\Builder;
 
 /**
  * App\Models\UserOAuth
  *
- * @property integer $id
- * @property integer $user_id
- * @property string $remote_provider
- * @property string $remote_id
- * @property string $nickname
- * @property string $name
- * @property string $email
- * @property string $avatar
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
+ * @property integer               $id
+ * @property integer               $user_id
+ * @property string                $remote_provider
+ * @property string                $remote_id
+ * @property string                $nickname
+ * @property string                $name
+ * @property string                $email
+ * @property string                $avatar
+ * @property \Carbon\Carbon        $created_at
+ * @property \Carbon\Carbon        $updated_at
  * @property-read \App\Models\User $owner
  * @method static \Illuminate\Database\Query\Builder|\App\Models\UserOAuth whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\UserOAuth whereUserId($value)
@@ -26,6 +26,7 @@ use Illuminate\Database\Query\Builder;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\UserOAuth whereAvatar($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\UserOAuth whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\UserOAuth whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\UserOAuth ofProvider($provider)
  */
 class UserOAuth extends \Eloquent
 {
@@ -45,43 +46,21 @@ class UserOAuth extends \Eloquent
      */
     protected $guarded = ['*'];
 
-    protected function getDateFormat()
-    {
-        return 'U';
-    }
+    protected $dateFormat = 'U';
 
     public function owner()
     {
-        return $this->belongsTo('App\Models\User', 'user_id', 'id');
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 
     /**
      * @param Builder $query
+     * @param string  $provider
      *
      * @return mixed
      */
-    public function scopeGoogle($query)
+    public function scopeOfProvider(Builder $query, $provider)
     {
-        return $query->where('remote_provider', '=', 'google');
-    }
-
-    /**
-     * @param Builder $query
-     *
-     * @return mixed
-     */
-    public function scopeTwitter($query)
-    {
-        return $query->where('remote_provider', '=', 'twitter');
-    }
-
-    /**
-     * @param Builder $query
-     *
-     * @return mixed
-     */
-    public function scopeFacebook($query)
-    {
-        return $query->where('remote_provider', '=', 'facebook');
+        return $query->where('remote_provider', '=', $provider);
     }
 }

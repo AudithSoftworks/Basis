@@ -204,6 +204,7 @@ class AuthenticationWebUITest extends TestCase
      */
     public function testLogout()
     {
+        /** @var App\Models\User $user */
         $user = \App\Models\User::find(1);
         $this->actingAs($user);
         $this->visit('/login');

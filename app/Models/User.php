@@ -52,13 +52,10 @@ class User extends \Eloquent implements AuthenticatableContract, CanResetPasswor
      */
     protected $dates = ['deleted_at'];
 
-    protected function getDateFormat()
-    {
-        return 'U';
-    }
+    protected $dateFormat = 'U';
 
     public function linkedAccounts()
     {
-        return $this->hasMany('App\Models\UserOAuth', 'user_id', 'id');
+        return $this->hasMany(UserOAuth::class, 'user_id', 'id');
     }
 }

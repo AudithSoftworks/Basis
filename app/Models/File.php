@@ -48,15 +48,7 @@ class File extends \Eloquent
      */
     protected $dates = ['deleted_at'];
 
-    /**
-     * Model uses Unix-timestamp date-format.
-     *
-     * @return string
-     */
-    protected function getDateFormat()
-    {
-        return 'U';
-    }
+    protected $dateFormat = 'U';
 
     /**
      * @param \Illuminate\Database\Query\Builder $query
@@ -67,7 +59,7 @@ class File extends \Eloquent
      */
     public function scopeOfType($query, $type = 'image')
     {
-        if (!in_array($type, array('plain', 'image', 'audio', 'video', 'application'))) {
+        if (!in_array($type, ['plain', 'image', 'audio', 'video', 'application'])) {
             throw new \Exception();
         }
 

@@ -11,9 +11,9 @@ class LoggedOut extends EventAbstract
     public $user;
 
     /**
-     * @param Authenticatable $user
+     * @param Authenticatable|null $user
      */
-    public function __construct(Authenticatable $user)
+    public function __construct($user)
     {
         $this->user = $user;
 

@@ -63,7 +63,7 @@ class UsersController extends Controller
     public function create()
     {
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Ready'];
+            return ['message' => 'Ready']; // TODO Move to an API layer
         }
 
         return view('auth/register');
@@ -120,7 +120,7 @@ class UsersController extends Controller
         /** @var \App\Models\User $user */
         $user = $this->registrar->get($id);
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Ready', 'data' => $user->toJson()];
+            return ['message' => 'Ready', 'data' => $user->toJson()]; // TODO Move to an API layer
         }
 
         // TODO Create appropriate Views for non-JSON requests

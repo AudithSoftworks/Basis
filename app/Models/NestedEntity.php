@@ -6,13 +6,13 @@ use Illuminate\Database\Query\JoinClause;
 /**
  * App\Models\NestedEntity
  *
- * @property integer $id
- * @property string $name
- * @property integer $left_range
- * @property integer $right_range
+ * @property integer        $id
+ * @property string         $name
+ * @property integer        $left_range
+ * @property integer        $right_range
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
- * @property integer $deleted_at
+ * @property integer        $deleted_at
  * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereLeftRange($value)
@@ -27,7 +27,9 @@ class NestedEntity extends \Eloquent
 
     protected $table = "nested_entities";
 
-    protected $guarded = array("left_range", "right_range");
+    protected $dateFormat = 'U';
+
+    protected $guarded = ["left_range", "right_range"];
 
     const SELECT_ALL_WITH_MINIMUM_INFO = 1;
 
@@ -36,13 +38,6 @@ class NestedEntity extends \Eloquent
     const SELECT_WITH_DEPTH_INFO = 4;
 
     const SELECT_LEAVES_ONLY = 8;
-
-
-    protected function getDateFormat()
-    {
-        return 'U';
-    }
-
 
     /**
      * @param        $newEntityName
@@ -67,13 +62,13 @@ class NestedEntity extends \Eloquent
                 # Update ranges in preparation of insertion
                 \DB::table($this->table)
                     ->where('right_range', '>', $referenceEntity->left_range)
-                    ->update(array('right_range' => \DB::raw('right_range + 2')));
+                    ->update(['right_range' => \DB::raw('right_range + 2')]);
                 \DB::table($this->table)
                     ->where('left_range', '>', $referenceEntity->left_range)
-                    ->update(array('left_range' => \DB::raw('left_range + 2')));
+                    ->update(['left_range' => \DB::raw('left_range + 2')]);
 
                 # Insert now
-                return $newEntity->insert(array('name' => $newEntityName, 'left_range' => $referenceEntity->left_range + 1, 'right_range' => $referenceEntity->left_range + 2, 'created_at' => time()));
+                return $newEntity->insert(['name' => $newEntityName, 'left_range' => $referenceEntity->left_range + 1, 'right_range' => $referenceEntity->left_range + 2, 'created_at' => time()]);
             }
         );
     }
@@ -102,13 +97,13 @@ class NestedEntity extends \Eloquent
                 # Update ranges in preparation of insertion
                 \DB::table($this->table)
                     ->where('right_range', '>=', $referenceEntity->right_range)
-                    ->update(array('right_range' => \DB::raw('right_range + 2')));
+                    ->update(['right_range' => \DB::raw('right_range + 2')]);
                 \DB::table($this->table)
                     ->where('left_range', '>', $referenceEntity->right_range)
-                    ->update(array('left_range' => \DB::raw('left_range + 2')));
+                    ->update(['left_range' => \DB::raw('left_range + 2')]);
 
                 # Insert now
-                return $newEntity->insert(array('name' => $newEntityName, 'left_range' => $referenceEntity->right_range, 'right_range' => $referenceEntity->right_range + 1, 'created_at' => time()));
+                return $newEntity->insert(['name' => $newEntityName, 'left_range' => $referenceEntity->right_range, 'right_range' => $referenceEntity->right_range + 1, 'created_at' => time()]);
             }
         );
     }
@@ -152,13 +147,13 @@ class NestedEntity extends \Eloquent
                 # Update ranges in preparation of insertion
                 \DB::table($this->table)
                     ->where('right_range', '>', $referenceEntity->left_range)
-                    ->update(array('right_range' => \DB::raw('right_range + 2')));
+                    ->update(['right_range' => \DB::raw('right_range + 2')]);
                 \DB::table($this->table)
                     ->where('left_range', '>=', $referenceEntity->left_range)
-                    ->update(array('left_range' => \DB::raw('left_range + 2')));
+                    ->update(['left_range' => \DB::raw('left_range + 2')]);
 
                 # Insert now
-                return $newEntity->insert(array('name' => $newEntityName, 'left_range' => $referenceEntity->left_range, 'right_range' => $referenceEntity->right_range, 'created_at' => time()));
+                return $newEntity->insert(['name' => $newEntityName, 'left_range' => $referenceEntity->left_range, 'right_range' => $referenceEntity->right_range, 'created_at' => time()]);
             }
         );
     }
@@ -187,18 +182,18 @@ class NestedEntity extends \Eloquent
                 # Update ranges in preparation of insertion
                 \DB::table($this->table)
                     ->where('right_range', '>', $referenceEntity->right_range)
-                    ->update(array('right_range' => \DB::raw('right_range + 2')));
+                    ->update(['right_range' => \DB::raw('right_range + 2')]);
                 \DB::table($this->table)
                     ->where('left_range', '>', $referenceEntity->right_range)
-                    ->update(array('left_range' => \DB::raw('left_range + 2')));
+                    ->update(['left_range' => \DB::raw('left_range + 2')]);
 
                 # Insert now
-                return $newEntity->insert(array(
+                return $newEntity->insert([
                     'name' => $newEntityName,
                     'left_range' => $referenceEntity->right_range + 1,
                     'right_range' => $referenceEntity->right_range + 2,
                     'created_at' => time()
-                ));
+                ]);
             }
         );
     }
@@ -220,7 +215,7 @@ class NestedEntity extends \Eloquent
             function () use ($referenceEntity, $doSoftDelete, $completeListOfEntitiesToDeleteIncludingOrphans) {
                 if ($doSoftDelete) {
                     # Soft delete
-                    $removeResult = $completeListOfEntitiesToDeleteIncludingOrphans->update(array('deleted_at' => time()));
+                    $removeResult = $completeListOfEntitiesToDeleteIncludingOrphans->update(['deleted_at' => time()]);
                 } else {
                     # Hard delete
                     $removeResult = $completeListOfEntitiesToDeleteIncludingOrphans->delete();
@@ -228,10 +223,10 @@ class NestedEntity extends \Eloquent
                     # Update ranges
                     \DB::table($this->table)
                         ->where('right_range', '>', $referenceEntity->right_range)
-                        ->update(array('right_range' => \DB::raw('right_range - ' . $referenceEntity->range_width)));
+                        ->update(['right_range' => \DB::raw('right_range - ' . $referenceEntity->range_width)]);
                     \DB::table($this->table)
                         ->where('left_range', '>', $referenceEntity->right_range)
-                        ->update(array('left_range' => \DB::raw('left_range - ' . $referenceEntity->range_width)));
+                        ->update(['left_range' => \DB::raw('left_range - ' . $referenceEntity->range_width)]);
                 }
 
                 return $removeResult;
@@ -283,7 +278,7 @@ class NestedEntity extends \Eloquent
         $flag == self::SELECT_LEAVES_ONLY && $nestedEntities = \DB::table($this->table)->select('id', 'name')->where('right_range', '=', \DB::raw('left_range + 1'))->orderBy('left_range');
         if ($flag == self::SELECT_LEAVES_ONLY && $id !== 1) {
             $parentEntity = \DB::table($this->table)->select('left_range', 'right_range')->where('id', $id)->first();
-            $nestedEntities->whereBetween('left_range', array($parentEntity->left_range, $parentEntity->right_range));
+            $nestedEntities->whereBetween('left_range', [$parentEntity->left_range, $parentEntity->right_range]);
         }
 
         return $nestedEntities->get();

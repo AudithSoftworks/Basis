@@ -12,7 +12,7 @@ class CreateUsersOauthTable extends Migration
      */
     public function up()
     {
-        \Schema::create('users_oauth', function (Blueprint $table) {
+        Schema::create('users_oauth', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('user_id');
             $table->string('remote_provider', 32);
@@ -35,6 +35,6 @@ class CreateUsersOauthTable extends Migration
      */
     public function down()
     {
-        \Schema::drop('users_oauth');
+        Schema::drop('users_oauth');
     }
 }

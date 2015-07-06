@@ -362,21 +362,21 @@ function autoUpdateNumber() {
         decimal: '.' // character to use as a decimal
     };
 
-    var productUp = new countUp('product-up', 0, 39, 0, 9.5, countUpOptions);
+    var productUp = new CountUp('product-up', 0, 39, 0, 9.5, countUpOptions);
     productUp.start();
 
-    var incomeShow = new countUp('income-show', 0, 10299.30, 2, 9.5, countUpOptions);
+    var incomeShow = new CountUp('income-show', 0, 10299.30, 2, 9.5, countUpOptions);
     incomeShow.start();
 
-    var userShow = new countUp('user-show', 0, 132129, 0, 5.5, countUpOptions);
+    var userShow = new CountUp('user-show', 0, 132129, 0, 5.5, countUpOptions);
     userShow.start();
 
-    var deliverShow = new countUp('deliver-show', 0, 10490, 1, 6.5, countUpOptions);
+    var deliverShow = new CountUp('deliver-show', 0, 10490, 1, 6.5, countUpOptions);
     deliverShow.start();
 
-    var downloadShow = new countUp('download-show', 0, 5340, 0, 9.5, countUpOptions);
+    var downloadShow = new CountUp('download-show', 0, 5340, 0, 9.5, countUpOptions);
     downloadShow.start();
-    var saleView = new countUp('sale-view', 0, 2129, 0, 9.5, countUpOptions);
+    var saleView = new CountUp('sale-view', 0, 2129, 0, 9.5, countUpOptions);
     saleView.start();
 }
 
