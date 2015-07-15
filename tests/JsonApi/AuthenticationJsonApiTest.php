@@ -9,7 +9,7 @@ use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class AuthenticationJsonApiTest extends TestCase
+class AuthenticationJsonApiTest extends IlluminateTestCase
 {
     use WithoutMiddleware;
 

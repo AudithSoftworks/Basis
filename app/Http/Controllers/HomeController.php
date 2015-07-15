@@ -1,28 +1,28 @@
 <?php namespace App\Http\Controllers;
 
-use Illuminate\Http\Response;
-
 class HomeController extends Controller
 {
-    public function getIndex()
+    public function __construct()
     {
-        return redirect('/home');
+        $this->middleware('auth', ['only' => ['getProfile']]);
     }
 
-    /**
-     * Show the application dashboard to the user.
-     *
-     * @return Response
-     */
-    public function getHome()
+    public function getIndex()
     {
-        $name = "Guest";
+        $name = trans('auth.guest');
+        $userType = self::TRANSLATION_TAG_GUEST_USER;
 
         if (\Auth::check()) {
             $user = \Auth::user();
             $name = $user->name;
+            $userType = self::TRANSLATION_TAG_REGISTERED_USER;
         }
 
-        return view('home', ['name' => $name]);
+        return view('index', ['userType' => $userType, 'name' => $name]);
+    }
+
+    public function getProfile()
+    {
+        return view('profile', ['userType' => self::TRANSLATION_TAG_REGISTERED_USER, 'name' => \Auth::user()->name]);
     }
 }

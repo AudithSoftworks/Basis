@@ -5,7 +5,7 @@
 {% use "layout/body/main" %}
 {% use "layout/body/footer" %}
 
-{% block document_head_title %}<title>Home - Audith Basis</title>{% endblock %}
+{% block document_head_title %}<title>Profile - Audith Basis</title>{% endblock %}
 
 {% block document_head_javascripts %}
     <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
@@ -23,14 +23,12 @@
 
 {% block document_body_main %}
     <main class="container-fluid">
-        <h2><b>Welcome</b>, {{ name }}!</h2>
+        <h2>{{ trans_choice('auth.headings.welcome', userType, {'name' : name})|raw }}</h2>
 
-        <form class="form-horizontal" role="form" method="POST" action="/password/email">
+        <form class="form-horizontal" role="form" method="POST" action="{{ action('Users\\AuthController@postLogin', [], false) }}">
             <fieldset class="submit-button col-md-12">
                 <div class="col-md-6 col-md-offset-3">
-                    <a href="{% if name == 'Guest' %}/login{% else %}/logout{% endif %}" class="btn btn-primary btn-xs col-md-12">
-                        {% if name == 'Guest' %}Log in{% else %}Log out{% endif %}
-                    </a>
+                    <a href="{{ action('HomeController@getIndex', [], false) }}" class="btn btn-primary btn-xs col-md-12">{{ trans('auth.buttons.home') }}</a>
                 </div>
             </fieldset>
         </form>

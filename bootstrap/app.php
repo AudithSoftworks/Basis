@@ -26,6 +26,12 @@ $app = new Illuminate\Foundation\Application(
 |
 */
 
+# Our customized Locale-enabled Router.
+$app->singleton(
+    'router',
+    \App\Services\Routing\LocalizedRouter::class
+);
+
 $app->singleton(
     \Illuminate\Contracts\Http\Kernel::class,
     \App\Http\Kernel::class

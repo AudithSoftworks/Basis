@@ -1,6 +1,7 @@
 <?php namespace App\Http\Controllers\Users;
 
 use App\Contracts\Registrar;
+use App\Exceptions\Users\LoginNotValidException;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
@@ -35,6 +36,8 @@ class AuthController extends Controller
      */
     protected $request;
 
+    protected $redirectTo = '/';
+
     /**
      * Create a new authentication controller instance.
      *
@@ -48,8 +51,51 @@ class AuthController extends Controller
         $this->registrar = $registrar;
         $this->request = \Route::getCurrentRequest();
         $this->socialite = $socialite;
+        if (!empty($locale = \Lang::getLocale()) && $locale != \Config::get('app.locale')) {
+            $this->redirectTo = '/' . $locale . $this->redirectTo;
+        }
 
         $this->middleware('guest', ['except' => 'getLogout']);
+    }
+
+    /**
+     * Handle OAuth login.
+     *
+     * @param string $provider
+     *
+     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     */
+    public function getOAuth($provider)
+    {
+        switch ($provider) {
+            case 'google':
+            case 'facebook':
+                if (!$this->request->exists('code')) {
+                    return redirect('/login')->withErrors(trans('passwords.oauth_failed'));
+                }
+                break;
+            case 'twitter':
+                if (!$this->request->exists('oauth_token') || !$this->request->exists('oauth_verifier')) {
+                    return redirect('/login')->withErrors(trans('passwords.oauth_failed'));
+                }
+                break;
+        }
+
+        /** @var SocialiteUser $userInfo */
+        $userInfo = $this->socialite->driver($provider)->user();
+        if ($this->registrar->loginViaOAuth($userInfo, $provider)) {
+            if ($this->request->ajax() || $this->request->wantsJson()) {
+                return ['message' => 'Login successful']; // TODO: Move to API app (Lumen based?)
+            }
+
+            return redirect()->intended($this->redirectPath());
+        }
+
+        if ($this->request->ajax() || $this->request->wantsJson()) {
+            throw new LoginNotValidException(trans('passwords.oauth_failed')); // TODO: Move to API app (Lumen based?)
+        }
+
+        return redirect('/login')->withErrors(trans('passwords.oauth_failed'));
     }
 
     /**
@@ -62,39 +108,7 @@ class AuthController extends Controller
     public function getLogin($provider = null)
     {
         if (!is_null($provider)) {
-            switch ($provider) {
-                case 'google':
-                case 'facebook':
-                    if ($this->request->exists('code')) {
-                        break;
-                    }
-                    if ($this->request->exists('error') && $this->request->get('error') == 'access_denied') {
-                        return redirect('/login')->withErrors(trans('passwords.oauth_cancelled'));
-                    }
-
-                    return $this->socialite->driver($provider)->redirect();
-                case 'twitter':
-                    if ($this->request->exists('oauth_token') && $this->request->exists('oauth_verifier')) {
-                        break;
-                    }
-                    if ($this->request->exists('denied')) {
-                        return redirect('/login')->withErrors(trans('passwords.oauth_cancelled'));
-                    }
-
-                    return $this->socialite->driver($provider)->redirect();
-                default:
-                    return redirect()->back();
-            }
-
-            /** @var SocialiteUser $userInfo */
-            $userInfo = $this->socialite->driver($provider)->user();
-            if ($this->registrar->loginViaOAuth($userInfo, $provider)) {
-                if ($this->request->ajax() || $this->request->wantsJson()) {
-                    return ['message' => 'Login successful']; // TODO: Move to API app (Lumen based?)
-                }
-
-                return redirect('/home');
-            }
+            return $this->socialite->driver($provider)->redirect();
         }
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
@@ -133,7 +147,7 @@ class AuthController extends Controller
             return ['message' => 'Logout successful'];
         }
 
-        return redirect(isset($this->redirectAfterLogout) ? $this->redirectAfterLogout : '/home');
+        return redirect()->intended($this->redirectPath());
     }
 
     /**
@@ -147,6 +161,6 @@ class AuthController extends Controller
             return $this->redirectPath;
         }
 
-        return isset($this->redirectTo) ? $this->redirectTo : '/home';
+        return isset($this->redirectTo) ? $this->redirectTo : '/';
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-class TestCase extends Illuminate\Foundation\Testing\TestCase
+class IlluminateTestCase extends Illuminate\Foundation\Testing\TestCase
 {
     protected $baseUrl = 'http://basis.audith.org';
 
