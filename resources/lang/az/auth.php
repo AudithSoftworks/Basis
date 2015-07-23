@@ -8,6 +8,9 @@ return [
     'buttons' => [
         'home' => 'Baş Səhifə',
         'login' => 'Giriş',
-        'logout' => 'Çıxış'
+        'logout' => 'Çıxış',
+        'register' => 'Qeydiyyat',
+        'signup' => 'Qeyd ol',
+        'password' => 'Parol sıfırlama'
     ]
 ];

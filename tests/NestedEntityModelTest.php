@@ -2,7 +2,7 @@
 
 use App\Models\NestedEntity;
 
-class NestedEntityModelTest extends TestCase
+class NestedEntityModelTest extends IlluminateTestCase
 {
     public static function setUpBeforeClass()
     {

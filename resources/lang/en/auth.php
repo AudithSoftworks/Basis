@@ -8,6 +8,9 @@ return [
     'buttons' => [
         'home' => 'Home',
         'login' => 'Log in',
-        'logout' => 'Log out'
+        'logout' => 'Log out',
+        'register' => 'Register',
+        'signup' => 'Sign up',
+        'password' => 'Reset password'
     ]
 ];
