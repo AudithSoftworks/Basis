@@ -27,7 +27,7 @@ class AuthenticationWebUITest extends IlluminateTestCase
     {
         $this->visit('/register');
         $this->seeStatusCode(200);
-        $this->click('Sign in');
+        $this->click('Log in');
         $this->seeStatusCode(200);
         $this->seePageIs('/login');
         $this->click('Register');
