@@ -25,7 +25,7 @@
     <main class="container-fluid">
         <h2><b>Log in</b> to your account</h2>
 
-        <form class="form-horizontal" role="form" method="POST" action="/login">
+        <form class="form-horizontal" role="form" method="POST" action="{{ action('Users\\AuthController@postLogin', [], false) }}">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
             <fieldset class="col-md-12">
@@ -49,24 +49,22 @@
                     </script>
                 </div>
                 <div class="col-md-6">
-                    <button type="submit" class="btn btn-primary btn-xs col-md-12">
-                        Log in
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-xs col-md-12">{{ trans('auth.buttons.login') }}</button>
                 </div>
             </fieldset>
 
             <p>or</p>
 
             <fieldset class="socialite">
-                <a class="btn btn-primary brand-color-twitter fa-twitter" href="/login/twitter"></a>
-                <a class="btn btn-primary brand-color-googleplus fa-google-plus" href="/login/google"></a>
-                <a class="btn btn-primary brand-color-facebook fa-facebook" href="/login/facebook"></a>
+                <a class="btn btn-primary brand-color-twitter fa-twitter" href="{{ route('login', 'twitter', false) }}"></a>
+                <a class="btn btn-primary brand-color-googleplus fa-google-plus" href="{{ route('login', 'google', false) }}"></a>
+                <a class="btn btn-primary brand-color-facebook fa-facebook" href="{{ route('login', 'facebook', false) }}"></a>
             </fieldset>
         </form>
 
         <ul class="col-md-12">
-            <li class="col-md-6 text-left"><a href="/register">Register</a></li>
-            <li class="col-md-6 text-right"><a href="/password/email">Reset password</a></li>
+            <li class="col-md-6 text-left"><a href="{{ route('register', [], false) }}">{{ trans('auth.buttons.register') }}</a></li>
+            <li class="col-md-6 text-right"><a href="{{ action('Users\\PasswordController@getEmail', [], false) }}">{{ trans('auth.buttons.password') }}</a></li>
         </ul>
     </main>
 {% endblock %}

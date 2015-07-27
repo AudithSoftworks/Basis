@@ -1,8 +1,11 @@
 <?php
 
-class TestCase extends Illuminate\Foundation\Testing\TestCase
+use Illuminate\Foundation\Testing\ApplicationTrait;
+use Illuminate\Foundation\Testing\CrawlerTrait;
+
+class SauceWebDriverTestCase extends Sauce\Sausage\WebDriverTestCase
 {
-    protected $baseUrl = 'http://basis.audith.org';
+    use ApplicationTrait;
 
     /**
      * Creates the application.
@@ -12,7 +15,6 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     public function createApplication()
     {
         $app = require __DIR__ . '/../bootstrap/app.php';
-
         $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
         return $app;

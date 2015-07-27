@@ -177,6 +177,6 @@ class UsersController extends Controller
             return $this->redirectPath;
         }
 
-        return isset($this->redirectTo) ? $this->redirectTo : '/home';
+        return isset($this->redirectTo) ? $this->redirectTo : '/';
     }
 }

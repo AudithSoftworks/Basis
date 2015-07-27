@@ -1,4 +1,4 @@
-FROM php:5.5-fpm
+FROM php:5.6-fpm
 MAINTAINER Shahriyar Imanov <shehi@imanov.me>
 
 RUN apt-get update -y \

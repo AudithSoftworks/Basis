@@ -1,0 +1,44 @@
+{% extends "layout" %}
+
+{% use "layout/head" %}
+{% use "layout/body/header" %}
+{% use "layout/body/main" %}
+{% use "layout/body/footer" %}
+
+{% block document_head_title %}<title>Home - Audith Basis</title>{% endblock %}
+
+{% block document_head_javascripts %}
+    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
+{% endblock %}
+
+{% block document_head_stylesheets %}
+    <link rel="stylesheet" href="{{ elixir('stylesheets/auth.css') }}">
+{% endblock %}
+
+{% block document_body_header %}
+    <header class="container-fluid">
+        <h1 class="text-center">Audith Basis</h1>
+    </header>
+{% endblock %}
+
+{% block document_body_main %}
+    <main class="container-fluid">
+        <h2>{{ trans_choice('auth.headings.welcome', userType, {'name' : name})|raw }}</h2>
+
+        <form class="form-horizontal" role="form" method="POST" action="{{ action('Users\\AuthController@postLogin', [], false) }}">
+            <fieldset class="submit-button col-md-12">
+                <div class="col-md-6 col-md-offset-3">
+                    <a href="{% if name == trans('auth.guest') %}{{ action('Users\\AuthController@getLogin', [], false) }}{% else %}{{ action('Users\\AuthController@getLogout', [], false) }}{% endif %}" class="btn btn-primary btn-xs col-md-12">
+                        {% if name == trans('auth.guest') %}{{ trans('auth.buttons.login') }}{% else %}{{ trans('auth.buttons.logout') }}{% endif %}
+                    </a>
+                </div>
+            </fieldset>
+        </form>
+    </main>
+{% endblock %}
+
+{% block document_body_footer %}
+    <footer>
+        &copy;
+    </footer>
+{% endblock %}

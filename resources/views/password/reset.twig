@@ -25,7 +25,7 @@
     <main class="container-fluid">
         <h2><b>Reset</b> your password</h2>
 
-        <form class="form-horizontal" role="form" method="POST" action="/password/reset">
+        <form class="form-horizontal" role="form" method="POST" action="{{ action('Users\\PasswordController@postReset', [], false) }}">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="token" value="{{ token }}">
 
@@ -45,16 +45,14 @@
 
             <fieldset class="submit-button col-md-12">
                 <div class="col-md-8 col-md-offset-2">
-                    <button type="submit" class="btn btn-primary btn-xs col-md-12">
-                        Reset Password
-                    </button>
+                    <button type="submit" class="btn btn-primary btn-xs col-md-12">Reset Password</button>
                 </div>
             </fieldset>
         </form>
 
         <ul class="col-md-12">
-            <li class="col-md-6 text-left"><a href="/login">Sign in</a></li>
-            <li class="col-md-6 text-right"><a href="/register">Register</a></li>
+            <li class="col-md-6 text-left"><a href="{{ url('/login', [], false) }}">Sign in</a></li>
+            <li class="col-md-6 text-right"><a href="{{ url('/register', [], false) }}">Register</a></li>
         </ul>
     </main>
 {% endblock %}

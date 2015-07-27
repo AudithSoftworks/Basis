@@ -2,10 +2,8 @@
 
 use Illuminate\Contracts\Auth\PasswordBroker;
 
-class AuthenticationWebUITest extends TestCase
+class AuthenticationWebUITest extends IlluminateTestCase
 {
-    public static $csrfToken = null;
-
     /**
      * This is used to memorize password reset token for tests.
      *
@@ -13,10 +11,13 @@ class AuthenticationWebUITest extends TestCase
      */
     public static $passwordResetToken;
 
+    /**
+     * Create an app instance for facades to work + Migrations.
+     */
     public static function setUpBeforeClass()
     {
         putenv('APP_ENV=testing');
-        $app = require __DIR__.'/../../bootstrap/app.php';
+        $app = require __DIR__ . '/../../bootstrap/app.php';
         $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
         \Artisan::call('migrate:refresh');
@@ -26,7 +27,7 @@ class AuthenticationWebUITest extends TestCase
     {
         $this->visit('/register');
         $this->seeStatusCode(200);
-        $this->click('Sign in');
+        $this->click('Log in');
         $this->seeStatusCode(200);
         $this->seePageIs('/login');
         $this->click('Register');
@@ -101,6 +102,7 @@ class AuthenticationWebUITest extends TestCase
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.required', ['attribute' => 'password']), true);
                 $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
+                $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
                 break;
             case 'testRegister with data set #1':
                 $this->seePageIs('/register');
@@ -108,6 +110,7 @@ class AuthenticationWebUITest extends TestCase
                 $this->see(trans('validation.required', ['attribute' => 'name']), true);
                 $this->see(trans('validation.required', ['attribute' => 'password']), true);
                 $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
+                $this->notSeeInDatabase('users', ['name' => $credentials['name']]);
                 break;
             case 'testRegister with data set #2':
                 $this->seePageIs('/register');
@@ -115,10 +118,12 @@ class AuthenticationWebUITest extends TestCase
                 $this->see(trans('validation.required', ['attribute' => 'name']), true);
                 $this->see(trans('validation.required', ['attribute' => 'password']), true);
                 $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]));
+                $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
                 break;
             default:
-                $this->seePageIs('/home');
+                $this->seePageIs('/');
                 $this->see('<b>Welcome</b>, John Doe!');
+                $this->seeInDatabase('users', ['email' => $credentials['email']]);
                 break;
         }
     }
@@ -190,7 +195,7 @@ class AuthenticationWebUITest extends TestCase
                 $this->see('These credentials do not match our records!');
                 break;
             default:
-                $this->seePageIs('/home');
+                $this->seePageIs('/');
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.required', ['attribute' => 'password']), true);
                 $this->see('These credentials do not match our records!', true);
@@ -209,13 +214,13 @@ class AuthenticationWebUITest extends TestCase
         $this->actingAs($user);
         $this->visit('/login');
         $this->seeStatusCode(200);
-        $this->seePageIs('/home'); // Since we are authenticated, we are redirected to /home
+        $this->seePageIs(''); // Since we are authenticated, we are redirected to /
         $this->see('<h2><b>Welcome</b>, John Doe!</h2>');
 
         $this->click('Log out');
         $this->seeStatusCode(200);
-        $this->seePageIs('/home');
-        $this->see('<h2><b>Welcome</b>, Guest!</h2>');
+        $this->seePageIs('/');
+        $this->see('<h2><b>Welcome</b>!</h2>');
     }
 
     public function data_testPasswordEmail()
