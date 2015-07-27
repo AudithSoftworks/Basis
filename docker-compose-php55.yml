@@ -1,0 +1,60 @@
+mysql55:
+  image: mysql:5.5
+  environment:
+    - MYSQL_DATABASE=basis
+    - MYSQL_ALLOW_EMPTY_PASSWORD=true
+mysql56:
+  image: mysql:5.6
+  environment:
+    - MYSQL_DATABASE=basis
+    - MYSQL_ALLOW_EMPTY_PASSWORD=true
+mysql57:
+  image: mysql:5.7
+  environment:
+    - MYSQL_DATABASE=basis
+    - MYSQL_ALLOW_EMPTY_PASSWORD=true
+postgres92:
+  image: postgres:9.2
+postgres93:
+  image: postgres:9.3
+postgres94:
+  image: postgres:9.4
+redis:
+  image: redis
+phpFpm55:
+  image: audithsoftworks/basis:php_5.5-fpm
+  volumes:
+    - .:/home/basis
+  working_dir: /home/basis
+  links:
+    - mysql55
+    - mysql56
+    - mysql57
+    - postgres92
+    - postgres93
+    - postgres94
+    - redis
+nginxForPhpFpm55:
+  image: audithsoftworks/basis:nginx
+  volumes:
+    - ./storage/build/configs/nginxForPhpFpm55.conf:/etc/nginx/conf.d/default.conf:ro
+    - .:/home/basis
+  working_dir: /home/basis
+  links:
+    - phpFpm55
+php55:
+  image: audithsoftworks/basis:php_5.5
+  volumes:
+    - .:/home/basis
+  working_dir: /home/basis
+  links:
+    - mysql55
+    - mysql56
+    - mysql57
+    - postgres92
+    - postgres93
+    - postgres94
+    - redis
+    - nginxForPhpFpm55
+  stdin_open: true
+  restart: on-failure[10]

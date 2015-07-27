@@ -2,7 +2,6 @@ machine:
   php:
     version: 5.5.9
   pre:
-    - sudo curl -L -o /usr/bin/docker 'http://s3-external-1.amazonaws.com/circle-downloads/docker-1.6.2-circleci'; sudo chmod 0755 /usr/bin/docker; true
     - curl -L https://github.com/docker/compose/releases/download/1.3.1/docker-compose-`uname -s`-`uname -m` > docker-compose; chmod +x docker-compose; true
     - sudo mv docker-compose /usr/local/bin/
 
@@ -41,140 +40,122 @@ dependencies:
 
     # Docker build: HHVM, PHP 5.5, 5.6 & caching
 #    - if [[ -e ~/.docker/audithsoftworks-basis-php_5.5.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.5.tar; else docker build -f storage/build/scripts/php_5.5.Dockerfile -t audithsoftworks/basis:php_5.5 .; fi
-    - if [[ -e ~/.docker/audithsoftworks-basis-php_5.5.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.5.tar; else docker pull audithsoftworks/basis:php_5.5; fi
-    - if [[ ! -e ~/.docker/audithsoftworks-basis-php_5.5.tar ]]; then docker save audithsoftworks/basis:php_5.5 > ~/.docker/audithsoftworks-basis-php_5.5.tar; fi
 #    - if [[ -e ~/.docker/audithsoftworks-basis-php_5.6.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.6.tar; else docker build -f storage/build/scripts/php_5.6.Dockerfile -t audithsoftworks/basis:php_5.6 .; fi
-    - if [[ -e ~/.docker/audithsoftworks-basis-php_5.6.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.6.tar; else docker pull audithsoftworks/basis:php_5.6; fi
-    - if [[ ! -e ~/.docker/audithsoftworks-basis-php_5.6.tar ]]; then docker save audithsoftworks/basis:php_5.6 > ~/.docker/audithsoftworks-basis-php_5.6.tar; fi
 #    - if [[ -e ~/.docker/audithsoftworks-basis-hhvm.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-hhvm.tar; else docker build -f storage/build/scripts/hhvm.Dockerfile -t audithsoftworks/basis:hhvm .; fi
-    - if [[ -e ~/.docker/audithsoftworks-basis-hhvm.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-hhvm.tar; else docker pull audithsoftworks/basis:hhvm; fi
-    - if [[ ! -e ~/.docker/audithsoftworks-basis-hhvm.tar ]]; then docker save audithsoftworks/basis:hhvm > ~/.docker/audithsoftworks-basis-hhvm.tar; fi
+    - if [[ $CIRCLE_NODE_INDEX == 0 ]]; then if [[ -e ~/.docker/audithsoftworks-basis-php_5.5.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.5.tar; else docker pull audithsoftworks/basis:php_5.5; fi; fi;
+      if [[ $CIRCLE_NODE_INDEX == 1 ]]; then if [[ -e ~/.docker/audithsoftworks-basis-php_5.6.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.6.tar; else docker pull audithsoftworks/basis:php_5.6; fi; fi;
+      if [[ $CIRCLE_NODE_INDEX == 2 ]]; then if [[ -e ~/.docker/audithsoftworks-basis-hhvm.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-hhvm.tar; else docker pull audithsoftworks/basis:hhvm; fi; fi;
+    - if [[ $CIRCLE_NODE_INDEX == 0 ]]; then if [[ ! -e ~/.docker/audithsoftworks-basis-php_5.5.tar ]]; then docker save audithsoftworks/basis:php_5.5 > ~/.docker/audithsoftworks-basis-php_5.5.tar; fi; fi;
+      if [[ $CIRCLE_NODE_INDEX == 1 ]]; then if [[ ! -e ~/.docker/audithsoftworks-basis-php_5.6.tar ]]; then docker save audithsoftworks/basis:php_5.6 > ~/.docker/audithsoftworks-basis-php_5.6.tar; fi; fi;
+      if [[ $CIRCLE_NODE_INDEX == 2 ]]; then if [[ ! -e ~/.docker/audithsoftworks-basis-hhvm.tar ]]; then docker save audithsoftworks/basis:hhvm > ~/.docker/audithsoftworks-basis-hhvm.tar; fi; fi;
 
     # Docker build: PHP-FPM 5.5, 5.6 & caching
 #    - if [[ -e ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar; else docker build -f storage/build/scripts/php_5.5-fpm.Dockerfile -t audithsoftworks/basis:php_5.5-fpm .; fi
-    - if [[ -e ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar; else docker pull audithsoftworks/basis:php_5.5-fpm; fi
-    - if [[ ! -e ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar ]]; then docker save audithsoftworks/basis:php_5.5-fpm > ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar; fi
 #    - if [[ -e ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar; else docker build -f storage/build/scripts/php_5.6-fpm.Dockerfile -t audithsoftworks/basis:php_5.6-fpm .; fi
-    - if [[ -e ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar; else docker pull audithsoftworks/basis:php_5.6-fpm; fi
-    - if [[ ! -e ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar ]]; then docker save audithsoftworks/basis:php_5.6-fpm > ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar; fi
+    - if [[ $CIRCLE_NODE_INDEX == 0 ]]; then if [[ -e ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar; else docker pull audithsoftworks/basis:php_5.5-fpm; fi; fi;
+      if [[ $CIRCLE_NODE_INDEX == 1 ]]; then if [[ -e ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar ]]; then docker load -i ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar; else docker pull audithsoftworks/basis:php_5.6-fpm; fi; fi;
+    - if [[ $CIRCLE_NODE_INDEX == 0 ]]; then if [[ ! -e ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar ]]; then docker save audithsoftworks/basis:php_5.5-fpm > ~/.docker/audithsoftworks-basis-php_5.5-fpm.tar; fi; fi;
+      if [[ $CIRCLE_NODE_INDEX == 1 ]]; then if [[ ! -e ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar ]]; then docker save audithsoftworks/basis:php_5.6-fpm > ~/.docker/audithsoftworks-basis-php_5.6-fpm.tar; fi; fi;
 
     # Docker Compose
-    - docker-compose pull
-    - docker-compose up -d && docker-compose ps
+    - case $CIRCLE_NODE_INDEX in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 2) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
+      && docker-compose -f $DOCKER_COMPOSE_FILE pull
+    - case $CIRCLE_NODE_INDEX in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 2) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
+      && docker-compose -f $DOCKER_COMPOSE_FILE up -d && docker-compose ps
 
     # Create database for PgSQL 9.2, 9.3, 9.4
-    - psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres92_1) -U postgres -c "CREATE DATABASE basis;"
-    - psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres93_1) -U postgres -c "CREATE DATABASE basis;"
-    - psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"
+    - if [[ $CIRCLE_NODE_INDEX != 2 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres92_1) -U postgres -c "CREATE DATABASE basis;"; fi;
+    - if [[ $CIRCLE_NODE_INDEX != 2 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres93_1) -U postgres -c "CREATE DATABASE basis;"; fi;
+    - if [[ $CIRCLE_NODE_INDEX != 2 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
 
     # Fix for /etc/hosts file
-    - docker-compose run php55 /bin/sh -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm55_1) basis.audith.org | tee -a /etc/hosts"
-    - docker-compose run php56 /bin/sh -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm56_1) basis.audith.org | tee -a /etc/hosts"
-    - docker-compose run hhvmAsCli /bin/sh -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForHhvm_1) basis.audith.org | tee -a /etc/hosts"
+    - if [[ $CIRCLE_NODE_INDEX == 0 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_php55_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm55_1) basis.audith.org | tee -a /etc/hosts"; fi
+    - if [[ $CIRCLE_NODE_INDEX == 1 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_php56_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm56_1) basis.audith.org | tee -a /etc/hosts"; fi
+    - if [[ $CIRCLE_NODE_INDEX == 2 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_hhvmAsCli_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForHhvm_1) basis.audith.org | tee -a /etc/hosts"; fi
 
     # Build project dependencies
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'npm update && bower --config.interactive=false --allow-root update'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git /home/basis/storage/build/tools/css3_font_converter'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'cp -r /home/basis/public/bower_components/bootstrap/fonts /home/basis/public/fonts/glyphicons'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'cp -r /home/basis/public/bower_components/fontawesome/fonts  /home/basis/public/fonts/font_awesome'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'cp -r /home/basis/public/bower_components/google-fonts/ofl/armata /home/basis/public/fonts/armata'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'cp -r /home/basis/public/bower_components/google-fonts/ofl/ptsans /home/basis/public/fonts/pt_sans'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'cp -r /home/basis/public/bower_components/google-fonts/ofl/marcellus /home/basis/public/fonts/marcellus'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'cp -r /home/basis/public/bower_components/google-fonts/ofl/pontanosans /home/basis/public/fonts/pontano_sans'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'cp -r /home/basis/public/bower_components/google-fonts/ofl/montserrat /home/basis/public/fonts/montserrat'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'cp -r /home/basis/public/bower_components/google-fonts/apache/opensans /home/basis/public/fonts/opensans'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'export PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 && chmod -R +x /home/basis/storage/build/tools'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf'
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pt_sans/stylesheet.css public/fonts/pt_sans/*.ttf'
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pontano_sans/stylesheet.css public/fonts/pontano_sans/*.ttf'
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf'
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf'
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'compass compile'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'gulp'
-
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
+      && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c "
+        cd /home/basis;
+        npm update;
+        bower --config.interactive=false --allow-root update;
+        git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2;
+        cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
+        git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git /home/basis/storage/build/tools/css3_font_converter;
+      "
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
+      && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c "
+        cd /home/basis;
+        cp -r /home/basis/public/bower_components/bootstrap/fonts /home/basis/public/fonts/glyphicons;
+        cp -r /home/basis/public/bower_components/fontawesome/fonts /home/basis/public/fonts/font_awesome;
+        cp -r /home/basis/public/bower_components/google-fonts/ofl/armata /home/basis/public/fonts/armata;
+        cp -r /home/basis/public/bower_components/google-fonts/ofl/ptsans /home/basis/public/fonts/pt_sans;
+        cp -r /home/basis/public/bower_components/google-fonts/ofl/marcellus /home/basis/public/fonts/marcellus;
+        cp -r /home/basis/public/bower_components/google-fonts/ofl/pontanosans /home/basis/public/fonts/pontano_sans;
+        cp -r /home/basis/public/bower_components/google-fonts/ofl/montserrat /home/basis/public/fonts/montserrat;
+        cp -r /home/basis/public/bower_components/google-fonts/apache/opensans /home/basis/public/fonts/opensans;
+      "
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
+      && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c "
+        cd /home/basis;
+        chmod -R +x /home/basis/storage/build/tools;
+        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf;
+        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pt_sans/stylesheet.css public/fonts/pt_sans/*.ttf;
+        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pontano_sans/stylesheet.css public/fonts/pontano_sans/*.ttf;
+        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf;
+        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
+        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf;
+        compass compile;
+        gulp;
+      "
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
       && cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql55/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
 
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac
-      && docker-compose run $PHP_CONTAINER /bin/sh -c 'composer update --no-interaction'
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
+      && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c "
+        cd /home/basis;
+        composer selfupdate;
+        composer update --prefer-source --no-interaction;
+      "
 test:
   override:
     # Testing PHP 5.5 and 5.6 against MySQL 5.5
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac && docker-compose run $PHP_CONTAINER /bin/sh -c './vendor/bin/phpunit --debug --verbose':
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
         parallel: true
 
     # Switching to MySQL 5.6
     - cat .env | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB=.*/DB=mysql/g | tee .env
 
     # Testing PHP 5.5 and 5.6 against MySQL 5.6
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac && docker-compose run $PHP_CONTAINER /bin/sh -c './vendor/bin/phpunit --debug --verbose':
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
         parallel: true
 
     # Switching to MySQL 5.7
     - cat .env | sed s/DB_HOST=.*/DB_HOST=mysql57/g | sed s/DB=.*/DB=mysql/g | tee .env
 
     # Testing PHP 5.5 and 5.6 against MySQL 5.6
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; 2) export PHP_CONTAINER=hhvmAsCli ;; esac && docker-compose run $PHP_CONTAINER /bin/sh -c './vendor/bin/phpunit --debug --verbose':
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
         parallel: true
 
     # Switching to PgSQL 9.2
     - cat .env | sed s/DB_HOST=.*/DB_HOST=postgres92/g | sed s/DB=.*/DB=pgsql/g | tee .env
 
     # Testing PHP 5.5 and 5.6 against PgSQL 9.2
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; esac && if [[ $CIRCLE_NODE_INDEX != 2 ]]; then docker-compose run $PHP_CONTAINER /bin/sh -c './vendor/bin/phpunit --debug --verbose'; fi:
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; esac && if [[ $CIRCLE_NODE_INDEX != 2 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose'; fi:
         parallel: true
 
     # Switching to PgSQL 9.3
     - cat .env | sed s/DB_HOST=.*/DB_HOST=postgres93/g | sed s/DB=.*/DB=pgsql/g | tee .env
 
     # Testing PHP 5.5 and 5.6 against PgSQL 9.3
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; esac && if [[ $CIRCLE_NODE_INDEX != 2 ]]; then docker-compose run $PHP_CONTAINER /bin/sh -c './vendor/bin/phpunit --debug --verbose'; fi:
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; esac && if [[ $CIRCLE_NODE_INDEX != 2 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose'; fi:
         parallel: true
 
     # Switching to PgSQL 9.4
     - cat .env | sed s/DB_HOST=.*/DB_HOST=postgres94/g | sed s/DB=.*/DB=pgsql/g | tee .env
 
     # Testing PHP 5.5 and 5.6 against PgSQL 9.4
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=php55 ;; 1) export PHP_CONTAINER=php56 ;; esac && if [[ $CIRCLE_NODE_INDEX != 2 ]]; then docker-compose run $PHP_CONTAINER /bin/sh -c './vendor/bin/phpunit --debug --verbose'; fi:
+    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; esac && if [[ $CIRCLE_NODE_INDEX != 2 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose'; fi:
         parallel: true
 
   post:
