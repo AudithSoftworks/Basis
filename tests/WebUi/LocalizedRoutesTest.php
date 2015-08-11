@@ -1,4 +1,6 @@
-<?php
+<?php namespace App\Tests\WebUi;
+
+use App\Tests\IlluminateTestCase;
 
 class LocalizedRoutesTest extends IlluminateTestCase
 {

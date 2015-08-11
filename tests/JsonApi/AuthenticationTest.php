@@ -1,15 +1,16 @@
-<?php
+<?php namespace App\Tests\JsonApi;
 
 use App\Exceptions\Common\ValidationException;
 use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Exceptions\Users\TokenNotValidException;
 use App\Exceptions\Users\UserNotFoundException;
+use App\Tests\IlluminateTestCase;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
-class AuthenticationJsonApiTest extends IlluminateTestCase
+class AuthenticationTest extends IlluminateTestCase
 {
     use WithoutMiddleware;
 
@@ -81,9 +82,11 @@ class AuthenticationJsonApiTest extends IlluminateTestCase
                     break;
             }
             $this->seeJson(['exception' => $exceptionExpected]);
+            isset($credentials['email']) && $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
         } else {
             $this->seeStatusCode(200);
             $this->seeJson(['message' => 'Created']);
+            $this->seeInDatabase('users', ['email' => $credentials['email']]);
         }
     }
 
@@ -423,7 +426,7 @@ class AuthenticationJsonApiTest extends IlluminateTestCase
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
 
-        $this->assertFalse(Auth::check());
+        $this->assertFalse(\Auth::check());
     }
 
     public function data_testDestroy()

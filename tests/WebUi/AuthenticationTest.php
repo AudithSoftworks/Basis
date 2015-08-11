@@ -1,8 +1,9 @@
-<?php
+<?php namespace App\Tests\WebUi;
 
+use App\Tests\IlluminateTestCase;
 use Illuminate\Contracts\Auth\PasswordBroker;
 
-class AuthenticationWebUITest extends IlluminateTestCase
+class AuthenticationTest extends IlluminateTestCase
 {
     /**
      * This is used to memorize password reset token for tests.
@@ -209,7 +210,7 @@ class AuthenticationWebUITest extends IlluminateTestCase
      */
     public function testLogout()
     {
-        /** @var App\Models\User $user */
+        /** @var \App\Models\User $user */
         $user = \App\Models\User::find(1);
         $this->actingAs($user);
         $this->visit('/login');

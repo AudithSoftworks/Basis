@@ -1,6 +1,8 @@
-<?php
+<?php namespace App\Tests;
 
-class IlluminateTestCase extends Illuminate\Foundation\Testing\TestCase
+use Illuminate\Foundation\Testing\TestCase;
+
+class IlluminateTestCase extends TestCase
 {
     protected $baseUrl = 'http://basis.audith.org';
 

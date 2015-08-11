@@ -51,7 +51,7 @@ class NestedEntity extends \Eloquent
         # Fetch reference entity
         $referenceEntity = \DB::table($this->table)->where('id', $referenceEntityId)->first();
         if (is_null($referenceEntity)) {
-            throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . "not found!");
+            throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . " not found!");
         }
 
         \DB::transaction(
@@ -86,7 +86,7 @@ class NestedEntity extends \Eloquent
         # Fetch reference entity
         $referenceEntity = \DB::table($this->table)->where('id', $referenceEntityId)->first();
         if (is_null($referenceEntity)) {
-            throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . "not found!");
+            throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . " not found!");
         }
 
         \DB::transaction(
@@ -136,7 +136,7 @@ class NestedEntity extends \Eloquent
         # Fetch reference entity
         $referenceEntity = \DB::table($this->table)->where('id', $referenceEntityId)->first();
         if (is_null($referenceEntity)) {
-            throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . "not found!");
+            throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . " not found!");
         }
 
         \DB::transaction(
@@ -171,7 +171,7 @@ class NestedEntity extends \Eloquent
         # Fetch reference entity
         $referenceEntity = \DB::table($this->table)->where('id', $referenceEntityId)->first();
         if (is_null($referenceEntity)) {
-            throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . "not found!");
+            throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . " not found!");
         }
 
         \DB::transaction(
@@ -204,7 +204,7 @@ class NestedEntity extends \Eloquent
         # Round up delete-ables
         $referenceEntity = \DB::table($this->table)->select('left_range', 'right_range', \DB::raw('right_range - left_range + 1 as range_width'))->where('id', $id)->first();
         if (is_null($referenceEntity)) {
-            throw new \InvalidArgumentException("Reference entity with id: " . $id . "not found!");
+            throw new \InvalidArgumentException("Reference entity with id: " . $id . " not found!");
         }
         $completeListOfEntitiesToDeleteIncludingOrphans = \DB::table($this->table)
             ->where('left_range', '>=', $referenceEntity->left_range)

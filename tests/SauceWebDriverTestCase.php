@@ -1,4 +1,4 @@
-<?php
+<?php namespace App\Tests;
 
 use Illuminate\Foundation\Testing\ApplicationTrait;
 use Illuminate\Foundation\Testing\CrawlerTrait;

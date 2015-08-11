@@ -1,17 +1,16 @@
-<?php
+<?php namespace App\Tests\Models;
 
 use App\Models\NestedEntity;
+use App\Tests\IlluminateTestCase;
 
 class NestedEntityModelTest extends IlluminateTestCase
 {
     public static function setUpBeforeClass()
     {
-        // static::createApplication(); TODO Facilitate this method @see https://github.com/laravel/framework/pull/8496
-        $app = require __DIR__ . '/../bootstrap/app.php';
+        $app = require __DIR__ . '/../../bootstrap/app.php';
         $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
-        Artisan::call('migrate:refresh');
-        Artisan::call('db:seed');
+        \Artisan::call('db:seed', ['--class' => 'NestedEntitiesTableSeeder']);
     }
 
     public function data_testInsertForException()

@@ -11,14 +11,17 @@ class NestedEntitiesTableSeeder extends Seeder
      */
     public function run()
     {
-        DB::table('nested_entities')->truncate();
-	    DB::table('nested_entities')->insert(
-            array(
-                'name' => 'Root',
-                'left_range' => 1,
-                'right_range' => 2,
-                'created_at' => time()
-            )
-        );
+        \Eloquent::unguarded(function () {
+            DB::table('nested_entities')->truncate();
+            DB::table('nested_entities')->insert(
+                array(
+                    'name' => 'Root',
+                    'left_range' => 1,
+                    'right_range' => 2,
+                    'created_at' => time()
+                )
+            );
+        });
+        $this->command->info('NestedEntitiesTable seeded.');
     }
 }

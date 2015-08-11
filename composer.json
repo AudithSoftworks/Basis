@@ -47,10 +47,9 @@
         }
     },
     "autoload-dev": {
-        "classmap": [
-            "tests/IlluminateTestCase.php",
-            "tests/SauceWebDriverTestCase.php"
-        ]
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
     },
     "scripts": {
         "post-install-cmd": [
