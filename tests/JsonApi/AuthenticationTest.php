@@ -7,13 +7,10 @@ use App\Exceptions\Users\TokenNotValidException;
 use App\Exceptions\Users\UserNotFoundException;
 use App\Tests\IlluminateTestCase;
 use Illuminate\Contracts\Auth\PasswordBroker;
-use Illuminate\Foundation\Testing\WithoutMiddleware;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuthenticationTest extends IlluminateTestCase
 {
-    use WithoutMiddleware;
-
     /**
      * This is used to memorize password reset token for tests.
      *
@@ -40,6 +37,16 @@ class AuthenticationTest extends IlluminateTestCase
         $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
 
         \Artisan::call('migrate:refresh');
+    }
+
+    public function testCsrfMiddleWareBehaviorForNonApiHandling()
+    {
+        // Let's trick it to think that we are only sending AJAX request
+        // (i.e. we are not appending 'Accept: application/json' to request headers).
+        $temporaryRequestHeaders = ['HTTP_ACCEPT' => '', 'X-Requested-With' => 'XMLHttpRequest'];
+
+        $this->post('/users', [], $temporaryRequestHeaders);
+        $this->seeStatusCode(422);
     }
 
     public function data_testStore()
@@ -115,7 +122,7 @@ class AuthenticationTest extends IlluminateTestCase
      */
     public function testShow(array $user, $exceptionExpected)
     {
-        $this->get('/users/'.$user['id'], self::$requestHeaders);
+        $this->get('/users/' . $user['id'], self::$requestHeaders);
         $this->shouldReturnJson();
         if (!empty($exceptionExpected)) {
             $this->seeStatusCode(404);
@@ -194,7 +201,7 @@ class AuthenticationTest extends IlluminateTestCase
     {
         $parameters = array_except($user, ['id']);
 
-        $this->put('/users/'.$user['id'], $parameters, self::$requestHeaders);
+        $this->put('/users/' . $user['id'], $parameters, self::$requestHeaders);
         $this->shouldReturnJson();
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
@@ -460,7 +467,7 @@ class AuthenticationTest extends IlluminateTestCase
     {
         $parameters = array_except($user, ['email']);
 
-        $this->delete('/users/'.$user['id'], $parameters, self::$requestHeaders);
+        $this->delete('/users/' . $user['id'], $parameters, self::$requestHeaders);
         $this->shouldReturnJson();
         $this->see('message');
         if (!empty($exceptionExpected)) {

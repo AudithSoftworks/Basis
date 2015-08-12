@@ -76,7 +76,10 @@ class RouteServiceProvider extends ServiceProvider
             });
         }
 
+        //------------------------------------------------
         // Default locale? No prefices are necessary.
+        //------------------------------------------------
+
         \Lang::setLocale(\Config::get('app.locale'));
         $router->group(compact('namespace'), function (Router $router) {
             $this->localizedRoutes($router, \Config::get('app.locale'));

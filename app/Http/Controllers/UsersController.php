@@ -42,7 +42,7 @@ class UsersController extends Controller
         $this->registrar = $registrar;
         $this->request = \Route::getCurrentRequest();
 
-        $this->middleware('guest', ['except' => ['edit', 'update', 'destroy']]);
+        $this->middleware('guest', ['except' => ['show', 'edit', 'update', 'destroy']]);
     }
 
     /**
