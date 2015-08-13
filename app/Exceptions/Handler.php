@@ -1,5 +1,6 @@
 <?php namespace App\Exceptions;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Session\TokenMismatchException;
@@ -57,6 +58,8 @@ class Handler extends ExceptionHandler
                 case HttpResponseException::class:
                 case TokenMismatchException::class:
                     return $response->setStatusCode(SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY);
+                case ModelNotFoundException::class:
+                    return $response->setStatusCode(SymfonyResponse::HTTP_NOT_FOUND);
                 default:
                     $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
                     if (!empty($statusCode)) {

@@ -131,12 +131,8 @@ class Registrar implements RegistrarContract
      */
     public function delete($id)
     {
-        /**
-         * @var User $user
-         */
-        if (!($user = User::find($id))) {
-            throw new NotFoundHttpException;
-        }
+        /** @var User $user */
+        $user = User::findOrFail($id);
 
         if (!\Hash::check($this->request->input("password"), $user->password)) {
             throw new PasswordNotValidException;
@@ -154,9 +150,7 @@ class Registrar implements RegistrarContract
      */
     public function get($id)
     {
-        if (!($user = User::find($id))) {
-            throw new NotFoundHttpException;
-        }
+        $user = User::findOrFail($id);
 
         return $user;
     }

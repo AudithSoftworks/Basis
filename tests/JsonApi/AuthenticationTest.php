@@ -7,6 +7,7 @@ use App\Exceptions\Users\TokenNotValidException;
 use App\Exceptions\Users\UserNotFoundException;
 use App\Tests\IlluminateTestCase;
 use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuthenticationTest extends IlluminateTestCase
@@ -106,7 +107,7 @@ class AuthenticationTest extends IlluminateTestCase
             ],
             [
                 ['id' => 2, 'email' => 'john.doe@example.com'],
-                NotFoundHttpException::class
+                ModelNotFoundException::class
             ]
         ];
     }
@@ -173,7 +174,7 @@ class AuthenticationTest extends IlluminateTestCase
                     'password' => 's0m34ardPa55w0rd',
                     'password_confirmation' => 's0m34ardPa55w0rd'
                 ],
-                NotFoundHttpException::class
+                ModelNotFoundException::class
             ],
             [
                 [ // Correct data
@@ -205,7 +206,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->shouldReturnJson();
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
-                case NotFoundHttpException::class:
+                case ModelNotFoundException::class:
                     $this->seeStatusCode(404);
                     break;
                 case PasswordNotValidException::class:
@@ -445,7 +446,7 @@ class AuthenticationTest extends IlluminateTestCase
             ],
             [
                 ['id' => 2, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'],
-                NotFoundHttpException::class
+                ModelNotFoundException::class
             ],
             [
                 ['id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0'],
@@ -472,7 +473,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see('message');
         if (!empty($exceptionExpected)) {
             switch ($exceptionExpected) {
-                case NotFoundHttpException::class:
+                case ModelNotFoundException::class:
                     $this->seeStatusCode(404);
                     break;
                 case PasswordNotValidException::class:
