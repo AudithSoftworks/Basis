@@ -1,10 +1,8 @@
 <?php namespace App\Services;
 
 use App\Contracts\Registrar as RegistrarContract;
-use App\Events\Users\Deleted;
 use App\Events\Users\LoggedIn;
 use App\Events\Users\LoggedOut;
-use App\Events\Users\Registered;
 use App\Events\Users\RequestedResetPasswordLinkViaEmail;
 use App\Events\Users\ResetPassword;
 use App\Events\Users\Updated;
@@ -79,7 +77,7 @@ class Registrar implements RegistrarContract
         $this->request->has('name') && $user->name = $this->request->input('name');
         $user->email = $this->request->input('email');
         $user->password = \Hash::make($this->request->input('password'));
-        $user->save() && \Event::fire(new Registered($user)); // Fire the event on success only!
+        $user->save();
 
         return $user;
     }
@@ -111,9 +109,6 @@ class Registrar implements RegistrarContract
             $ownerAccount->save();
         }
 
-        # Event
-        \Event::fire(new Registered($ownerAccount, $provider));
-
         ($doLinkOAuthAccount = $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount)) && $this->auth->login($ownerAccount, true);
 
         \Event::fire(new LoggedIn($ownerAccount, $provider));
@@ -130,11 +125,7 @@ class Registrar implements RegistrarContract
      */
     public function delete($id)
     {
-        /** @var User $user */
-        $user = User::findOrFail($id);
-        $user->destroy($id) && \Event::fire(new Deleted($user)); // Fire the event on success only!
-
-        return true;
+        return (bool) User::destroy($id);
     }
 
     /**
