@@ -126,18 +126,12 @@ class Registrar implements RegistrarContract
      *
      * @return boolean
      *
-     * @throws NotFoundHttpException
-     * @throws PasswordNotValidException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function delete($id)
     {
         /** @var User $user */
         $user = User::findOrFail($id);
-
-        if (!\Hash::check($this->request->input("password"), $user->password)) {
-            throw new PasswordNotValidException;
-        }
-
         $user->destroy($id) && \Event::fire(new Deleted($user)); // Fire the event on success only!
 
         return true;

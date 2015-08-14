@@ -154,9 +154,17 @@ class UsersController extends Controller
      * @param int $id
      *
      * @return array
+     *
+     * @throws \App\Exceptions\Users\PasswordNotValidException
      */
     public function destroy($id)
     {
+        /** @var User $user */
+        $user = User::findOrFail($id);
+        if (!\Hash::check($this->request->input("password"), $user->password)) {
+            throw new PasswordNotValidException;
+        }
+
         $this->registrar->delete($id);
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
