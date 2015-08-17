@@ -1,15 +1,5 @@
-mysql55:
-  image: mysql:5.5
-  environment:
-    - MYSQL_DATABASE=basis
-    - MYSQL_ALLOW_EMPTY_PASSWORD=true
 mysql56:
   image: mysql:5.6
-  environment:
-    - MYSQL_DATABASE=basis
-    - MYSQL_ALLOW_EMPTY_PASSWORD=true
-mysql57:
-  image: mysql:5.7
   environment:
     - MYSQL_DATABASE=basis
     - MYSQL_ALLOW_EMPTY_PASSWORD=true
@@ -21,9 +11,7 @@ hhvmAsFpm:
     - .:/home/basis
   working_dir: /home/basis
   links:
-    - mysql55
     - mysql56
-    - mysql57
     - redis
 nginxForHhvm:
   image: audithsoftworks/basis:nginx
@@ -39,10 +27,7 @@ hhvmAsCli:
     - .:/home/basis
   working_dir: /home/basis
   links:
-    - mysql55
     - mysql56
-    - mysql57
     - redis
     - nginxForHhvm
   stdin_open: true
-  restart: on-failure[10]
