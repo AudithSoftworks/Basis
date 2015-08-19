@@ -3,8 +3,8 @@
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Http\Response;
 use Illuminate\Session\TokenMismatchException;
-use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Handler extends ExceptionHandler
@@ -37,7 +37,7 @@ class Handler extends ExceptionHandler
      * @param  \Illuminate\Http\Request $request
      * @param  \Exception               $e
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     public function render($request, \Exception $e)
     {
@@ -57,13 +57,15 @@ class Handler extends ExceptionHandler
                 case Users\TokenNotValidException::class:
                 case HttpResponseException::class:
                 case TokenMismatchException::class:
-                    return $response->setStatusCode(SymfonyResponse::HTTP_UNPROCESSABLE_ENTITY);
+                    return $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
                 case ModelNotFoundException::class:
-                    return $response->setStatusCode(SymfonyResponse::HTTP_NOT_FOUND);
+                    return $response->setStatusCode(Response::HTTP_NOT_FOUND);
                 default:
                     $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
                     if (!empty($statusCode)) {
                         $response->setStatusCode($statusCode);
+                    } else {
+                        $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
                     }
 
                     return $response;
