@@ -12,8 +12,7 @@ class HomeController extends Controller
         $name = trans('auth.guest');
         $userType = self::TRANSLATION_TAG_GUEST_USER;
 
-        if (\Auth::check()) {
-            $user = \Auth::user();
+        if ($user = \Sentinel::getUser()) {
             $name = $user->name;
             $userType = self::TRANSLATION_TAG_REGISTERED_USER;
         }
@@ -23,6 +22,6 @@ class HomeController extends Controller
 
     public function getProfile()
     {
-        return view('profile', ['userType' => self::TRANSLATION_TAG_REGISTERED_USER, 'name' => \Auth::user()->name]);
+        return view('profile', ['userType' => self::TRANSLATION_TAG_REGISTERED_USER, 'name' => \Sentinel::getUser()->name]);
     }
 }

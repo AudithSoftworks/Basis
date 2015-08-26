@@ -1,24 +1,19 @@
 <?php namespace App\Tests\JsonApi;
 
+use App\Exceptions\Common\NotImplementedException;
 use App\Exceptions\Common\ValidationException;
 use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Exceptions\Users\TokenNotValidException;
-use App\Exceptions\Users\UserNotFoundException;
 use App\Tests\IlluminateTestCase;
-use Illuminate\Contracts\Auth\PasswordBroker;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Cartalyst\Sentinel\Activations\EloquentActivation;
+use Cartalyst\Sentinel\Users\UserInterface;
+use Illuminate\Contracts\Console\Kernel;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class AuthenticationTest extends IlluminateTestCase
 {
-    /**
-     * This is used to memorize password reset token for tests.
-     *
-     * @var string
-     */
-    public static $passwordResetToken;
-
     /**
      * Since this is JSON API test suite, we need appropriate headers for requests.
      *
@@ -35,7 +30,7 @@ class AuthenticationTest extends IlluminateTestCase
     {
         putenv('APP_ENV=testing');
         $app = require __DIR__ . '/../../bootstrap/app.php';
-        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+        $app->make(Kernel::class)->bootstrap();
 
         \Artisan::call('migrate:refresh');
     }
@@ -50,443 +45,473 @@ class AuthenticationTest extends IlluminateTestCase
         $this->seeStatusCode(422);
     }
 
-    public function data_testStore()
+    /**
+     * Tests App\Controllers\UsersController::create() resource method.
+     *
+     * @depends testCsrfMiddleWareBehaviorForNonApiHandling
+     */
+    public function testUsersCreate()
     {
-        return [
-            [ // Validation fail: password_confirmation missing
-                ['email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver'],
-                ValidationException::class
-            ],
-            [ // Validation fail: email missing
-                ['password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'],
-                ValidationException::class
-            ],
-            [
-                ['email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'],
-                ''
-            ]
-        ];
+        $this->get('/users/create', self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(500);
+        $this->seeJson(['exception' => NotImplementedException::class]);
     }
 
     /**
      * Tests App\Controllers\UsersController::store() resource method.
      *
-     * @dataProvider data_testStore
-     *
-     * @param array  $credentials
-     * @param string $exceptionExpected
+     * @depends testCsrfMiddleWareBehaviorForNonApiHandling
      */
-    public function testStore(array $credentials, $exceptionExpected = '')
+    public function testUsersStoreForExceptions()
     {
+        # Validation failure: Password confirmation missing
+        $credentials = ['email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver'];
         $this->post('/users', $credentials, self::$requestHeaders);
         $this->shouldReturnJson();
-        if (!empty($exceptionExpected)) {
-            switch ($exceptionExpected) {
-                case ValidationException::class:
-                    $this->seeStatusCode(422);
-                    break;
-                default:
-                    $this->seeStatusCode(500);
-                    break;
-            }
-            $this->seeJson(['exception' => $exceptionExpected]);
-            isset($credentials['email']) && $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
-        } else {
-            $this->seeStatusCode(200);
-            $this->seeJson(['message' => 'Created']);
-            $this->seeInDatabase('users', ['email' => $credentials['email']]);
-        }
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => ValidationException::class]);
+        $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
+
+        # Validation failure: Email address missing
+        $credentials = ['password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'];
+        $this->post('/users', $credentials, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => ValidationException::class]);
     }
 
-    public function data_testShow()
+    /**
+     * Tests App\Controllers\UsersController::store() resource method.
+     *
+     * @depends testCsrfMiddleWareBehaviorForNonApiHandling
+     */
+    public function testUsersStoreForSuccess()
     {
-        return [
-            [
-                ['id' => 1, 'email' => 'john.doe@example.com'],
-                ''
-            ],
-            [
-                ['id' => 2, 'email' => 'john.doe@example.com'],
-                ModelNotFoundException::class
-            ]
-        ];
+        $credentials = ['email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'];
+        $this->post('/users', $credentials, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
+        $this->seeJson(['message' => 'Created']);
+        $this->seeInDatabase('users', ['email' => $credentials['email']]);
     }
 
     /**
      * Tests App\Controllers\UsersController::show() resource method.
      *
-     * @dataProvider data_testShow
-     * @depends      testStore
-     *
-     * @param array  $user
-     * @param string $exceptionExpected
+     * @depends testUsersStoreForSuccess
      */
-    public function testShow(array $user, $exceptionExpected)
+    public function testUsersShowForSuccess()
     {
+        $user = ['id' => 1, 'email' => 'john.doe@example.com'];
         $this->get('/users/' . $user['id'], self::$requestHeaders);
         $this->shouldReturnJson();
-        if (!empty($exceptionExpected)) {
-            $this->seeStatusCode(404);
-            $this->seeJson(['exception' => $exceptionExpected]);
-        } else {
-            $this->seeStatusCode(200);
-            $this->see('data');
-            $this->see('john.doe@example.com');
-        }
+        $this->seeStatusCode(200);
+        $this->see('data');
+        $this->see('john.doe@example.com');
     }
 
-    public function data_testUpdate()
+    /**
+     * Tests App\Controllers\UsersController::show() resource method.
+     *
+     * @depends testUsersStoreForSuccess
+     */
+    public function testUsersShowForExceptions()
     {
-        return [
-            [
-                [ // Wrong old_password
-                    'id' => 1,
-                    'email' => 'john.doe@example.com',
-                    'old_password' => 'someWrongPassword',
-                    'password' => 's0m34ardPa55w0rd',
-                    'password_confirmation' => 's0m34ardPa55w0rd'
-                ],
-                PasswordNotValidException::class
-            ],
-            [
-                [ // Validation fail: password_confirmation missing
-                    'id' => 1,
-                    'email' => 'john.doe@example.com',
-                    'old_password' => 'theWeakestPasswordEver',
-                    'password' => 's0m34ardPa55w0rd'
-                ],
-                ValidationException::class
-            ],
-            [
-                [ // Validation fail: old_password missing
-                    'id' => 1,
-                    'email' => 'john.doe@example.com',
-                    'password' => 's0m34ardPa55w0rd',
-                    'password_confirmation' => 's0m34ardPa55w0rd'
-                ],
-                ValidationException::class
-            ],
-            [
-                [ // Non-existing user
-                    'id' => 2,
-                    'email' => 'john.doe@example.com',
-                    'old_password' => 'theWeakestPasswordEver',
-                    'password' => 's0m34ardPa55w0rd',
-                    'password_confirmation' => 's0m34ardPa55w0rd'
-                ],
-                ModelNotFoundException::class
-            ],
-            [
-                [ // Correct data
-                    'id' => 1,
-                    'email' => 'john.doe@example.com',
-                    'old_password' => 'theWeakestPasswordEver',
-                    'password' => 's0m34ardPa55w0rd',
-                    'password_confirmation' => 's0m34ardPa55w0rd'
-                ],
-                ''
-            ]
-        ];
+        # User doesn't exist
+        $user = ['id' => 2, 'email' => 'john.doe@example.com'];
+        $this->get('/users/' . $user['id'], self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(404);
+        $this->seeJson(['exception' => NotFoundHttpException::class]);
+    }
+
+    /**
+     * Tests App\Controllers\UsersController::edit() resource method.
+     *
+     * @depends testUsersShowForSuccess
+     */
+    public function testUsersEdit()
+    {
+        $this->get('/users/1/edit', self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
+        $this->see('data');
+        $this->seeJson(['message' => 'Ready']);
     }
 
     /**
      * Tests App\Controllers\UsersController::update() resource method.
      *
-     * @dataProvider data_testUpdate
-     * @depends      testStore
-     *
-     * @param array  $user
-     * @param string $exceptionExpected
+     * @depends testUsersShowForSuccess
      */
-    public function testUpdate(array $user, $exceptionExpected)
+    public function testUsersUpdateForExceptions()
     {
-        $parameters = array_except($user, ['id']);
-
-        $this->put('/users/' . $user['id'], $parameters, self::$requestHeaders);
+        # User doesn't exist
+        $user = [
+            'id' => 2,
+            'email' => 'john.doe@example.com',
+            'old_password' => 'theWeakestPasswordEver',
+            'password' => 's0m34ardPa55w0rd',
+            'password_confirmation' => 's0m34ardPa55w0rd'
+        ];
+        $this->put('/users/' . $user['id'], array_except($user, ['id']), self::$requestHeaders);
         $this->shouldReturnJson();
-        if (!empty($exceptionExpected)) {
-            switch ($exceptionExpected) {
-                case ModelNotFoundException::class:
-                    $this->seeStatusCode(404);
-                    break;
-                case PasswordNotValidException::class:
-                case ValidationException::class:
-                    $this->seeStatusCode(422);
-                    break;
-                default:
-                    $this->seeStatusCode(500);
-                    break;
-            }
-            $this->seeJson(['exception' => $exceptionExpected]);
-        } else {
-            $this->seeStatusCode(200);
-            $this->seeJson(['message' => 'Updated']);
-        }
+        $this->seeStatusCode(404);
+        $this->seeJson(['exception' => NotFoundHttpException::class]);
+
+        # Validation fails: Email missing
+        $user = [
+            'id' => 1,
+            'old_password' => 'theWeakestPasswordEver',
+            'password' => 's0m34ardPa55w0rd',
+            'password_confirmation' => 's0m34ardPa55w0rd'
+        ];
+        $this->put('/users/' . $user['id'], array_except($user, ['id']), self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => ValidationException::class]);
     }
 
-    public function data_testPostEmail()
+    /**
+     * Tests App\Controllers\UsersController::update() resource method.
+     *
+     * @depends testUsersShowForSuccess
+     */
+    public function testUsersUpdateForSuccess()
     {
-        return [
-            [
-                [ // Invalid email
-                    'email' => 'jane.doe@'
-                ],
-                ValidationException::class
-            ],
-            [
-                [ // Wrong email
-                    'email' => 'jane.doe@example.com'
-                ],
-                UserNotFoundException::class
-            ],
-            [
-                [ // Correct data
-                    'email' => 'john.doe@example.com'
-                ],
-                ''
-            ]
+        $user = [
+            'id' => 1,
+            'email' => 'john.doe@example.com',
+            'old_password' => 'theWeakestPasswordEver',
+            'password' => 's0m34ardPa55w0rd',
+            'password_confirmation' => 's0m34ardPa55w0rd'
         ];
+        $this->put('/users/' . $user['id'], array_except($user, ['id']), self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
+        $this->seeJson(['message' => 'Updated']);
     }
 
     /**
      * Tests App\Controllers\Users\PasswordController::postEmail() controller method.
      *
-     * @dataProvider data_testPostEmail
-     * @depends      testUpdate
-     * @large
-     *
-     * @param array  $userData
-     * @param string $exceptionExpected
+     * @depends testUsersUpdateForSuccess
      */
-    public function testPostEmail(array $userData, $exceptionExpected)
+    public function testPasswordPostEmailForExceptions()
     {
+        # Validation failure: Invalid email address
+        $userData = ['email' => 'jane.doe@'];
         $this->post('/password/email', $userData, self::$requestHeaders);
         $this->shouldReturnJson();
         $this->see('message');
-        if (!empty($exceptionExpected)) {
-            switch ($exceptionExpected) {
-                case UserNotFoundException::class:
-                    $this->seeStatusCode(404);
-                    break;
-                case ValidationException::class:
-                    $this->seeStatusCode(422);
-                    break;
-                default:
-                    $this->seeStatusCode(500);
-                    break;
-            }
-            $this->seeJson(['exception' => $exceptionExpected]);
-        } else {
-            $this->seeStatusCode(200);
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => ValidationException::class]);
 
-            self::$passwordResetToken = \DB::table('password_resets')->where('email', '=', 'john.doe@example.com')->value('token');
-            $this->seeJson(['message' => trans(PasswordBroker::RESET_LINK_SENT)]);
-        }
+        # User doesn't exist
+        $userData = ['email' => 'jane.doe@example.com'];
+        $this->post('/password/email', $userData, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(404);
+        $this->seeJson(['exception' => NotFoundHttpException::class]);
     }
 
-    public function data_testPostReset()
+    /**
+     * Tests App\Controllers\Users\PasswordController::postEmail() controller method.
+     *
+     * @depends testUsersUpdateForSuccess
+     */
+    public function testPasswordPostEmailForSuccess()
     {
-        return [
-            [ // Validation fail: 'token' missing
-                ['id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0'],
-                ValidationException::class
-            ],
-            [ // Validation fail: Password confirmation mismatch
-                ['id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'password_confirmation' => 's0m34ardPa55w0rd', 'token' => self::$passwordResetToken],
-                ValidationException::class
-            ],
-            [ // Validation fail: Password confirmation missing
-                ['id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0', 'token' => self::$passwordResetToken],
-                ValidationException::class
-            ],
-            [ // Wrong email/account supplied
-                [
-                    'id' => 2,
-                    'email' => 'jane.doe@example.com',
-                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'token' => self::$passwordResetToken
-                ],
-                UserNotFoundException::class
-            ],
-            [ // Wrong token supplied
-                [
-                    'id' => 1,
-                    'email' => 'john.doe@example.com',
-                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'token' => 'wrong-token'
-                ],
-                TokenNotValidException::class
-            ],
-            [ // Correct entry
-                [
-                    'id' => 1,
-                    'email' => 'john.doe@example.com',
-                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'token' => self::$passwordResetToken
-                ],
-                ''
-            ]
-        ];
+        $userData = ['email' => 'john.doe@example.com'];
+        $this->post('/password/email', $userData, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
+        $this->seeJson(['message' => 'Password reset request received']);
     }
 
     /**
      * Tests App\Controllers\Users\PasswordController::postReset() controller method.
      *
-     * @dataProvider data_testPostReset
-     * @depends      testPostEmail
-     *
-     * @param array  $userData
-     * @param string $exceptionExpected
+     * @depends testPasswordPostEmailForSuccess
      */
-    public function testPostReset(array $userData, $exceptionExpected)
+    public function testPasswordPostResetForExceptions()
     {
-        // Fixing data with valid tokens
-        if ($exceptionExpected != TokenNotValidException::class and array_key_exists('token', $userData)) {
-            $userData['token'] = self::$passwordResetToken;
-        }
+        $passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
 
+        # Validation failure: Token missing
+        $userData = [
+            'id' => 1,
+            'email' => 'john.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0'
+        ];
         $this->post('/password/reset', $userData, self::$requestHeaders);
         $this->shouldReturnJson();
         $this->see('message');
-        if (!empty($exceptionExpected)) {
-            switch ($exceptionExpected) {
-                case UserNotFoundException::class:
-                case NotFoundHttpException::class:
-                    $this->seeStatusCode(404);
-                    break;
-                case ValidationException::class:
-                case TokenNotValidException::class:
-                    $this->seeStatusCode(422);
-                    break;
-                default:
-                    $this->seeStatusCode(500);
-                    break;
-            }
-            $this->seeJson(['exception' => $exceptionExpected]);
-        } else {
-            $this->seeStatusCode(200);
-        }
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => ValidationException::class]);
+
+        # Validation failure: Password confirmation mismatch
+        $userData = [
+            'id' => 1,
+            'email' => 'john.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'password_confirmation' => 's0m34ardPa55w0rd',
+            'token' => $passwordResetToken
+        ];
+        $this->post('/password/reset', $userData, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => ValidationException::class]);
+
+        # Validation failure: Password confirmation missing
+        $userData = [
+            'id' => 1,
+            'email' => 'john.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'token' => $passwordResetToken
+        ];
+        $this->post('/password/reset', $userData, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => ValidationException::class]);
+
+        # User doesn't exist
+        $userData = [
+            'id' => 2,
+            'email' => 'jane.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
+            'token' => $passwordResetToken
+        ];
+        $this->post('/password/reset', $userData, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(404);
+        $this->seeJson(['exception' => NotFoundHttpException::class]);
+
+        # Invalid token
+        $userData = [
+            'id' => 1,
+            'email' => 'john.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
+            'token' => 'wrong-token'
+        ];
+        $this->post('/password/reset', $userData, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => TokenNotValidException::class]);
     }
 
-    public function data_testLogin()
+    /**
+     * Tests App\Controllers\Users\PasswordController::postReset() controller method.
+     *
+     * @depends testPasswordPostEmailForSuccess
+     */
+    public function testPasswordPostResetForSuccess()
     {
-        return [
-            [
-                ['password' => 's0m34ardPa55w0rd'],
-                ValidationException::class
-            ],
-            [
-                ['email' => 'john.doe@example.com'],
-                ValidationException::class
-            ],
-            [
-                ['email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'],
-                LoginNotValidException::class
-            ],
-            [
-                ['email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0'],
-                ''
-            ]
+        $userData = [
+            'id' => 1,
+            'email' => 'john.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
+            'token' => app('db')->table('reminders')->where('user_id', '=', 1)->value('code')
         ];
+        $this->post('/password/reset', $userData, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
+        $this->seeJson(['message' => 'Password successfully reset']);
     }
 
     /**
      * Tests App\Controllers\Users\AuthController::postLogin() controller method.
      *
-     * @dataProvider data_testLogin
-     * @depends      testPostReset
-     *
-     * @param array  $user
-     * @param string $exceptionExpected
+     * @depend testPasswordPostResetForSuccess
      */
-    public function testLogin(array $user, $exceptionExpected)
+    public function testAuthLoginForExceptions()
     {
+        # Validation failure: Email address missing
+        $user = ['password' => 's0m34ardPa55w0rd'];
         $this->post('/login', $user, self::$requestHeaders);
-
         $this->shouldReturnJson();
-
         $this->see('message');
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => ValidationException::class]);
+        $this->assertTrue(app('sentinel')->guest());
 
-        if (!empty($exceptionExpected)) {
-            $this->seeStatusCode(422);
-            $this->seeJson(['exception' => $exceptionExpected]);
-            $this->assertFalse(\Auth::check());
-        } else {
-            $this->seeStatusCode(200);
-            $this->assertTrue(\Auth::check());
-        }
+        # Validation failure: Password missing
+        $user = ['email' => 'john.doe@example.com'];
+        $this->post('/login', $user, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => ValidationException::class]);
+        $this->assertTrue(app('sentinel')->guest());
+
+        # Invalid login credentials
+        $user = ['email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'];
+        $this->post('/login', $user, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => LoginNotValidException::class]);
+        $this->assertTrue(app('sentinel')->guest());
+    }
+
+    /**
+     * Tests App\Controllers\Users\AuthController::postLogin() controller method.
+     *
+     * @depends testPasswordPostResetForSuccess
+     */
+    public function testAuthLoginForSuccess()
+    {
+        $user = ['email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0'];
+        $this->post('/login', $user, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
+        $this->seeJson(['message' => 'Login successful']);
+        $this->assertFalse(app('sentinel')->guest());
+        $this->assertFalse(app('sentinel.activations')->completed(app('sentinel')->getUser()));
+    }
+
+    /**
+     * Tests App\Controllers\Users\ActivationController::getCode() controller method.
+     *
+     * @depends testAuthLoginForSuccess
+     */
+    public function testActivationGetCodeForExceptions()
+    {
+        # Failure: Tries to ask for code without logging in.
+        $this->assertTrue(app('sentinel')->guest());
+        $this->get('/activation/code', self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(401);
+        $this->seeJson(['exception' => UnauthorizedHttpException::class]);
+    }
+
+    /**
+     * Tests App\Controllers\Users\ActivationController::getCode() controller method.
+     *
+     * @depends testAuthLoginForSuccess
+     */
+    public function testActivationGetCodeForSuccess()
+    {
+        $user = app('sentinel')->getUserRepository()->findById(1);
+        app('sentinel')->login($user);
+        $this->assertFalse(app('sentinel')->guest());
+        $this->assertInstanceOf(UserInterface::class, app('sentinel')->check());
+
+        $this->get('/activation/code', self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
+        $this->seeJson(['message' => 'Activation link sent']);
+    }
+
+    /**
+     * Tests App\Controllers\Users\ActivationController::getProcess() controller method.
+     *
+     * @depends testActivationGetCodeForSuccess
+     */
+    public function testActivationGetProcessForExceptions()
+    {
+        $this->get('/activation/process/wrong-token', self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(500);
+        $this->seeJson(['exception' => NotImplementedException::class]);
+        $this->assertFalse(app('sentinel.activations')->completed(app('sentinel')->getUserRepository()->findById(1)));
+    }
+
+    /**
+     * Tests App\Controllers\Users\ActivationController::getProcess() controller method.
+     *
+     * @depends testActivationGetCodeForSuccess
+     */
+    public function testActivationPostProcessForExceptions()
+    {
+        $this->post('/activation/process', ['token' => 'wrong-token'], self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(422);
+        $this->seeJson(['exception' => TokenNotValidException::class]);
+        $this->assertFalse(app('sentinel.activations')->completed(app('sentinel')->getUserRepository()->findById(1)));
+    }
+
+    /**
+     * Tests App\Controllers\Users\ActivationController::getProcess() controller method.
+     *
+     * @depends testActivationGetCodeForSuccess
+     */
+    public function testActivationPostProcessForSuccess()
+    {
+        $data = ['token' => app('db')->table('activations')->where('user_id', '=', 1)->value('code')];
+        $this->post('/activation/process', $data, self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
+        $this->seeJson(['message' => 'Activated']);
+        $this->assertInstanceOf(EloquentActivation::class, app('sentinel.activations')->completed(app('sentinel')->getUserRepository()->findById(1)));
     }
 
     /**
      * Tests App\Controllers\Users\AuthController::getLogout() controller method.
      *
-     * @depends testLogin
+     * @depends testAuthLoginForSuccess
      */
-    public function testLogout()
+    public function testAuthLogout()
     {
-        \Auth::loginUsingId(1);
-        $this->assertTrue(\Auth::check());
+        app('sentinel')->login(app('sentinel')->getUserRepository()->findById(1));
+        $this->assertFalse(app('sentinel')->guest());
+        $this->assertInstanceOf(UserInterface::class, app('sentinel')->check());
 
         $this->get('logout', self::$requestHeaders);
+        $this->assertTrue(app('sentinel')->guest());
+        $this->assertFalse(app('sentinel')->check());
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
-
-        $this->assertFalse(\Auth::check());
-    }
-
-    public function data_testDestroy()
-    {
-        return [
-            [
-                ['id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'],
-                PasswordNotValidException::class
-            ],
-            [
-                ['id' => 2, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'],
-                ModelNotFoundException::class
-            ],
-            [
-                ['id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0'],
-                ''
-            ]
-        ];
     }
 
     /**
      * Tests App\Controllers\UsersController::destroy() resource method.
      *
-     * @dataProvider data_testDestroy
-     * @depends      testPostReset
-     *
-     * @param array  $user
-     * @param string $exceptionExpected
+     * @depends testAuthLoginForSuccess
      */
-    public function testDestroy(array $user, $exceptionExpected)
+    public function testUsersDestroyForExceptions()
     {
-        $parameters = array_except($user, ['email']);
-
-        $this->delete('/users/' . $user['id'], $parameters, self::$requestHeaders);
+        # Invalid password provided
+        $user = ['id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'];
+        $this->delete('/users/' . $user['id'], array_except($user, ['email']), self::$requestHeaders);
         $this->shouldReturnJson();
+        $this->seeStatusCode(422);
         $this->see('message');
-        if (!empty($exceptionExpected)) {
-            switch ($exceptionExpected) {
-                case ModelNotFoundException::class:
-                    $this->seeStatusCode(404);
-                    break;
-                case PasswordNotValidException::class:
-                    $this->seeStatusCode(422);
-                    break;
-                default:
-                    $this->seeStatusCode(500);
-                    break;
-            }
-            $this->seeJson(['exception' => $exceptionExpected]);
-        } else {
-            $this->seeStatusCode(200);
-            $this->seeJson(['message' => 'Deleted']);
-        }
+        $this->seeJson(['exception' => PasswordNotValidException::class]);
+
+        # User doesn't exist
+        $user = ['id' => 2, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'];
+        $this->delete('/users/' . $user['id'], array_except($user, ['email']), self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(404);
+        $this->see('message');
+        $this->seeJson(['exception' => NotFoundHttpException::class]);
+    }
+
+    /**
+     * Tests App\Controllers\UsersController::destroy() resource method.
+     *
+     * @depends testAuthLoginForSuccess
+     */
+    public function testUsersDestroyForSuccess()
+    {
+        $user = ['id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0'];
+        $this->delete('/users/' . $user['id'], array_except($user, ['email']), self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->seeStatusCode(200);
+        $this->seeJson(['message' => 'Deleted']);
     }
 }

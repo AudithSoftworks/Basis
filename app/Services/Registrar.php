@@ -3,23 +3,22 @@
 use App\Contracts\Registrar as RegistrarContract;
 use App\Events\Users\LoggedIn;
 use App\Events\Users\LoggedOut;
-use App\Events\Users\RequestedResetPasswordLinkViaEmail;
+use App\Events\Users\Registered;
+use App\Events\Users\RequestedResetPasswordLink;
 use App\Events\Users\ResetPassword;
 use App\Events\Users\Updated;
 use App\Exceptions\Common\ValidationException;
 use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Exceptions\Users\TokenNotValidException;
-use App\Exceptions\Users\UserNotFoundException;
 use App\Models\User;
 use App\Models\UserOAuth;
-use Illuminate\Auth\Guard;
+use Cartalyst\Sentinel\Activations\EloquentActivation;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
 use Laravel\Socialite\AbstractUser as SocialiteUser;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class Registrar implements RegistrarContract
 {
@@ -33,41 +32,34 @@ class Registrar implements RegistrarContract
     protected $request;
 
     /**
-     * The Guard implementation.
-     *
-     * @var Guard
+     * @var \Cartalyst\Sentinel\Users\UserRepositoryInterface|\Cartalyst\Sentinel\Users\IlluminateUserRepository
      */
-    protected $auth;
+    protected $userRepository;
 
     /**
-     * The password broker implementation.
-     *
-     * @var PasswordBroker
+     * @var \Cartalyst\Sentinel\Reminders\ReminderRepositoryInterface|\Cartalyst\Sentinel\Reminders\IlluminateReminderRepository
      */
-    protected $passwords;
+    protected $reminderRepository;
 
-    /**
-     * @param Guard          $auth
-     * @param PasswordBroker $password
-     */
-    public function __construct(Guard $auth, PasswordBroker $password)
+    public function __construct()
     {
-        $this->request = \Route::getCurrentRequest();
-        $this->auth = $auth;
-        $this->passwords = $password;
+        $this->request = app('router')->getCurrentRequest();
+        $this->userRepository = app('sentinel')->getUserRepository();
+        $this->reminderRepository = app('sentinel')->getReminderRepository();
     }
 
     /**
      * Create a new user instance after a valid registration.
      *
-     * @return Authenticatable
+     * @return \Cartalyst\Sentinel\Users\UserInterface
+     * @throws \App\Exceptions\Common\ValidationException
      */
     public function register()
     {
-        $validator = \Validator::make($this->request->all(), [
+        $validator = app('validator')->make($this->request->all(), [
             'name' => 'sometimes|required|max:255',
             'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min_length'),
+            'password' => 'required|confirmed|min:' . config('auth.password.min_length'),
         ]);
         if ($validator->fails()) {
             throw new ValidationException($validator);
@@ -76,8 +68,8 @@ class Registrar implements RegistrarContract
         $user = new User();
         $this->request->has('name') && $user->name = $this->request->input('name');
         $user->email = $this->request->input('email');
-        $user->password = \Hash::make($this->request->input('password'));
-        $user->save();
+        $user->password = $this->userRepository->getHasher()->hash($this->request->input('password'));
+        $user->save() && app('events')->fire(new Registered($user));
 
         return $user;
     }
@@ -86,17 +78,20 @@ class Registrar implements RegistrarContract
      * @param SocialiteUser $oauthUserData
      * @param string        $provider
      *
-     * @return Authenticatable|bool
+     * @return \Cartalyst\Sentinel\Users\UserInterface|bool
      */
     public function registerViaOAuth(SocialiteUser $oauthUserData, $provider)
     {
         if (!($ownerAccount = User::withTrashed()->whereEmail($oauthUserData->email)->first())) {
-            $ownerAccount = \Eloquent::unguarded(function () use ($oauthUserData) {
-                return User::create([
+            $ownerAccount = \Eloquent::unguarded(function () use ($oauthUserData, $provider) {
+                $user = User::create([
                     'name' => $oauthUserData->name,
                     'email' => $oauthUserData->email,
-                    'password' => \Hash::make(uniqid("", true))
+                    'password' => $this->userRepository->getHasher()->hash(uniqid("", true))
                 ]);
+                app('events')->fire(new Registered($user, $provider));
+
+                return $user;
             });
         }
 
@@ -109,80 +104,113 @@ class Registrar implements RegistrarContract
             $ownerAccount->save();
         }
 
-        ($doLinkOAuthAccount = $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount)) && $this->auth->login($ownerAccount, true);
+        ($doLinkOAuthAccount = $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount)) && app('sentinel')->login($ownerAccount, true);
 
-        \Event::fire(new LoggedIn($ownerAccount, $provider));
+        app('events')->fire(new LoggedIn($ownerAccount, $provider));
 
         return $doLinkOAuthAccount;
     }
 
     /**
-     * @param integer $id
+     * @param string $token
      *
-     * @return boolean
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @return bool
+     * @throws \App\Exceptions\Common\ValidationException
+     * @throws \App\Exceptions\Users\TokenNotValidException
      */
-    public function delete($id)
+    public function activate($token = null)
     {
-        return (bool) User::destroy($id);
-    }
-
-    /**
-     * @param integer $id
-     *
-     * @return Authenticatable
-     */
-    public function get($id)
-    {
-        $user = User::findOrFail($id);
-
-        return $user;
-    }
-
-    /**
-     * @param integer $id
-     *
-     * @return boolean
-     */
-    public function update($id)
-    {
-        /**
-         * @var User $user
-         */
-        $user = $this->get($id);
-
-        $validator = \Validator::make($this->request->all(), [
-            'name' => 'sometimes|required|max:255',
-            'email' => 'required|email|max:255|unique:users,email,' . $id,
-            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min_length'),
-            'old_password' => 'required|min:' . \Config::get('auth.password.min_length'),
+        $data = !is_null($token) ? ['token' => $token] : $this->request->all();
+        $validator = app('validator')->make($data, [
+            'token' => 'required|string',
         ]);
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
 
-        if (!\Hash::check($this->request->input("old_password"), $user->password)) {
+        $activation = EloquentActivation::whereCode($data['token'])->first();
+        if (!$activation) {
+            throw new TokenNotValidException;
+        }
+        $user = $this->userRepository->findById($activation->user_id);
+
+        return app('sentinel.activations')->complete($user, $data['token']);
+    }
+
+    /**
+     * @param integer $id
+     *
+     * @return boolean
+     * @throws \App\Exceptions\Common\ValidationException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function delete($id)
+    {
+        $validator = app('validator')->make($this->request->all(), [
+            'password' => 'required|min:' . config('auth.password.min_length'),
+        ]);
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
+        }
+
+        $user = $this->get($id);
+        if (!$this->userRepository->getHasher()->check($this->request->input("password"), $user->password)) {
             throw new PasswordNotValidException;
+        }
+
+        return (bool)User::destroy($id);
+    }
+
+    /**
+     * @param integer $id
+     *
+     * @return \App\Models\User|\Cartalyst\Sentinel\Users\UserInterface
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     */
+    public function get($id)
+    {
+        if (!empty($user = $this->userRepository->findById($id))) {
+            return $user;
+        }
+
+        throw new ModelNotFoundException;
+    }
+
+    /**
+     * @param integer $id
+     *
+     * @return boolean
+     * @throws \App\Exceptions\Common\ValidationException
+     */
+    public function update($id)
+    {
+        $user = $this->get($id);
+
+        $validator = app('validator')->make($this->request->all(), [
+            'name' => 'sometimes|required|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $id
+        ]);
+        if ($validator->fails()) {
+            throw new ValidationException($validator);
         }
 
         $userBefore = clone $user;
 
         $this->request->has('name') && $user->name = $this->request->input("name");
         $user->email = $this->request->input("email");
-        $user->password = \Hash::make($this->request->input("password"));
 
-        return $user->save() && \Event::fire(new Updated($userBefore, $user)); // Fire the event on success only!
+        return $user->save() && app('events')->fire(new Updated($userBefore, $user)); // Fire the event on success only!
     }
 
     /**
      * @return boolean
      *
-     * @throws LoginNotValidException
+     * @throws \App\Exceptions\Common\ValidationException
+     * @throws \App\Exceptions\Users\LoginNotValidException
      */
     public function login()
     {
-        $validator = \Validator::make($this->request->all(), [
+        $validator = app('validator')->make($this->request->all(), [
             'email' => 'required|email',
             'password' => 'required',
         ]);
@@ -192,8 +220,8 @@ class Registrar implements RegistrarContract
 
         $credentials = $this->request->only('email', 'password');
 
-        if ($this->auth->attempt($credentials, $this->request->has('remember'))) {
-            \Event::fire(new LoggedIn($this->auth->user()));
+        if ($user = app('sentinel')->authenticate($credentials, $this->request->has('remember'))) {
+            app('events')->fire(new LoggedIn($user));
 
             return true;
         }
@@ -212,9 +240,9 @@ class Registrar implements RegistrarContract
         /** @var UserOAuth $owningOAuthAccount */
         if ($owningOAuthAccount = UserOAuth::whereRemoteProvider($provider)->whereRemoteId($oauthUserData->id)->first()) {
             $ownerAccount = $owningOAuthAccount->owner;
-            $this->auth->login($ownerAccount, true);
+            app('sentinel')->login($ownerAccount, true);
 
-            \Event::fire(new LoggedIn($ownerAccount, $provider));
+            app('events')->fire(new LoggedIn($ownerAccount, $provider));
 
             return true;
         }
@@ -227,22 +255,22 @@ class Registrar implements RegistrarContract
      */
     public function logout()
     {
-        $userInfoForEventTrigger = $this->auth->user();
-        $this->auth->logout();
-        \Event::fire(new LoggedOut($userInfoForEventTrigger));
+        if ($user = app('sentinel')->getUser()) {
+            app('events')->fire(new LoggedOut($user));
+        }
 
-        return true;
+        return app('sentinel')->logout();
     }
 
     /**
      * @return boolean
      *
-     * @throws NotFoundHttpException
-     * @throws \UnexpectedValueException
+     * @throws \App\Exceptions\Common\ValidationException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function sendResetPasswordLinkViaEmail()
     {
-        $validator = \Validator::make($this->request->all(), [
+        $validator = app('validator')->make($this->request->all(), [
             'email' => 'required|email|max:255'
         ]);
         if ($validator->fails()) {
@@ -251,10 +279,10 @@ class Registrar implements RegistrarContract
 
         $user = User::whereEmail($this->request->only('email'))->first();
         if (is_null($user)) {
-            throw new UserNotFoundException();
+            throw new ModelNotFoundException(trans('passwords.user'));
         }
 
-        \Event::fire(new RequestedResetPasswordLinkViaEmail($user));
+        app('events')->fire(new RequestedResetPasswordLink($user));
 
         return true;
     }
@@ -262,43 +290,36 @@ class Registrar implements RegistrarContract
     /**
      * @return boolean
      *
-     * @throws ValidationException
-     * @throws NotFoundHttpException
-     * @throws TokenNotValidException
-     * @throws \UnexpectedValueException
+     * @throws \App\Exceptions\Common\ValidationException
+     * @throws \App\Exceptions\Users\TokenNotValidException
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function resetPassword()
     {
-        $validator = \Validator::make($this->request->all(), [
-            'token' => 'required',
+        $validator = app('validator')->make($this->request->all(), [
+            'token' => 'required|string',
             'email' => 'required|email|max:255',
             'password' => 'required|confirmed|min:' . \Config::get('auth.password.min_length')
         ]);
-
         if ($validator->fails()) {
             throw new ValidationException($validator);
         }
 
-        $credentials = $this->request->only('email', 'password', 'password_confirmation', 'token');
+        $credentials = $this->request->only('email', 'password', 'token');
 
-        $attemptReset = $this->passwords->reset($credentials, function ($user, $password) {
-            /**
-             * @var \App\Models\User $user
-             */
-            $user->password = \Hash::make($password);
-            $user->save() && \Event::fire(new ResetPassword($user));
-        });
-
-        switch ($attemptReset) {
-            case PasswordBroker::PASSWORD_RESET:
-                return true;
-            case PasswordBroker::INVALID_USER:
-                throw new UserNotFoundException;
-            case PasswordBroker::INVALID_TOKEN:
-                throw new TokenNotValidException;
-            default:
-                throw new \UnexpectedValueException(trans($attemptReset, ['min_length' => \Config::get('auth.password.min_length')]));
+        if (!($user = User::whereEmail($credentials['email'])->first())) {
+            throw new ModelNotFoundException(trans('passwords.user'));
         }
+
+        /** @var \Cartalyst\Sentinel\Reminders\EloquentReminder $reminder */
+        $reminder = $this->reminderRepository->exists($user);
+        if (!$reminder || $reminder->code !== $credentials['token']) {
+            throw new TokenNotValidException(trans('passwords.token'));
+        }
+
+        app('sentinel.reminders')->complete($user, $credentials['token'], $credentials['password']) && app('events')->fire(new ResetPassword($user));
+
+        return true;
     }
 
     /**

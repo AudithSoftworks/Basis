@@ -1,10 +1,6 @@
 <?php namespace App\Models;
 
 use Cartalyst\Sentinel\Users\EloquentUser;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Auth\Passwords\CanResetPassword;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
@@ -14,7 +10,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @property string         $name
  * @property string         $email
  * @property string         $password
- * @property string         $remember_token
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
@@ -22,22 +17,30 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereEmail($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User wherePassword($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereRememberToken($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereDeletedAt($value)
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserOAuth[] $linkedAccounts
+ * @property string $permissions
+ * @property string $last_login
+ * @property-read \Illuminate\Database\Eloquent\Collection|\static::$rolesModel[] $roles
+ * @property-read \Illuminate\Database\Eloquent\Collection|\static::$persistencesModel[] $persistences
+ * @property-read \Illuminate\Database\Eloquent\Collection|\static::$activationsModel[] $activations
+ * @property-read \Illuminate\Database\Eloquent\Collection|\static::$remindersModel[] $reminders
+ * @property-read \Illuminate\Database\Eloquent\Collection|\static::$throttlingModel[] $throttle
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User wherePermissions($value)
+ * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLastLogin($value)
  */
-class User extends EloquentUser implements AuthenticatableContract, CanResetPasswordContract
+class User extends EloquentUser
 {
-    use Authenticatable, CanResetPassword, SoftDeletes;
+    use SoftDeletes;
 
     /**
      * The attributes excluded from the model's JSON form.
      *
      * @var array
      */
-    protected $hidden = ['password', 'remember_token'];
+    protected $hidden = ['password'];
 
     /**
      * {@inheritDoc}

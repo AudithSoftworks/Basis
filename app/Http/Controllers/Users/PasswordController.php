@@ -3,7 +3,6 @@
 use App\Contracts\Registrar;
 use App\Exceptions\Users\TokenNotValidException;
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -11,25 +10,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class PasswordController extends Controller
 {
     /**
-     * The Guard implementation.
-     *
-     * @var Guard
-     */
-    protected $auth;
-
-    /**
      * Registrar service instance.
      *
      * @var Registrar
      */
     protected $registrar;
-
-    /**
-     * The password broker implementation.
-     *
-     * @var PasswordBroker
-     */
-    protected $passwords;
 
     /**
      * Request instance.
@@ -41,16 +26,12 @@ class PasswordController extends Controller
     /**
      * Create a new password controller instance.
      *
-     * @param  \Illuminate\Contracts\Auth\Guard          $auth
      * @param  Registrar                                 $registrar
-     * @param  \Illuminate\Contracts\Auth\PasswordBroker $passwords
      */
-    public function __construct(Guard $auth, Registrar $registrar, PasswordBroker $passwords)
+    public function __construct(Registrar $registrar)
     {
-        $this->auth = $auth;
         $this->registrar = $registrar;
-        $this->request = \Route::getCurrentRequest();
-        $this->passwords = $passwords;
+        $this->request = app('router')->getCurrentRequest();
 
         $this->middleware('guest');
     }
@@ -79,10 +60,10 @@ class PasswordController extends Controller
         $this->registrar->sendResetPasswordLinkViaEmail();
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => trans(PasswordBroker::RESET_LINK_SENT)];
+            return ['message' => 'Password reset request received'];
         }
 
-        return redirect()->back()->with('message', trans(PasswordBroker::RESET_LINK_SENT));
+        return redirect()->back()->with('message', trans('passwords.sent'));
     }
 
     /**
@@ -124,7 +105,7 @@ class PasswordController extends Controller
             return ['message' => 'Password successfully reset'];
         }
 
-        return redirect($this->redirectPath())->with('message', trans(PasswordBroker::PASSWORD_RESET));
+        return redirect($this->redirectPath())->with('message', trans('passwords.reset'));
     }
 
     /**

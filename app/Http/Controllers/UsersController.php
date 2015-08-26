@@ -1,20 +1,14 @@
 <?php namespace App\Http\Controllers;
 
 use App\Contracts\Registrar;
+use App\Exceptions\Common\NotImplementedException;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Models\User;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UsersController extends Controller
 {
-    /**
-     * The Guard implementation.
-     *
-     * @var Guard
-     */
-    protected $auth;
 
     /**
      * The registrar implementation.
@@ -33,26 +27,14 @@ class UsersController extends Controller
     /**
      * Create a new authentication controller instance.
      *
-     * @param  Guard     $auth
      * @param  Registrar $registrar
      */
-    public function __construct(Guard $auth, Registrar $registrar)
+    public function __construct(Registrar $registrar)
     {
-        $this->auth = $auth;
         $this->registrar = $registrar;
         $this->request = \Route::getCurrentRequest();
 
         $this->middleware('guest', ['except' => ['show', 'edit', 'update', 'destroy']]);
-    }
-
-    /**
-     * Display a listing of the resource.
-     *
-     * @throws \BadMethodCallException
-     */
-    public function index()
-    {
-        throw new \BadMethodCallException;
     }
 
     /**
@@ -63,7 +45,7 @@ class UsersController extends Controller
     public function create()
     {
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Ready']; // TODO Move to an API layer
+            throw new NotImplementedException;
         }
 
         return view('auth/register');
@@ -76,15 +58,13 @@ class UsersController extends Controller
      */
     public function store()
     {
-        $user = $this->registrar->register();
+        $this->registrar->register();
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Created'];
         }
 
-        $this->auth->login($user);
-
-        return redirect($this->redirectPath());
+        return redirect($this->redirectPath())->with('message', 'Created');
     }
 
     /**
@@ -120,11 +100,10 @@ class UsersController extends Controller
         /** @var \App\Models\User $user */
         $user = $this->registrar->get($id);
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Ready', 'data' => $user->toJson()]; // TODO Move to an API layer
+            return ['message' => 'Ready', 'data' => $user->toJson()];
         }
 
-        // TODO Create appropriate Views for non-JSON requests
-        return;
+        return view('auth/edit', ['user' => $user]);
     }
 
     /**
@@ -135,7 +114,6 @@ class UsersController extends Controller
      * @return \Response
      *
      * @throws NotFoundHttpException
-     * @throws PasswordNotValidException
      */
     public function update($id)
     {
@@ -144,8 +122,7 @@ class UsersController extends Controller
             return ['message' => 'Updated'];
         }
 
-        // TODO Create appropriate Views for non-JSON requests
-        return;
+        return redirect()->back()->with('message', 'Updated');
     }
 
     /**
@@ -159,19 +136,13 @@ class UsersController extends Controller
      */
     public function destroy($id)
     {
-        /** @var User $user */
-        $user = User::findOrFail($id);
-        if (!\Hash::check($this->request->input("password"), $user->password)) {
-            throw new PasswordNotValidException;
-        }
-
         $this->registrar->delete($id);
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
             return ['message' => 'Deleted'];
         }
 
-        return redirect($this->redirectPath()); // TODO Redirection path might need a fix.
+        return redirect($this->redirectPath())->with('message', 'Deleted');
     }
 
     /**

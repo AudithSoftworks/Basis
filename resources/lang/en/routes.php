@@ -17,9 +17,14 @@ return [
     'files' => [
         '' => 'files'
     ],
-    'login' => '/login',
-    'logout' => '/logout',
-    'register' => '/register',
+    'login' => 'login',
+    'logout' => 'logout',
+    'register' => 'register',
+    'activation' => [
+        '' => 'activation',
+        'code' => 'code',
+        'process' => 'process'
+    ],
     'password' => [
         '' => 'password',
         'email' => 'email',

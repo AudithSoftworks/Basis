@@ -1,0 +1,53 @@
+{% extends "layout" %}
+
+{% use "layout/head" %}
+{% use "layout/body/header" %}
+{% use "layout/body/main" %}
+{% use "layout/body/footer" %}
+
+{% block document_head_title %}<title>Update Account - Audith Basis</title>{% endblock %}
+
+{% block document_head_javascripts %}
+    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
+{% endblock %}
+
+{% block document_head_stylesheets %}
+    <link rel="stylesheet" href="{{ elixir('stylesheets/auth.css') }}">
+{% endblock %}
+
+{% block document_body_header %}
+    <header class="container-fluid">
+        <h1 class="text-center">Audith Basis</h1>
+    </header>
+{% endblock %}
+
+{% block document_body_main %}
+    <main class="container-fluid">
+        <h2><b>Update</b> account details</h2>
+
+        <form class="form-horizontal" role="form" method="POST" action="{{ action('UsersController@update', [user.id], false) }}">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="_method" value="PUT">
+
+            <fieldset class="col-md-12">
+                <label for="name" class="control-label">Name</label>
+                <input type="text" name="name" id="name" value="{{ user.name }}" placeholder="Name" class="form-control">
+            </fieldset>
+
+            <fieldset class="col-md-12">
+                <label for="email" class="control-label">E-mail</label>
+                <input type="email" id="email" name="email" value="{{ user.email }}" placeholder="E-mail address" class="form-control">
+            </fieldset>
+
+            <fieldset class="submit-button col-md-12">
+                <div class="col-md-6 col-md-offset-6">
+                    <button type="submit" class="btn btn-primary btn-xs col-md-12">{{ trans('auth.buttons.update') }}</button>
+                </div>
+            </fieldset>
+        </form>
+
+        <ul class="col-md-12">
+            <li class="col-md-6 col-md-offset-6 text-right"><a href="{{ route('logout', [], false) }}">{{ trans('auth.buttons.logout') }}</a></li>
+        </ul>
+    </main>
+{% endblock %}

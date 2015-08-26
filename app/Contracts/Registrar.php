@@ -1,21 +1,12 @@
 <?php namespace App\Contracts;
 
-use Illuminate\Auth\Guard;
 use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Contracts\Auth\PasswordBroker;
-use Illuminate\Http\Request;
 use Laravel\Socialite\AbstractUser as SocialiteUser;
 
 interface Registrar
 {
     /**
-     * @param Guard          $auth
-     * @param PasswordBroker $password
-     */
-    public function __construct(Guard $auth, PasswordBroker $password);
-
-    /**
-     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @return \Cartalyst\Sentinel\Users\UserInterface
      */
     public function register();
 
@@ -28,6 +19,13 @@ interface Registrar
     public function registerViaOAuth(SocialiteUser $oauthUserData, $provider);
 
     /**
+     * @param string $token
+     *
+     * @return bool
+     */
+    public function activate($token = null);
+
+    /**
      * @param integer $id
      *
      * @return boolean
@@ -37,7 +35,7 @@ interface Registrar
     /**
      * @param integer $id
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable
+     * @return \Cartalyst\Sentinel\Users\UserInterface
      */
     public function get($id);
 

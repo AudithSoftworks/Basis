@@ -2,6 +2,7 @@
 
 use App\Models\NestedEntity;
 use App\Tests\IlluminateTestCase;
+use Carbon\Carbon;
 
 class NestedEntityModelTest extends IlluminateTestCase
 {
@@ -335,7 +336,7 @@ class NestedEntityModelTest extends IlluminateTestCase
 
     public function testRemoveForException()
     {
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->setExpectedException(\InvalidArgumentException::class);
 
         $nestedEntitiesModel = new NestedEntity();
         $nestedEntitiesModel->remove(100);
@@ -344,7 +345,7 @@ class NestedEntityModelTest extends IlluminateTestCase
     public function testRemove()
     {
         $nestedEntitiesModel = new NestedEntity();
-        $_timeNow = time();
+        $_timeNow = Carbon::now();
 
         //------------------------------------------
         // Case 1: Soft-delete of a leaf entity
@@ -352,8 +353,9 @@ class NestedEntityModelTest extends IlluminateTestCase
 
         $nestedEntitiesModel->remove(7);
         $softDeletedObject = $nestedEntitiesModel->withTrashed()->find(7);
+        $softDeletedObjectDeletedAt = Carbon::parse($softDeletedObject->deleted_at);
         $this->assertNotNull($softDeletedObject->deleted_at);
-        $this->assertTrue($softDeletedObject->deleted_at >= $_timeNow);
+        $this->assertTrue($softDeletedObjectDeletedAt->gte($_timeNow));
 
         //------------------------------------------
         // Case 2: Hard-delete of a leaf entity

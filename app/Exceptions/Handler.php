@@ -1,11 +1,14 @@
 <?php namespace App\Exceptions;
 
+use Cartalyst\Sentinel\Checkpoints\NotActivatedException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Http\Response;
 use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class Handler extends ExceptionHandler
 {
@@ -15,7 +18,8 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
-        HttpException::class
+        HttpException::class,
+        ModelNotFoundException::class,
     ];
 
     /**
@@ -41,6 +45,10 @@ class Handler extends ExceptionHandler
      */
     public function render($request, \Exception $e)
     {
+        if ($e instanceof ModelNotFoundException) {
+            $e = new NotFoundHttpException($e->getMessage(), $e);
+        }
+
         if ($request->ajax() || $request->wantsJson()) {
             $exceptionClass = get_class($e);
 
@@ -58,7 +66,11 @@ class Handler extends ExceptionHandler
                 case HttpResponseException::class:
                 case TokenMismatchException::class:
                     return $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
-                case ModelNotFoundException::class:
+                case UnauthorizedHttpException::class:
+                    return $response->setStatusCode(Response::HTTP_UNAUTHORIZED);
+                case NotActivatedException::class:
+                    return $response->setStatusCode(Response::HTTP_FORBIDDEN);
+                case NotFoundHttpException::class:
                     return $response->setStatusCode(Response::HTTP_NOT_FOUND);
                 default:
                     $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
@@ -73,7 +85,7 @@ class Handler extends ExceptionHandler
         }
 
         $redirect = redirect()->back();
-        if ($redirect->getTargetUrl() === \Config::get('app.url')) {
+        if ($redirect->getTargetUrl() === config('app.url') || false === strpos($redirect->getTargetUrl(), config('app.url'))) {
             $redirect = redirect()->refresh();
         }
 
