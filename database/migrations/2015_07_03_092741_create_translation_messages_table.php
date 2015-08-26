@@ -17,8 +17,7 @@ class CreateTranslationMessagesTable extends Migration
             $table->string('key');
             $table->integer('category_id', false, true);
             $table->text('message');
-            $table->unsignedInteger('created_at');
-            $table->unsignedInteger('updated_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('category_id')->references('id')->on('translation_categories')->onUpdate('cascade')->onDelete('restrict');
         });

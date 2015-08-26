@@ -27,8 +27,6 @@ class NestedEntity extends \Eloquent
 
     protected $table = "nested_entities";
 
-    protected $dateFormat = 'U';
-
     protected $guarded = ["left_range", "right_range"];
 
     const SELECT_ALL_WITH_MINIMUM_INFO = 1;

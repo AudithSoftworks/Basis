@@ -21,8 +21,7 @@ class CreateUsersOauthTable extends Migration
             $table->string('name')->nullable();
             $table->string('email')->nullable();
             $table->string('avatar', 255)->nullable();
-            $table->unsignedInteger('created_at');
-            $table->unsignedInteger('updated_at')->nullable();
+            $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onUpdate('cascade')->onDelete('cascade');
         });

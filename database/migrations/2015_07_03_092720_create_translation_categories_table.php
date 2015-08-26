@@ -15,6 +15,7 @@ class CreateTranslationCategoriesTable extends Migration
         Schema::create('translation_categories', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->unique();
+            $table->timestamps();
         });
     }
 

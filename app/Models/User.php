@@ -1,5 +1,6 @@
 <?php namespace App\Models;
 
+use Cartalyst\Sentinel\Users\EloquentUser;
 use Illuminate\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
@@ -27,7 +28,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereDeletedAt($value)
  * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserOAuth[] $linkedAccounts
  */
-class User extends \Eloquent implements AuthenticatableContract, CanResetPasswordContract
+class User extends EloquentUser implements AuthenticatableContract, CanResetPasswordContract
 {
     use Authenticatable, CanResetPassword, SoftDeletes;
 
@@ -39,11 +40,14 @@ class User extends \Eloquent implements AuthenticatableContract, CanResetPasswor
     protected $hidden = ['password', 'remember_token'];
 
     /**
-     * All fields are 'guarded' (protected against mass-assignment)
-     *
-     * @var array
+     * {@inheritDoc}
      */
-    protected $guarded = ['*'];
+    protected $fillable = [
+        'email',
+        'password',
+        'name',
+        'permissions',
+    ];
 
     /**
      * Soft-deletes enabled.
@@ -51,8 +55,6 @@ class User extends \Eloquent implements AuthenticatableContract, CanResetPasswor
      * @var array
      */
     protected $dates = ['deleted_at'];
-
-    protected $dateFormat = 'U';
 
     public function linkedAccounts()
     {

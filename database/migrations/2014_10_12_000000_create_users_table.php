@@ -18,9 +18,8 @@ class CreateUsersTable extends Migration
             $table->string('email')->unique()->nullable(); // Unique constraints can be Nullable, its SQL-92 compatible
             $table->string('password', 255); // 255 instead of 60, for forward-compatibility with PASSWORD_DEFAULT constant
             $table->rememberToken();
-            $table->integer('created_at', false, true);
-            $table->integer('updated_at', false, true)->nullable();
-            $table->integer('deleted_at', false, true)->nullable();
+            $table->timestamps();
+            $table->softDeletes();
         });
     }
 
