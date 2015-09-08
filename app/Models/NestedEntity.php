@@ -7,13 +7,13 @@ use Illuminate\Database\Query\JoinClause;
 /**
  * App\Models\NestedEntity
  *
- * @property integer        $id
- * @property string         $name
- * @property integer        $left_range
- * @property integer        $right_range
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property integer        $deleted_at
+ * @property integer $id
+ * @property string  $name
+ * @property integer $left_range
+ * @property integer $right_range
+ * @property Carbon  $created_at
+ * @property Carbon  $updated_at
+ * @property integer $deleted_at
  * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereLeftRange($value)
@@ -67,7 +67,13 @@ class NestedEntity extends \Eloquent
                     ->update(['left_range' => \DB::raw('left_range + 2')]);
 
                 # Insert now
-                return $newEntity->insert(['name' => $newEntityName, 'left_range' => $referenceEntity->left_range + 1, 'right_range' => $referenceEntity->left_range + 2, 'created_at' => Carbon::now()]);
+                return $newEntity->insert([
+                    'name' => $newEntityName,
+                    'left_range' => $referenceEntity->left_range + 1,
+                    'right_range' => $referenceEntity->left_range + 2,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
             }
         );
     }
@@ -102,7 +108,13 @@ class NestedEntity extends \Eloquent
                     ->update(['left_range' => \DB::raw('left_range + 2')]);
 
                 # Insert now
-                return $newEntity->insert(['name' => $newEntityName, 'left_range' => $referenceEntity->right_range, 'right_range' => $referenceEntity->right_range + 1, 'created_at' => Carbon::now()]);
+                return $newEntity->insert([
+                    'name' => $newEntityName,
+                    'left_range' => $referenceEntity->right_range,
+                    'right_range' => $referenceEntity->right_range + 1,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
             }
         );
     }
@@ -152,7 +164,13 @@ class NestedEntity extends \Eloquent
                     ->update(['left_range' => \DB::raw('left_range + 2')]);
 
                 # Insert now
-                return $newEntity->insert(['name' => $newEntityName, 'left_range' => $referenceEntity->left_range, 'right_range' => $referenceEntity->right_range, 'created_at' => Carbon::now()]);
+                return $newEntity->insert([
+                    'name' => $newEntityName,
+                    'left_range' => $referenceEntity->left_range,
+                    'right_range' => $referenceEntity->right_range,
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
+                ]);
             }
         );
     }
@@ -191,7 +209,8 @@ class NestedEntity extends \Eloquent
                     'name' => $newEntityName,
                     'left_range' => $referenceEntity->right_range + 1,
                     'right_range' => $referenceEntity->right_range + 2,
-                    'created_at' => Carbon::now()
+                    'created_at' => Carbon::now(),
+                    'updated_at' => Carbon::now()
                 ]);
             }
         );
