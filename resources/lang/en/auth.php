@@ -11,6 +11,8 @@ return [
         'logout' => 'Log out',
         'register' => 'Register',
         'signup' => 'Sign up',
-        'password' => 'Reset password'
-    ]
+        'password' => 'Reset password',
+        'update' => 'Update'
+    ],
+    'activation_email_subject' => 'Activate Your Account'
 ];

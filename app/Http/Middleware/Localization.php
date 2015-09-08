@@ -14,7 +14,7 @@ class Localization
      */
     public function handle(Request $request, \Closure $next)
     {
-        \Lang::setLocale($request->segment(1));
+        app('translator')->setLocale($request->segment(1));
 
         return $next($request);
     }

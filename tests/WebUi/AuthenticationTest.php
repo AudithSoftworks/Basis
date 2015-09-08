@@ -84,7 +84,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see(trans('validation.required', ['attribute' => 'name']), true);
         $this->see(trans('validation.required', ['attribute' => 'email']), true);
         $this->see(trans('validation.required', ['attribute' => 'password']), true);
-        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
 
         # Fill in the form fed by data-provider
         foreach ($credentials as $key => $value) {
@@ -102,7 +102,7 @@ class AuthenticationTest extends IlluminateTestCase
                 $this->see(trans('validation.required', ['attribute' => 'name']), true);
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.required', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
                 $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
                 break;
             case 'testRegister with data set #1':
@@ -110,7 +110,7 @@ class AuthenticationTest extends IlluminateTestCase
                 $this->see(trans('validation.required', ['attribute' => 'email']));
                 $this->see(trans('validation.required', ['attribute' => 'name']), true);
                 $this->see(trans('validation.required', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
                 $this->notSeeInDatabase('users', ['name' => $credentials['name']]);
                 break;
             case 'testRegister with data set #2':
@@ -118,12 +118,12 @@ class AuthenticationTest extends IlluminateTestCase
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.required', ['attribute' => 'name']), true);
                 $this->see(trans('validation.required', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]));
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]));
                 $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
                 break;
             default:
                 $this->seePageIs('/');
-                $this->see('<b>Welcome</b>, John Doe!');
+                $this->see('<b>Welcome</b>!');
                 $this->seeInDatabase('users', ['email' => $credentials['email']]);
                 break;
         }
@@ -210,9 +210,7 @@ class AuthenticationTest extends IlluminateTestCase
      */
     public function testLogout()
     {
-        /** @var \App\Models\User $user */
-        $user = \App\Models\User::find(1);
-        $this->actingAs($user);
+        app('sentinel')->login(app('sentinel')->getUserRepository()->findById(1));
         $this->visit('/login');
         $this->seeStatusCode(200);
         $this->seePageIs(''); // Since we are authenticated, we are redirected to /
@@ -267,7 +265,7 @@ class AuthenticationTest extends IlluminateTestCase
         # We shouldn't have flash error messages around.
         $this->see(trans('validation.required', ['attribute' => 'email']), true);
         $this->see(trans('validation.email', ['attribute' => 'email']), true);
-        $this->see(trans(PasswordBroker::INVALID_USER), true);
+        $this->see(trans('passwords.user'), true);
         $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
 
         # Fill in the form fed by data-provider
@@ -284,25 +282,25 @@ class AuthenticationTest extends IlluminateTestCase
             case 'testPasswordEmail with data set #0':
                 $this->see(trans('validation.required', ['attribute' => 'email']));
                 $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans(PasswordBroker::INVALID_USER), true);
+                $this->see(trans('passwords.user'), true);
                 $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
                 break;
             case 'testPasswordEmail with data set #1':
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.email', ['attribute' => 'email']));
-                $this->see(trans(PasswordBroker::INVALID_USER), true);
+                $this->see(trans('passwords.user'), true);
                 $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
                 break;
             case 'testPasswordEmail with data set #2':
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans(PasswordBroker::INVALID_USER));
+                $this->see(trans('passwords.user'));
                 $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
                 break;
             default:
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans(PasswordBroker::INVALID_USER), true);
+                $this->see(trans('passwords.user'), true);
                 $this->see(trans(PasswordBroker::RESET_LINK_SENT));
                 break;
         }
@@ -324,10 +322,10 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see(trans('validation.required', ['attribute' => 'email']), true);
         $this->see(trans('validation.email', ['attribute' => 'email']), true);
         $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-        $this->see(trans(PasswordBroker::INVALID_USER), true);
-        $this->see(trans(PasswordBroker::INVALID_TOKEN));
-        $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
-        $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'));
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
     }
 
     public function data_testPasswordReset()
@@ -392,7 +390,7 @@ class AuthenticationTest extends IlluminateTestCase
      */
     public function testPasswordReset(array $credentials)
     {
-        self::$passwordResetToken = \DB::table('password_resets')->where('email', '=', 'john.doe@example.com')->value('token');
+        self::$passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
 
         # Visit the page, make sure we have landed on right page.
         $_uri = '/password/reset';
@@ -405,12 +403,12 @@ class AuthenticationTest extends IlluminateTestCase
         # We shouldn't have flash error messages around.
         $this->see(trans('validation.required', ['attribute' => 'email']), true);
         $this->see(trans('validation.email', ['attribute' => 'email']), true);
-        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
         $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-        $this->see(trans(PasswordBroker::INVALID_USER), true);
-        $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
-        $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
-        $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
 
         # Fill in the form fed by data-provider
         foreach ($credentials as $key => $value) {
@@ -428,11 +426,11 @@ class AuthenticationTest extends IlluminateTestCase
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.email', ['attribute' => 'email']), true);
                 $this->see(trans('validation.confirmed', ['attribute' => 'password']));
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
-                $this->see(trans(PasswordBroker::INVALID_USER), true);
-                $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
-                $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
-                $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+                $this->see(trans('passwords.user'), true);
+                $this->see(trans('passwords.token'), true);
+                $this->see(trans('passwords.reset'), true);
+                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
                 break;
             case 'testPasswordReset with data set #1':
                 $this->seePageIs($_uri);
@@ -440,11 +438,11 @@ class AuthenticationTest extends IlluminateTestCase
                 $this->see('The email field is required.', true);
                 $this->see(trans('validation.email', ['attribute' => 'email']), true);
                 $this->see(trans('validation.confirmed', ['attribute' => 'password']));
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
-                $this->see(trans(PasswordBroker::INVALID_USER), true);
-                $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
-                $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
-                $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+                $this->see(trans('passwords.user'), true);
+                $this->see(trans('passwords.token'), true);
+                $this->see(trans('passwords.reset'), true);
+                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
                 break;
             case 'testPasswordReset with data set #2':
                 $this->seePageIs($_uri);
@@ -452,11 +450,11 @@ class AuthenticationTest extends IlluminateTestCase
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.email', ['attribute' => 'email']), true);
                 $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
-                $this->see(trans(PasswordBroker::INVALID_USER));
-                $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
-                $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
-                $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+                $this->see(trans('passwords.user'));
+                $this->see(trans('passwords.token'), true);
+                $this->see(trans('passwords.reset'), true);
+                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
                 break;
             case 'testPasswordReset with data set #3':
                 $this->seePageIs($_uri);
@@ -464,11 +462,11 @@ class AuthenticationTest extends IlluminateTestCase
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.email', ['attribute' => 'email']), true);
                 $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
-                $this->see(trans(PasswordBroker::INVALID_USER), true);
-                $this->see(trans(PasswordBroker::INVALID_TOKEN));
-                $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
-                $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+                $this->see(trans('passwords.user'), true);
+                $this->see(trans('passwords.token'));
+                $this->see(trans('passwords.reset'), true);
+                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
                 break;
             case 'testPasswordReset with data set #4':
                 $this->seePageIs($_uri);
@@ -476,11 +474,11 @@ class AuthenticationTest extends IlluminateTestCase
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.email', ['attribute' => 'email']), true);
                 $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]));
-                $this->see(trans(PasswordBroker::INVALID_USER), true);
-                $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
-                $this->see(trans(PasswordBroker::PASSWORD_RESET), true);
-                $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]));
+                $this->see(trans('passwords.user'), true);
+                $this->see(trans('passwords.token'), true);
+                $this->see(trans('passwords.reset'), true);
+                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
                 break;
             default:
                 $this->seePageIs('/login');
@@ -488,11 +486,11 @@ class AuthenticationTest extends IlluminateTestCase
                 $this->see(trans('validation.required', ['attribute' => 'email']), true);
                 $this->see(trans('validation.email', ['attribute' => 'email']), true);
                 $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => \Config::get('auth.password.min_length')]), true);
-                $this->see(trans(PasswordBroker::INVALID_USER), true);
-                $this->see(trans(PasswordBroker::INVALID_TOKEN), true);
-                $this->see(trans(PasswordBroker::PASSWORD_RESET));
-                $this->see(trans(PasswordBroker::INVALID_PASSWORD, ['min_length' => \Config::get('auth.password.min_length')]), true);
+                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+                $this->see(trans('passwords.user'), true);
+                $this->see(trans('passwords.token'), true);
+                $this->see(trans('passwords.reset'));
+                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
                 break;
         }
     }

@@ -46,8 +46,6 @@ class UserOAuth extends \Eloquent
      */
     protected $guarded = ['*'];
 
-    protected $dateFormat = 'U';
-
     public function owner()
     {
         return $this->belongsTo(User::class, 'user_id', 'id');

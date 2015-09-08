@@ -19,9 +19,8 @@ class CreateNestedEntities extends Migration
             $table->string('name', 255);
             $table->mediumInteger('left_range', false, true);
             $table->mediumInteger('right_range', false, true);
-            $table->integer('created_at', false, true);
-            $table->integer('updated_at', false, true)->nullable();
-            $table->integer('deleted_at', false, true)->nullable();
+            $table->timestamps();
+            $table->softDeletes();
 
             $table->unique(array('left_range', 'right_range'));
         });

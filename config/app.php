@@ -124,9 +124,10 @@ return [
         /*
          * Custom Service Providers...
          */
-        \TwigBridge\ServiceProvider::class,
+        \Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
+        \Cartalyst\Sentinel\Laravel\SentinelServiceProvider::class,
         \Laravel\Socialite\SocialiteServiceProvider::class,
-        \Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class
+        \TwigBridge\ServiceProvider::class,
     ],
 
     /*
@@ -176,6 +177,9 @@ return [
          * Custom Facades...
          */
         'Twig' => \TwigBridge\Facade\Twig::class,
-        'Socialite' => \Laravel\Socialite\Facades\Socialite::class
+        'Socialite' => \Laravel\Socialite\Facades\Socialite::class,
+        'Activation' => \Cartalyst\Sentinel\Laravel\Facades\Activation::class,
+        'Reminder' => \Cartalyst\Sentinel\Laravel\Facades\Reminder::class,
+        'Sentinel' => \Cartalyst\Sentinel\Laravel\Facades\Sentinel::class,
     ],
 ];

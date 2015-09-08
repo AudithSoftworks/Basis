@@ -14,9 +14,14 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\Users\Deleted::class => [],
         \App\Events\Users\LoggedIn::class => [],
         \App\Events\Users\LoggedOut::class => [],
-        \App\Events\Users\Registered::class => [],
-        \App\Events\Users\RequestedResetPasswordLinkViaEmail::class => [
-            \App\Listeners\Users\WhenRequestedResetPasswordLinkViaEmail::class
+        \App\Events\Users\Registered::class => [
+            \App\Listeners\Users\SendActivationLinkViaEmail::class
+        ],
+        \App\Events\Users\RequestedActivationLink::class => [
+            \App\Listeners\Users\SendActivationLinkViaEmail::class
+        ],
+        \App\Events\Users\RequestedResetPasswordLink::class => [
+            \App\Listeners\Users\SendResetPasswordLinkViaEmail::class
         ],
         \App\Events\Users\Updated::class => [],
     ];

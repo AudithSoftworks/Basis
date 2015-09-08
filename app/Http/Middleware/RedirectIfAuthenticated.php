@@ -7,23 +7,6 @@ use Illuminate\Http\Request;
 class RedirectIfAuthenticated
 {
     /**
-     * The Guard implementation.
-     *
-     * @var Guard
-     */
-    protected $auth;
-
-    /**
-     * Create a new filter instance.
-     *
-     * @param  Guard $auth
-     */
-    public function __construct(Guard $auth)
-    {
-        $this->auth = $auth;
-    }
-
-    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request $request
@@ -33,7 +16,7 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, \Closure $next)
     {
-        if ($this->auth->check()) {
+        if (!\Sentinel::guest()) {
             return new RedirectResponse(url('/'));
         }
 

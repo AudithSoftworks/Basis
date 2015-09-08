@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 
 class Authenticate
 {
@@ -32,9 +33,9 @@ class Authenticate
      */
     public function handle(Request $request, \Closure $next)
     {
-        if ($this->auth->guest()) {
+        if (app('sentinel')->guest()) {
             if ($request->ajax() || $request->wantsJson()) {
-                return response('Unauthorized.', 401);
+                throw new UnauthorizedHttpException('Unauthorized');
             } else {
                 return redirect()->guest(route('login'));
             }

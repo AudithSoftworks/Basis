@@ -3,17 +3,12 @@
 use App\Events\Event as EventAbstract;
 use Cartalyst\Sentinel\Users\UserInterface;
 
-class Updated extends EventAbstract
+class Registered extends EventAbstract
 {
     /**
      * @var \Cartalyst\Sentinel\Users\UserInterface
      */
-    public $userBefore;
-
-    /**
-     * @var \Cartalyst\Sentinel\Users\UserInterface
-     */
-    public $userAfter;
+    public $user;
 
     /**
      * @var null|string
@@ -22,13 +17,11 @@ class Updated extends EventAbstract
 
     /**
      * @param \Cartalyst\Sentinel\Users\UserInterface $user
-     * @param \Cartalyst\Sentinel\Users\UserInterface $userAfter
      * @param string|null                             $oauthProviderName
      */
-    public function __construct(UserInterface $user, UserInterface $userAfter, $oauthProviderName = null)
+    public function __construct(UserInterface $user, $oauthProviderName = null)
     {
-        $this->userBefore = $user;
-        $this->userAfter = $userAfter;
+        $this->user = $user;
         $this->oauthProviderName = $oauthProviderName;
 
         parent::__construct();

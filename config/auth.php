@@ -58,5 +58,5 @@ return [
         'table' => 'password_resets',
         'expire' => 60,
         'min_length' => 6
-    ],
+    ]
 ];

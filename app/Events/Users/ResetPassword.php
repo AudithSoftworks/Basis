@@ -1,16 +1,19 @@
 <?php namespace App\Events\Users;
 
 use App\Events\Event as EventAbstract;
-use Illuminate\Contracts\Auth\CanResetPassword;
+use Cartalyst\Sentinel\Users\UserInterface;
 
 class ResetPassword extends EventAbstract
 {
     /**
-     * @var CanResetPassword
+     * @var array|\Cartalyst\Sentinel\Users\UserInterface
      */
     public $user;
 
-    public function __construct(CanResetPassword $user)
+    /**
+     * @param \Cartalyst\Sentinel\Users\UserInterface $user
+     */
+    public function __construct(UserInterface $user)
     {
         $this->user = $user;
 

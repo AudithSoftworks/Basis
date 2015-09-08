@@ -11,6 +11,8 @@ return [
         'logout' => 'Çıkış',
         'register' => 'Üye ol',
         'signup' => 'Kaydol',
-        'password' => 'Parola Sıfırlama'
-    ]
+        'password' => 'Parola Sıfırlama',
+        'update' => 'Güncelle'
+    ],
+    'activation_email_subject' => 'Hesap Aktivasyonu'
 ];

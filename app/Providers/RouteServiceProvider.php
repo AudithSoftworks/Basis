@@ -24,7 +24,8 @@ class RouteServiceProvider extends ServiceProvider
     public function boot(Router $router)
     {
         $router->patterns(
-            ['provider' => 'twitter|google|facebook']
+            ['provider' => 'twitter|google|facebook'],
+            ['token' => '[a-zA-Z0-9]+']
         );
 
         parent::boot($router);
@@ -80,9 +81,10 @@ class RouteServiceProvider extends ServiceProvider
         // Default locale? No prefices are necessary.
         //------------------------------------------------
 
-        \Lang::setLocale(\Config::get('app.locale'));
-        $router->group(compact('namespace'), function (Router $router) {
-            $this->localizedRoutes($router, \Config::get('app.locale'));
+        $defaultLocale = config('app.locale');
+        app('translator')->setLocale($defaultLocale);
+        $router->group(compact('namespace'), function (Router $router) use ($defaultLocale) {
+            $this->localizedRoutes($router, $defaultLocale);
         });
     }
 
@@ -94,10 +96,11 @@ class RouteServiceProvider extends ServiceProvider
         $router->get(trans('routes.register'), ['uses' => 'UsersController@create', 'as' => $prefix . '.register']);
         $router->post(trans('routes.register'), 'UsersController@store');
 
-        $router->controller('/password', 'Users\PasswordController');
+        $router->resource('users', 'UsersController');
+        $router->controller('password', 'Users\PasswordController');
+        $router->controller(trans('routes.activation.'), 'Users\ActivationController');
 
-        $router->resource('/files', 'FilesController');
-        $router->resource('/users', 'UsersController');
+        $router->resource('files', 'FilesController');
 
         $router->controller('/', 'HomeController');
     }

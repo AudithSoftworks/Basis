@@ -3,7 +3,7 @@
 use App\Events\Event as EventAbstract;
 use Cartalyst\Sentinel\Users\UserInterface;
 
-class LoggedIn extends EventAbstract
+class RequestedActivationLink extends EventAbstract
 {
     /**
      * @var array|\Cartalyst\Sentinel\Users\UserInterface
@@ -11,18 +11,11 @@ class LoggedIn extends EventAbstract
     public $user;
 
     /**
-     * @var null|string
-     */
-    public $oauthProviderNameIfApplicable;
-
-    /**
      * @param \Cartalyst\Sentinel\Users\UserInterface $user
-     * @param string|null                             $oauthProviderName
      */
-    public function __construct(UserInterface $user, $oauthProviderName = null)
+    public function __construct(UserInterface $user)
     {
         $this->user = $user;
-        $this->oauthProviderNameIfApplicable = $oauthProviderName;
 
         parent::__construct();
     }
