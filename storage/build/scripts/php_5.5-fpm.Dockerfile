@@ -1,6 +1,8 @@
 FROM php:5.5-fpm
 MAINTAINER Shahriyar Imanov <shehi@imanov.me>
 
+ENV DEBIAN_FRONTEND noninteractive
+
 RUN apt-get update -y \
     && apt-get install -y apt-utils \
     && apt-get install -y \
@@ -33,7 +35,7 @@ RUN apt-get update -y \
         zip
 
 # Locale
-RUN locale-gen en_US.UTF-8 && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
+RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
