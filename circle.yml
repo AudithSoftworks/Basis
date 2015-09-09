@@ -32,16 +32,16 @@ dependencies:
     ########################################################################
 
     # Docker build: Nginx & caching
-#    - docker build -f storage/build/scripts/nginx.Dockerfile -t audithsoftworks/basis:nginx .
+#    - docker build -f storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .
 
     # Docker build: HHVM, PHP 5.5, 5.6 & caching
-#    - docker build -f storage/build/scripts/php_5.5.Dockerfile -t audithsoftworks/basis:php_5.5 .
-#    - docker build -f storage/build/scripts/php_5.6.Dockerfile -t audithsoftworks/basis:php_5.6 .
-#    - docker build -f storage/build/scripts/hhvm.Dockerfile -t audithsoftworks/basis:hhvm .
+#    - docker build -f storage/build/scripts/php_5.5/Dockerfile -t audithsoftworks/basis:php_5.5 .
+#    - docker build -f storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .
+#    - docker build -f storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .
 
     # Docker build: PHP-FPM 5.5, 5.6 & caching
-#    - docker build -f storage/build/scripts/php_5.5-fpm.Dockerfile -t audithsoftworks/basis:php_5.5-fpm .
-#    - docker build -f storage/build/scripts/php_5.6-fpm.Dockerfile -t audithsoftworks/basis:php_5.6-fpm .
+#    - docker build -f storage/build/scripts/php_5.5-fpm/Dockerfile -t audithsoftworks/basis:php_5.5-fpm .
+#    - docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .
 
     # Docker Compose
     - case $CIRCLE_NODE_INDEX in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 2) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac

@@ -6,6 +6,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * App\Models\User
  *
+ * @mixin \Eloquent
+ *
  * @property integer        $id
  * @property string         $name
  * @property string         $email
