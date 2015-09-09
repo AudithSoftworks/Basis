@@ -1,33 +1,17 @@
-language: php
+sudo: required
 
-php:
-  - 5.5
-  - 5.6
-  - 7.0
-  - hhvm
-
-rvm:
-  - head
+services:
+  - docker
 
 env:
-  - DB=mysql DB_USERNAME=root NODE_VERSION=stable
-  - DB=pgsql DB_USERNAME=postgres NODE_VERSION=stable
-  - DB=mysql DB_USERNAME=root NODE_VERSION=unstable
-
-addons:
-  postgresql: "9.4"
-  apt:
-    packages:
-      - fontforge
-      - ttfautohint
+  - PHP_VERSION=5.5
+  - PHP_VERSION=5.6
+  - PHP_VERSION=hhvm
 
 matrix:
   fast_finish: true
   allow_failures:
-    - php: 7.0
-    - php: hhvm
-      env: DB=pgsql DB_USERNAME=postgres NODE_VERSION=stable
-    - env: DB=mysql DB_USERNAME=root NODE_VERSION=unstable
+    - env: PHP_VERSION=7.0
 
 # sudo: false
 
@@ -38,52 +22,76 @@ cache:
     - ./public/bower_components
 
 before_install:
-  - sudo apt-get update # @todo To be removed
-  - sudo apt-get install -y fontforge # @todo To be removed
-  - nvm install $NODE_VERSION
-  - npm install -g npm@latest
-  - npm update -g
-  - npm install -g bower gulp ttf2eot
-  - composer self-update
-  - gem install compass sass sass-globbing autoprefixer-rails fontcustom
+  - curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > docker-compose; chmod +x docker-compose; true
+  - sudo mv docker-compose /usr/local/bin/
+  - pwd && docker -v && docker info && docker-compose -v
 
 install:
-  - travis_retry composer install --no-interaction --prefer-source
-  - npm install
-  - bower update
+  - chmod -R 0777 ./storage/logs
+
+  # Docker Compose
+  - case $PHP_VERSION in '5.5') export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; '5.6') export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 'hhvm') export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
+    && docker-compose -f $DOCKER_COMPOSE_FILE pull
+  - case $PHP_VERSION in '5.5') export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; '5.6') export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 'hhvm') export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
+    && docker-compose -f $DOCKER_COMPOSE_FILE up -d && docker-compose ps
+
+  # Create database for MySQL and PgSQL
+  - sleep 15;
+    mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
+    if [[ $PHP_VERSION != 'hhvm' ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
+
+  # Fix for /etc/hosts file
+  - case $PHP_VERSION in '5.5') export PHP_CONTAINER=basis_php55_1 NGINX_CONTAINER=basis_nginxForPhpFpm55_1 ;; '5.6') export PHP_CONTAINER=basis_php56_1 NGINX_CONTAINER=basis_nginxForPhpFpm56_1 ;; 'hhvm') export PHP_CONTAINER=basis_hhvmAsCli_1 NGINX_CONTAINER=basis_nginxForHhvm_1 ;; esac
+    && docker exec $PHP_CONTAINER echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' $NGINX_CONTAINER) basis.audith.org | sudo tee -a /etc/hosts;
+
+  # dotEnv file for initial test setup
+  - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
 
 before_script:
-  - if [[ "$DB" == "mysql" ]]; then mysql -e "CREATE DATABASE IF NOT EXISTS basis;" -uroot; fi
-  - if [[ "$DB" == "pgsql" ]]; then psql -c "CREATE DATABASE basis;" -U postgres; fi
-#  - git clone --depth=1 https://github.com/google/woff2.git storage/build/tools/woff2
-#  - cd storage/build/tools/woff2
-#  - git submodule init
-#  - git submodule update
-#  - make clean all
-#  - cd $TRAVIS_BUILD_DIR
-  - git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git storage/build/tools/css3_font_converter
-  - cp -r public/bower_components/bootstrap/fonts  public/fonts/glyphicons
-  - cp -r public/bower_components/fontawesome/fonts  public/fonts/font_awesome
-  - cp -r public/bower_components/google-fonts/ofl/armata public/fonts/armata
-  - cp -r public/bower_components/google-fonts/ofl/ptsans public/fonts/pt_sans
-  - cp -r public/bower_components/google-fonts/ofl/marcellus public/fonts/marcellus
-  - cp -r public/bower_components/google-fonts/ofl/pontanosans public/fonts/pontano_sans
-  - cp -r public/bower_components/google-fonts/ofl/montserrat public/fonts/montserrat
-  - cp -r public/bower_components/google-fonts/apache/opensans public/fonts/opensans
-  - export PATH=$PATH:`pwd`/storage/build/tools/sfnt2woff:`pwd`/storage/build/tools/woff2 && chmod -R +x `pwd`/storage/build/tools
-  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf
-  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pt_sans/stylesheet.css public/fonts/pt_sans/*.ttf
-  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pontano_sans/stylesheet.css public/fonts/pontano_sans/*.ttf
-  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf
-  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf
-  - ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf
-  - compass compile
-  - gulp
+  # Build project dependencies
+  - case $PHP_VERSION in '5.5') export PHP_CONTAINER=basis_php55_1 ;; '5.6') export PHP_CONTAINER=basis_php56_1 ;; 'hhvm') export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
+    && docker exec $PHP_CONTAINER /bin/bash -c "
+      cd /home/basis;
+      npm update;
+      bower --config.interactive=false --allow-root update;
+      git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2;
+      cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
+      git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git /home/basis/storage/build/tools/css3_font_converter;
+
+      cd /home/basis;
+      cp -r ./public/bower_components/bootstrap/fonts ./public/fonts/glyphicons;
+      cp -r ./public/bower_components/fontawesome/fonts ./public/fonts/font_awesome;
+      cp -r ./public/bower_components/google-fonts/ofl/armata ./public/fonts/armata;
+      cp -r ./public/bower_components/google-fonts/ofl/ptsans ./public/fonts/pt_sans;
+      cp -r ./public/bower_components/google-fonts/ofl/marcellus ./public/fonts/marcellus;
+      cp -r ./public/bower_components/google-fonts/ofl/pontanosans ./public/fonts/pontano_sans;
+      cp -r ./public/bower_components/google-fonts/ofl/montserrat ./public/fonts/montserrat;
+      cp -r ./public/bower_components/google-fonts/apache/opensans ./public/fonts/opensans;
+
+      chmod -R +x /home/basis/storage/build/tools;
+      PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf;
+      PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pt_sans/stylesheet.css public/fonts/pt_sans/*.ttf;
+      PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pontano_sans/stylesheet.css public/fonts/pontano_sans/*.ttf;
+      PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf;
+      PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
+      PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf;
+
+      compass compile;
+      gulp;
+      composer selfupdate && composer update --prefer-source --no-interaction;
+    ";
 
 script:
-  - cp .env.example .env
-  - php artisan migrate --force
-  - vendor/bin/phpunit --debug --verbose
+  # Testing against MySQL
+  - case $PHP_VERSION in '5.5') export PHP_CONTAINER=basis_php55_1 ;; '5.6') export PHP_CONTAINER=basis_php56_1 ;; 'hhvm') export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
+    && docker exec $PHP_CONTAINER /bin/bash -c "cd /home/basis; ./vendor/bin/phpunit --debug --verbose";
+
+  # Switching to PgSQL 9.4
+  - cat .env | sed s/DB_HOST=.*/DB_HOST=postgres94/g | sed s/DB=.*/DB=pgsql/g | tee .env
+
+  # Testing against PgSQL 9.4
+  - case $PHP_VERSION in '5.5') export PHP_CONTAINER=basis_php55_1 ;; '5.6') export PHP_CONTAINER=basis_php56_1 ;; esac
+    && if [[ $PHP_VERSION != 'hhvm' ]]; then docker exec $PHP_CONTAINER /bin/bash -c "cd /home/basis; ./vendor/bin/phpunit --debug --verbose"; fi;
 
 notifications:
   hipchat: f504f9e2e6696c17589a7b49f4ce05@Audith.Basis

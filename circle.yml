@@ -50,8 +50,9 @@ dependencies:
       && docker-compose -f $DOCKER_COMPOSE_FILE up -d && docker-compose ps
 
     # Create database for MySQL and PgSQL
-    - sleep 5; mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;"
-    - sleep 5; if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 1 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
+    - sleep 5;
+      mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
+      if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 1 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
 
     # Fix for /etc/hosts file
     - if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 0 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_php55_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm55_1) basis.audith.org | tee -a /etc/hosts"; fi
@@ -92,19 +93,17 @@ dependencies:
         compass compile;
         gulp;
         composer selfupdate && composer update --prefer-source --no-interaction;
-
-        env;
       "
 test:
   override:
-    # Testing PHP 5.5 and 5.6 against MySQL
+    # Testing against MySQL
     - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
         parallel: true
 
     # Switching to PgSQL 9.4
     - cat .env | sed s/DB_HOST=.*/DB_HOST=postgres94/g | sed s/DB=.*/DB=pgsql/g | tee .env
 
-    # Testing PHP 5.5 and 5.6 against PgSQL 9.4
+    # Testing against PgSQL 9.4
     - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php55_1 ;; esac && if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 1 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose'; fi:
         parallel: true
 
