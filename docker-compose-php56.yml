@@ -35,4 +35,3 @@ php56:
     - redis
     - nginxForPhpFpm56
   stdin_open: true
-  restart: on-failure[10]

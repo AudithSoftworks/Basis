@@ -99,7 +99,6 @@ php55:
     - redis
     - nginxForPhpFpm55
   stdin_open: true
-  restart: on-failure[10]
 php56:
   image: audithsoftworks/basis:php_5.6
   volumes:
@@ -115,7 +114,6 @@ php56:
     - redis
     - nginxForPhpFpm56
   stdin_open: true
-  restart: on-failure[10]
 hhvmAsCli:
   image: audithsoftworks/basis:hhvm
   volumes:
@@ -131,4 +129,3 @@ hhvmAsCli:
     - redis
     - nginxForHhvm
   stdin_open: true
-  restart: on-failure[10]

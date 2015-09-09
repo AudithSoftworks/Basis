@@ -2,8 +2,9 @@ machine:
   php:
     version: 5.5.9
   pre:
-    - curl -L https://github.com/docker/compose/releases/download/1.3.1/docker-compose-`uname -s`-`uname -m` > docker-compose; chmod +x docker-compose; true
-    - sudo mv docker-compose /usr/local/bin/
+#    - sudo curl -L -o /usr/bin/docker https://s3-external-1.amazonaws.com/circle-downloads/docker-1.7.1-circleci; sudo chmod 0755 /usr/bin/docker
+#    - curl -L https://github.com/docker/compose/releases/download/1.4.0/docker-compose-`uname -s`-`uname -m` > docker-compose; sudo mv docker-compose /usr/bin/docker-compose; sudo chmod 0755 /usr/bin/docker-compose
+    - curl -L https://github.com/docker/compose/releases/download/1.3.1/docker-compose-`uname -s`-`uname -m` > docker-compose; sudo mv docker-compose /usr/bin/docker-compose; sudo chmod 0755 /usr/bin/docker-compose
   services:
     - docker
 
@@ -44,27 +45,25 @@ dependencies:
 #    - docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .
 
     # Docker Compose
-    - case $CIRCLE_NODE_INDEX in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 2) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
+    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
       && docker-compose -f $DOCKER_COMPOSE_FILE pull
-    - case $CIRCLE_NODE_INDEX in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 2) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
+    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
       && docker-compose -f $DOCKER_COMPOSE_FILE up -d && docker-compose ps
-    - while [[ $(docker-compose ps | grep "Exit") ]]; do docker start $(docker-compose ps | grep "Exit" | awk "{print \$1}"); done && docker-compose ps
 
     # Create database for MySQL and PgSQL
-    - mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;"
-    - if [[ $CIRCLE_NODE_INDEX != 2 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
+    - sleep 5; mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;"
+    - sleep 5; if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 1 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
 
     # Fix for /etc/hosts file
-    - if [[ $CIRCLE_NODE_INDEX == 0 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_php55_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm55_1) basis.audith.org | tee -a /etc/hosts"; fi
-    - if [[ $CIRCLE_NODE_INDEX == 1 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_php56_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm56_1) basis.audith.org | tee -a /etc/hosts"; fi
-    - if [[ $CIRCLE_NODE_INDEX == 2 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_hhvmAsCli_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForHhvm_1) basis.audith.org | tee -a /etc/hosts"; fi
+    - if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 0 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_php55_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm55_1) basis.audith.org | tee -a /etc/hosts"; fi
+    - if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 1 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_hhvmAsCli_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForHhvm_1) basis.audith.org | tee -a /etc/hosts"; fi
 
     # dotEnv file for initial test setup
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
+    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
       && cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
 
     # Build project dependencies
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
+    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
       && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c "
         cd /home/basis;
         npm update;
@@ -100,18 +99,18 @@ dependencies:
 test:
   override:
     # Testing PHP 5.5 and 5.6 against MySQL
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; 2) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
+    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
         parallel: true
 
     # Switching to PgSQL 9.4
     - cat .env | sed s/DB_HOST=.*/DB_HOST=postgres94/g | sed s/DB=.*/DB=pgsql/g | tee .env
 
     # Testing PHP 5.5 and 5.6 against PgSQL 9.4
-    - case $CIRCLE_NODE_INDEX in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_php56_1 ;; esac && if [[ $CIRCLE_NODE_INDEX != 2 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose'; fi:
+    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php55_1 ;; esac && if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 1 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose'; fi:
         parallel: true
 
   post:
     - mkdir -p $CIRCLE_TEST_REPORTS/phpunit/
     - cp ./storage/coverage/*.xml $CIRCLE_TEST_REPORTS/phpunit/
     - wget https://scrutinizer-ci.com/ocular.phar
-    - if [[ $CIRCLE_NODE_INDEX == 0 ]]; then php ocular.phar code-coverage:upload --format=php-clover ./storage/coverage/coverage.xml; fi
+    - if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 0 ]]; then php ocular.phar code-coverage:upload --format=php-clover ./storage/coverage/coverage.xml; fi
