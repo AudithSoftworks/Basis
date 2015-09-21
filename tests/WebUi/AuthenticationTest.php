@@ -48,32 +48,10 @@ class AuthenticationTest extends IlluminateTestCase
         $this->seePageIs('/register');
     }
 
-    public function data_testRegister()
-    {
-        return [
-            [ // Password confirmation missing
-                ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver']
-            ],
-            [ // Email missing
-                ['name' => 'John Doe', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver']
-            ],
-            [ // Short password
-                ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'password' => 'short', 'password_confirmation' => 'short']
-            ],
-            [ // Success
-                ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd', 'password_confirmation' => 's0m34ardPa55w0rd']
-            ]
-        ];
-    }
-
     /**
      * Tests /register route.
-     *
-     * @dataProvider data_testRegister
-     *
-     * @param array $credentials
      */
-    public function testRegister(array $credentials)
+    public function testRegisterForFailures()
     {
         # Visit the page, make sure we have landed on right page.
         $this->visit('/register');
@@ -86,77 +64,80 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see(trans('validation.required', ['attribute' => 'password']), true);
         $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
 
-        # Fill in the form fed by data-provider
+        # Fill in the form - case 1: Password confirmation missing
+        $credentials = ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver'];
         foreach ($credentials as $key => $value) {
             $this->type($value, $key);
         }
-
-        # Press the submit button
         $this->press('Sign up');
+        $this->seePageIs('/register');
+        $this->see('The password confirmation does not match.');
+        $this->see(trans('validation.required', ['attribute' => 'name']), true);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.required', ['attribute' => 'password']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
 
-        # Check for errors
-        switch ($this->getName()) {
-            case 'testRegister with data set #0':
-                $this->seePageIs('/register');
-                $this->see('The password confirmation does not match.');
-                $this->see(trans('validation.required', ['attribute' => 'name']), true);
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.required', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
-                $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
-                break;
-            case 'testRegister with data set #1':
-                $this->seePageIs('/register');
-                $this->see(trans('validation.required', ['attribute' => 'email']));
-                $this->see(trans('validation.required', ['attribute' => 'name']), true);
-                $this->see(trans('validation.required', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
-                $this->notSeeInDatabase('users', ['name' => $credentials['name']]);
-                break;
-            case 'testRegister with data set #2':
-                $this->seePageIs('/register');
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.required', ['attribute' => 'name']), true);
-                $this->see(trans('validation.required', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]));
-                $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
-                break;
-            default:
-                $this->seePageIs('/');
-                $this->see('<b>Welcome</b>!');
-                $this->seeInDatabase('users', ['email' => $credentials['email']]);
-                break;
+        # Case 2: Email missing
+        $this->visit('/register');
+        $credentials = ['name' => 'John Doe', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
         }
+        $this->press('Sign up');
+        $this->seePageIs('/register');
+        $this->see(trans('validation.required', ['attribute' => 'email']));
+        $this->see(trans('validation.required', ['attribute' => 'name']), true);
+        $this->see(trans('validation.required', ['attribute' => 'password']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->notSeeInDatabase('users', ['name' => $credentials['name']]);
+
+        # Case 3: Short password
+        $this->visit('/register');
+        $credentials = ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'password' => 'short', 'password_confirmation' => 'short'];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
+        }
+        $this->press('Sign up');
+        $this->seePageIs('/register');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.required', ['attribute' => 'name']), true);
+        $this->see(trans('validation.required', ['attribute' => 'password']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]));
+        $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
     }
 
-    public function data_testLogin()
+    /**
+     * Tests /register route.
+     */
+    public function testRegisterForSuccess()
     {
-        return [
-            [ // Missing email
-                ['password' => 's0m34ardPa55w0rd']
-            ],
-            [ // Missing password
-                ['email' => 'john.doe@example.com']
-            ],
-            [ // Invalid login
-                ['email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver'],
-                'LoginNotValidException'
-            ],
-            [
-                ['email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'],
-                ''
-            ]
-        ];
+        # Visit the page, make sure we have landed on right page.
+        $this->visit('/register');
+        $this->seeStatusCode(200);
+        $this->see('<h2><b>Create</b> a new account</h2>');
+
+        # We shouldn't have flash error messages around.
+        $this->see(trans('validation.required', ['attribute' => 'name']), true);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.required', ['attribute' => 'password']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+
+        # Fill in the form
+        $credentials = ['name' => 'John Doe', 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd', 'password_confirmation' => 's0m34ardPa55w0rd'];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
+        }
+        $this->press('Sign up');
+        $this->seePageIs('');
+        $this->see('<b>Welcome</b>!');
+        $this->seeInDatabase('users', ['email' => $credentials['email']]);
     }
 
     /**
      * Tests /login route.
-     *
-     * @dataProvider data_testLogin
-     *
-     * @param array $credentials
      */
-    public function testLogin(array $credentials)
+    public function testLoginForFailures()
     {
         # Visit the page, make sure we have landed on right page.
         $this->visit('/login');
@@ -167,42 +148,58 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see(trans('validation.required', ['attribute' => 'email']), true);
         $this->see(trans('validation.required', ['attribute' => 'password']), true);
 
-        # Fill in the form fed by data-provider
+        # Case 1: Missing email
+        $credentials = ['password' => 's0m34ardPa55w0rd'];
         foreach ($credentials as $key => $value) {
             $this->type($value, $key);
         }
-
-        # Press the submit button
         $this->press('Log in');
+        $this->seePageIs('/login');
+        $this->see(trans('validation.required', ['attribute' => 'email']));
+        $this->see(trans('validation.required', ['attribute' => 'password']), true);
+        $this->see('These credentials do not match our records!', true);
 
-        # Check for errors
-        switch ($this->getName()) {
-            case 'testLogin with data set #0':
-                $this->seePageIs('/login');
-                $this->see(trans('validation.required', ['attribute' => 'email']));
-                $this->see(trans('validation.required', ['attribute' => 'password']), true);
-                $this->see('These credentials do not match our records!', true);
-                break;
-            case 'testLogin with data set #1':
-                $this->seePageIs('/login');
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.required', ['attribute' => 'password']));
-                $this->see('These credentials do not match our records!', true);
-                break;
-            case 'testLogin with data set #2':
-                $this->seePageIs('/login');
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.required', ['attribute' => 'password']), true);
-                $this->see('These credentials do not match our records!');
-                break;
-            default:
-                $this->seePageIs('/');
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.required', ['attribute' => 'password']), true);
-                $this->see('These credentials do not match our records!', true);
-                $this->see('<b>Welcome</b>, John Doe!');
-                break;
+        # Case 2: Missing password
+        $credentials = ['email' => 'john.doe@example.com'];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
         }
+        $this->press('Log in');
+        $this->seePageIs('/login');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.required', ['attribute' => 'password']));
+        $this->see('These credentials do not match our records!', true);
+
+        # Case 3: Invalid login
+        $credentials = ['email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver'];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
+        }
+        $this->press('Log in');
+        $this->seePageIs('/login');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.required', ['attribute' => 'password']), true);
+        $this->see('These credentials do not match our records!');
+    }
+
+    /**
+     * Tests /login route.
+     *
+     * @depends testRegisterForSuccess
+     */
+    public function testLoginForSuccess()
+    {
+        $this->visit('/login');
+        $credentials = ['email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
+        }
+        $this->press('Log in');
+        $this->seePageIs('');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.required', ['attribute' => 'password']), true);
+        $this->see('These credentials do not match our records!', true);
+        $this->see('<b>Welcome</b>, John Doe!');
     }
 
     /**
@@ -218,44 +215,14 @@ class AuthenticationTest extends IlluminateTestCase
 
         $this->click('Log out');
         $this->seeStatusCode(200);
-        $this->seePageIs('/');
+        $this->seePageIs('');
         $this->see('<h2><b>Welcome</b>!</h2>');
-    }
-
-    public function data_testPasswordEmail()
-    {
-        return [
-            [
-                [ // Missing email
-                    'email' => ''
-                ]
-            ],
-            [
-                [ // Invalid email
-                    'email' => 'john.doe@'
-                ]
-            ],
-            [
-                [ // Non-existent email
-                    'email' => 'jane.doe@example.com'
-                ]
-            ],
-            [
-                [ // Correct data
-                    'email' => 'john.doe@example.com'
-                ]
-            ]
-        ];
     }
 
     /**
      * Tests /password/email route.
-     *
-     * @dataProvider data_testPasswordEmail
-     *
-     * @param array $credentials
      */
-    public function testPasswordEmail(array $credentials)
+    public function testPasswordEmailForFailures()
     {
         # Visit the page, make sure we have landed on right page.
         $this->visit('/password/email');
@@ -268,54 +235,58 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see(trans('passwords.user'), true);
         $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
 
-        # Fill in the form fed by data-provider
-        foreach ($credentials as $key => $value) {
-            $this->type($value, $key);
-        }
-
-        # Press the submit button
+        # Case 1: Missing email
+        $this->type('', 'email');
         $this->press('Send Password Reset Link');
-
-        # Check for errors
         $this->seePageIs('/password/email');
-        switch ($this->getName()) {
-            case 'testPasswordEmail with data set #0':
-                $this->see(trans('validation.required', ['attribute' => 'email']));
-                $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans('passwords.user'), true);
-                $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
-                break;
-            case 'testPasswordEmail with data set #1':
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.email', ['attribute' => 'email']));
-                $this->see(trans('passwords.user'), true);
-                $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
-                break;
-            case 'testPasswordEmail with data set #2':
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans('passwords.user'));
-                $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
-                break;
-            default:
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans('passwords.user'), true);
-                $this->see(trans(PasswordBroker::RESET_LINK_SENT));
-                break;
-        }
+        $this->see(trans('validation.required', ['attribute' => 'email']));
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
+
+        # Case 2: Invalid email
+        $this->type('john.doe@', 'email');
+        $this->press('Send Password Reset Link');
+        $this->seePageIs('/password/email');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']));
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
+
+        # Case 3: Non-existent email
+        $this->type('jane.doe@example.com', 'email');
+        $this->press('Send Password Reset Link');
+        $this->seePageIs('/password/email');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('passwords.user'));
+        $this->see(trans(PasswordBroker::RESET_LINK_SENT), true);
+    }
+
+    /**
+     * Tests /password/email route.
+     *
+     * @depends testRegisterForSuccess
+     */
+    public function testPasswordEmailForSuccess()
+    {
+        # Visit the page, make sure we have landed on right page.
+        $this->visit('/password/email');
+        $this->type('john.doe@example.com', 'email');
+        $this->press('Send Password Reset Link');
+        $this->seePageIs('/password/email');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans(PasswordBroker::RESET_LINK_SENT));
     }
 
     /**
      * Tests /password/reset route.
      */
-    public function testPasswordResetWithMissingTokenSegmentInRequestUri()
+    public function testPasswordResetForFailuresWhereTokenSegmentInRequestUriIsMissing()
     {
-        # Visit the page, make sure we have landed on right page.
-        $_uri = '/password/reset';
-        $this->visit($_uri); // Token maybe missing in Request-URI
-
-        # We shouldn't have flash error messages around.
+        $this->visit('/password/reset');
         $this->seePageIs('/password/reset');
         $this->seeStatusCode(200);
         $this->see('<h2><b>Reset</b> your password</h2>');
@@ -328,79 +299,17 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
     }
 
-    public function data_testPasswordReset()
-    {
-        return [
-            [ // Password confirmation mismatch
-                [
-                    'email' => 'john.doe@example.com',
-                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'password_confirmation' => 's0m34ardPa55w0rd',
-                    'token' => &self::$passwordResetToken
-                ]
-            ],
-            [ // Password confirmation missing
-                [
-                    'email' => 'john.doe@example.com',
-                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'token' => &self::$passwordResetToken
-                ]
-            ],
-            [ // Wrong email/account supplied
-                [
-                    'email' => 'jane.doe@example.com',
-                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'token' => &self::$passwordResetToken
-                ]
-            ],
-            [ // Wrong token supplied
-                [
-                    'email' => 'john.doe@example.com',
-                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'token' => 'wrong-token'
-                ]
-            ],
-            [ // Short password
-                [
-                    'email' => 'john.doe@example.com',
-                    'password' => 'short',
-                    'password_confirmation' => 'short',
-                    'token' => &self::$passwordResetToken
-                ]
-            ],
-            [ // Correct entry
-                [
-                    'email' => 'john.doe@example.com',
-                    'password' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
-                    'token' => &self::$passwordResetToken
-                ]
-            ]
-        ];
-    }
-
     /**
      * Tests /password/reset/{token?} route.
      *
-     * @dataProvider data_testPasswordReset
-     *
-     * @param array $credentials
+     * @depends testPasswordEmailForSuccess
      */
-    public function testPasswordReset(array $credentials)
+    public function testPasswordResetForFailuresWherePasswordConfirmationMismatches()
     {
-        self::$passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
+        $passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
 
-        # Visit the page, make sure we have landed on right page.
-        $_uri = '/password/reset';
-        if (isset($credentials['token']) && !empty($credentials['token'])) {
-            $_uri .= '/'.$credentials['token'];
-        }
-        $this->visit($_uri); // Token maybe missing in Request-URI
+        $this->visit('/password/reset/' . $passwordResetToken);
         $this->seeStatusCode(200);
-
-        # We shouldn't have flash error messages around.
         $this->see(trans('validation.required', ['attribute' => 'email']), true);
         $this->see(trans('validation.email', ['attribute' => 'email']), true);
         $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
@@ -409,89 +318,220 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see(trans('passwords.token'), true);
         $this->see(trans('passwords.reset'), true);
         $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
-
-        # Fill in the form fed by data-provider
+        $credentials = [
+            'email' => 'john.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'password_confirmation' => 's0m34ardPa55w0rd'
+        ];
         foreach ($credentials as $key => $value) {
             $this->type($value, $key);
         }
-
-        # Press the submit button
         $this->press('Reset Password');
+        $this->seePageIs('/password/reset/' . $passwordResetToken);
+        $this->see('<h2><b>Reset</b> your password</h2>');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']));
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+    }
 
-        # Check for errors
-        switch ($this->getName()) {
-            case 'testPasswordReset with data set #0':
-                $this->seePageIs($_uri);
-                $this->see('<h2><b>Reset</b> your password</h2>');
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans('validation.confirmed', ['attribute' => 'password']));
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
-                $this->see(trans('passwords.user'), true);
-                $this->see(trans('passwords.token'), true);
-                $this->see(trans('passwords.reset'), true);
-                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
-                break;
-            case 'testPasswordReset with data set #1':
-                $this->seePageIs($_uri);
-                $this->see('<h2><b>Reset</b> your password</h2>');
-                $this->see('The email field is required.', true);
-                $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans('validation.confirmed', ['attribute' => 'password']));
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
-                $this->see(trans('passwords.user'), true);
-                $this->see(trans('passwords.token'), true);
-                $this->see(trans('passwords.reset'), true);
-                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
-                break;
-            case 'testPasswordReset with data set #2':
-                $this->seePageIs($_uri);
-                $this->see('<h2><b>Reset</b> your password</h2>');
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
-                $this->see(trans('passwords.user'));
-                $this->see(trans('passwords.token'), true);
-                $this->see(trans('passwords.reset'), true);
-                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
-                break;
-            case 'testPasswordReset with data set #3':
-                $this->seePageIs($_uri);
-                $this->see('<h2><b>Reset</b> your password</h2>');
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
-                $this->see(trans('passwords.user'), true);
-                $this->see(trans('passwords.token'));
-                $this->see(trans('passwords.reset'), true);
-                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
-                break;
-            case 'testPasswordReset with data set #4':
-                $this->seePageIs($_uri);
-                $this->see('<h2><b>Reset</b> your password</h2>');
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]));
-                $this->see(trans('passwords.user'), true);
-                $this->see(trans('passwords.token'), true);
-                $this->see(trans('passwords.reset'), true);
-                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
-                break;
-            default:
-                $this->seePageIs('/login');
-                $this->see('<h2><b>Log in</b> to your account</h2>');
-                $this->see(trans('validation.required', ['attribute' => 'email']), true);
-                $this->see(trans('validation.email', ['attribute' => 'email']), true);
-                $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
-                $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
-                $this->see(trans('passwords.user'), true);
-                $this->see(trans('passwords.token'), true);
-                $this->see(trans('passwords.reset'));
-                $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
-                break;
+    /**
+     * Tests /password/reset/{token?} route.
+     *
+     * @depends testPasswordEmailForSuccess
+     */
+    public function testPasswordResetForFailuresWherePasswordConfirmationIsMissing()
+    {
+        $passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
+
+        $this->visit('/password/reset/' . $passwordResetToken);
+        $this->seeStatusCode(200);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+        $credentials = [
+            'email' => 'john.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0'
+        ];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
         }
+        $this->press('Reset Password');
+        $this->seePageIs('/password/reset/' . $passwordResetToken);
+        $this->see('<h2><b>Reset</b> your password</h2>');
+        $this->see('The email field is required.', true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']));
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+    }
+
+    /**
+     * Tests /password/reset/{token?} route.
+     *
+     * @depends testPasswordEmailForSuccess
+     */
+    public function testPasswordResetForFailuresWhereWrongAccountIsSupplied()
+    {
+        $passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
+
+        $this->visit('/password/reset/' . $passwordResetToken);
+        $this->seeStatusCode(200);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+        $credentials = [
+            'email' => 'jane.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0'
+        ];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
+        }
+        $this->press('Reset Password');
+        $this->seePageIs('/password/reset/' . $passwordResetToken);
+        $this->see('<h2><b>Reset</b> your password</h2>');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('passwords.user'));
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+    }
+
+    /**
+     * Tests /password/reset/{token?} route.
+     *
+     * @depends testPasswordEmailForSuccess
+     */
+    public function testPasswordResetForFailuresWhereWrongTokenIsSupplied()
+    {
+        $this->visit('/password/reset/wrong-token');
+        $this->seeStatusCode(200);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+        $credentials = [
+            'email' => 'john.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0'
+        ];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
+        }
+        $this->press('Reset Password');
+        $this->seePageIs('/password/reset/wrong-token');
+        $this->see('<h2><b>Reset</b> your password</h2>');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'));
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+    }
+
+    /**
+     * Tests /password/reset/{token?} route.
+     *
+     * @depends testPasswordEmailForSuccess
+     */
+    public function testPasswordResetForFailuresWhereShortPasswordIsSupplied()
+    {
+        $passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
+
+        $this->visit('/password/reset/' . $passwordResetToken);
+        $this->seeStatusCode(200);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+        $credentials = [
+            'email' => 'john.doe@example.com',
+            'password' => 'short',
+            'password_confirmation' => 'short'
+        ];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
+        }
+        $this->press('Reset Password');
+        $this->seePageIs('/password/reset/' . $passwordResetToken);
+        $this->see('<h2><b>Reset</b> your password</h2>');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]));
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+    }
+
+    /**
+     * Tests /password/reset/{token?} route.
+     *
+     * @depends testPasswordEmailForSuccess
+     */
+    public function testPasswordResetForSuccess()
+    {
+        $passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
+        $this->visit('/password/reset/' . $passwordResetToken);
+        $this->seeStatusCode(200);
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'), true);
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
+        $credentials = [
+            'email' => 'john.doe@example.com',
+            'password' => 's0m34ardPa55w0rdV3r510nTw0',
+            'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0'
+        ];
+        foreach ($credentials as $key => $value) {
+            $this->type($value, $key);
+        }
+        $this->press('Reset Password');
+        $this->seePageIs('/login');
+        $this->see('<h2><b>Log in</b> to your account</h2>');
+        $this->see(trans('validation.required', ['attribute' => 'email']), true);
+        $this->see(trans('validation.email', ['attribute' => 'email']), true);
+        $this->see(trans('validation.confirmed', ['attribute' => 'password']), true);
+        $this->see(trans('validation.min.string', ['attribute' => 'password', 'min' => config('auth.password.min_length')]), true);
+        $this->see(trans('passwords.user'), true);
+        $this->see(trans('passwords.token'), true);
+        $this->see(trans('passwords.reset'));
+        $this->see(trans('passwords.password', ['min_length' => config('auth.password.min_length')]), true);
     }
 }

@@ -111,7 +111,7 @@ class LocalizedRouter extends Router
      */
     protected function addFallthroughRoute($controller, $uri)
     {
-        $localizedUri = \Lang::get('routes.' . $uri . '.');
+        $localizedUri = app('translator')->get('routes.' . $uri . '.');
         if (false !== strpos($localizedUri, '.')) {
             $localizedUri = $uri;
         }
@@ -136,7 +136,7 @@ class LocalizedRouter extends Router
             }
         }
         foreach ($localizedUriTranslationBitParts as $level => &$translationBitPart) {
-            $translationBitPart = \Lang::get($translationBitPart);
+            $translationBitPart = app('translator')->get($translationBitPart);
             if (false !== strpos($translationBitPart, '.')) {
                 $translationBitPart = $uriExploded[$level];
             }

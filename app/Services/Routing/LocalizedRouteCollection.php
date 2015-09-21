@@ -12,7 +12,7 @@ class LocalizedRouteCollection extends RouteCollection
      */
     protected function addLookups($route)
     {
-        $locale = \Lang::getLocale();
+        $locale = app('translator')->getLocale();
 
         // If the route has a name, we will add it to the name look-up table so that we
         // will quickly be able to find any route associate with a name and not have
@@ -41,7 +41,7 @@ class LocalizedRouteCollection extends RouteCollection
      */
     protected function addToActionList($action, $route)
     {
-        $locale = \Lang::getLocale();
+        $locale = app('translator')->getLocale();
         $this->actionList[trim($action['controller'], '\\')][$locale] = $route;
     }
 
@@ -54,7 +54,7 @@ class LocalizedRouteCollection extends RouteCollection
      */
     public function getByAction($action)
     {
-        $locale = \Lang::getLocale();
+        $locale = app('translator')->getLocale();
 
         return isset($this->actionList[$action][$locale]) ? $this->actionList[$action][$locale] : null;
     }
@@ -67,12 +67,12 @@ class LocalizedRouteCollection extends RouteCollection
      */
     public function getByName($name)
     {
-        $locale = \Lang::getLocale();
+        $locale = app('translator')->getLocale();
 
         if (isset($this->nameList[$name])) {
             return $this->nameList[$name];
         }
 
-        return isset($this->nameList[$locale . '.' . $name][$locale]) ? $this->nameList[$locale . '.' . $name][$locale] : null;
+        return isset($this->nameList[$locale . '.' . $name]) ? $this->nameList[$locale . '.' . $name] : null;
     }
 }

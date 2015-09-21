@@ -1,7 +1,6 @@
 <?php namespace App\Services\Routing;
 
 use Illuminate\Routing\ResourceRegistrar;
-use Illuminate\Support\Str;
 
 class LocalizedResourceRegistrar extends ResourceRegistrar
 {
@@ -24,7 +23,7 @@ class LocalizedResourceRegistrar extends ResourceRegistrar
      */
     protected function addResourceCreate($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name) . '/' . \Lang::get('routes..resources.create');
+        $uri = $this->getResourceUri($name) . '/' . app('translator')->get('routes..resources.create');
 
         $action = $this->getResourceAction($name, $controller, 'create', $options);
 
@@ -43,7 +42,7 @@ class LocalizedResourceRegistrar extends ResourceRegistrar
      */
     protected function addResourceEdit($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name) . '/{' . $base . '}/' . \Lang::get('routes..resources.edit');
+        $uri = $this->getResourceUri($name) . '/{' . $base . '}/' . app('translator')->get('routes..resources.edit');
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
