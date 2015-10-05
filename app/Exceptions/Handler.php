@@ -59,6 +59,14 @@ class Handler extends ExceptionHandler
 
             $response = response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()]);
             switch ($exceptionClass) {
+                case UnauthorizedHttpException::class:
+                    return $response->setStatusCode(Response::HTTP_UNAUTHORIZED);
+                case NotActivatedException::class:
+                    return $response->setStatusCode(Response::HTTP_FORBIDDEN);
+                case NotFoundHttpException::class:
+                    return $response->setStatusCode(Response::HTTP_NOT_FOUND);
+                case Common\NotImplementedException::class:
+                    return $response->setStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
                 case Common\ValidationException::class:
                 case Users\LoginNotValidException::class:
                 case Users\PasswordNotValidException::class:
@@ -66,12 +74,6 @@ class Handler extends ExceptionHandler
                 case HttpResponseException::class:
                 case TokenMismatchException::class:
                     return $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
-                case UnauthorizedHttpException::class:
-                    return $response->setStatusCode(Response::HTTP_UNAUTHORIZED);
-                case NotActivatedException::class:
-                    return $response->setStatusCode(Response::HTTP_FORBIDDEN);
-                case NotFoundHttpException::class:
-                    return $response->setStatusCode(Response::HTTP_NOT_FOUND);
                 default:
                     $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
                     if (!empty($statusCode)) {

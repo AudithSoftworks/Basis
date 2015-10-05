@@ -54,7 +54,7 @@ class AuthenticationTest extends IlluminateTestCase
     {
         $this->get('/users/create', self::$requestHeaders);
         $this->shouldReturnJson();
-        $this->seeStatusCode(500);
+        $this->seeStatusCode(405);
         $this->seeJson(['exception' => NotImplementedException::class]);
     }
 
@@ -424,7 +424,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->get('/activation/process/wrong-token', self::$requestHeaders);
         $this->shouldReturnJson();
         $this->see('message');
-        $this->seeStatusCode(500);
+        $this->seeStatusCode(405);
         $this->seeJson(['exception' => NotImplementedException::class]);
         $this->assertFalse(app('sentinel.activations')->completed(app('sentinel')->getUserRepository()->findById(1)));
     }
