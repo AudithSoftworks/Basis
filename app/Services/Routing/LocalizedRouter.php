@@ -136,11 +136,17 @@ class LocalizedRouter extends Router
             }
         }
         foreach ($localizedUriTranslationBitParts as $level => &$translationBitPart) {
-            $translationBitPart = app('translator')->get($translationBitPart);
-            if (false !== strpos($translationBitPart, '.')) {
-                $translationBitPart = $uriExploded[$level];
+            $phraseToGetTranslationFor = $translationBitPart;
+            if (preg_match('#(?<!routes)\.\{[^\}]+\}\.#', $translationBitPart)) { // For lower-level paths, in order not to hit 'routes.' index.
+                $phraseToGetTranslationFor = preg_replace('#\{[^\}]+\}\.?#', '', $translationBitPart);
             }
-            unset($translationBitPart);
+            $translatedPhrase = app('translator')->get($phraseToGetTranslationFor);
+            if (false !== strpos($translatedPhrase, '.')) {
+                $translationBitPart = $uriExploded[$level];
+            } else {
+                $translationBitPart = $translatedPhrase;
+            }
+            unset($translationBitPart); // Delete the reference (won't delete the original).
         }
 
         return implode('/', $localizedUriTranslationBitParts);

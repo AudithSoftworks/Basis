@@ -45,11 +45,11 @@ class LocalizedRoutesTest extends IlluminateTestCase
 
         $this->click(trans('auth.buttons.login'));
         $this->seeStatusCode(200);
-        $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.login')));
+        $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.login.')));
 
         $this->click(trans('auth.buttons.register'));
         $this->seeStatusCode(200);
-        $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register')));
+        $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register.')));
 
         $this->click(trans('auth.buttons.password'));
         $this->seeStatusCode(200);

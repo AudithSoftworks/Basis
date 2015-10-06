@@ -90,15 +90,15 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function localizedRoutes(Router $router, $prefix)
     {
-        $router->get(trans('routes.login') . '/{provider?}', ['uses' => 'Users\AuthController@getLogin', 'as' => $prefix . '.login']);
-        $router->post(trans('routes.login') . '/{provider?}', 'Users\AuthController@postLogin');
-        $router->get(trans('routes.logout'), ['uses' => 'Users\AuthController@getLogout', 'as' => $prefix . '.logout']);
-        $router->get(trans('routes.register'), ['uses' => 'UsersController@create', 'as' => $prefix . '.register']);
-        $router->post(trans('routes.register'), 'UsersController@store');
+        $router->get('login/{provider?}', ['uses' => 'Users\AuthController@getLogin', 'as' => $prefix . '.login']);
+        $router->post('login/{provider?}', 'Users\AuthController@postLogin');
+        $router->get('logout', ['uses' => 'Users\AuthController@getLogout', 'as' => $prefix . '.logout']);
+        $router->get('register', ['uses' => 'UsersController@create', 'as' => $prefix . '.register']);
+        $router->post('register', 'UsersController@store');
 
         $router->resource('users', 'UsersController');
         $router->controller('password', 'Users\PasswordController');
-        $router->controller(trans('routes.activation.'), 'Users\ActivationController');
+        $router->controller('activation', 'Users\ActivationController');
 
         $router->resource('files', 'FilesController');
 

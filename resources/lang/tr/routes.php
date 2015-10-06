@@ -17,9 +17,15 @@ return [
     'files' => [
         '' => 'dosya'
     ],
-    'login' => 'giriş',
-    'logout' => 'çıkış',
-    'register' => 'kaydol',
+    'login' => [
+        '' => 'giriş'
+    ],
+    'logout' => [
+        '' => 'çıkış'
+    ],
+    'register' => [
+        '' => 'kaydol'
+    ],
     'activation' => [
         '' => 'aktivasyon',
         'code' => 'iste',
