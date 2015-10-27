@@ -11,10 +11,8 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        Eloquent::unguard();
-
-        $this->call('NestedEntitiesTableSeeder');
-
-        Eloquent::reguard();
+        Eloquent::unguarded(function () {
+            $this->call(NestedEntitiesTableSeeder::class);
+        });
     }
 }
