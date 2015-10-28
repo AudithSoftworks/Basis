@@ -25,6 +25,8 @@ RUN apt-get update -y \
         openjdk-7-jre \
         ruby \
         ruby-dev \
+        wget \
+        telnet \
     && docker-php-ext-install \
         bcmath \
         exif \
