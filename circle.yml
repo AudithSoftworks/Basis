@@ -59,8 +59,7 @@ dependencies:
     - if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 1 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_hhvmAsCli_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForHhvm_1) basis.audith.org | tee -a /etc/hosts"; fi
 
     # dotEnv file for initial test setup
-    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
-      && cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
+    - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
 
     # Build project dependencies
     - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php55_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
