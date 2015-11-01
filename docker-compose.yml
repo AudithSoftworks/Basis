@@ -34,6 +34,8 @@ phpFpm55:
     - postgres93
     - postgres94
     - redis
+  environment:
+    XDEBUG_CONFIG: remote_host=192.168.1.33
 phpFpm56:
   image: audithsoftworks/basis:php_5.6-fpm
   volumes:
@@ -47,6 +49,8 @@ phpFpm56:
     - postgres93
     - postgres94
     - redis
+  environment:
+    XDEBUG_CONFIG: remote_host=192.168.1.33
 hhvmAsFpm:
   image: audithsoftworks/basis:hhvm
   volumes:
@@ -98,6 +102,8 @@ php55:
     - postgres94
     - redis
     - nginxForPhpFpm55
+  environment:
+    XDEBUG_CONFIG: remote_host=192.168.1.33
   stdin_open: true
 php56:
   image: audithsoftworks/basis:php_5.6
@@ -113,6 +119,8 @@ php56:
     - postgres94
     - redis
     - nginxForPhpFpm56
+  environment:
+    XDEBUG_CONFIG: remote_host=192.168.1.33
   stdin_open: true
 hhvmAsCli:
   image: audithsoftworks/basis:hhvm

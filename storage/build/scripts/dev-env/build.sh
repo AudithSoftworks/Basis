@@ -8,7 +8,8 @@
 #docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .;
 
 docker-compose -f docker-compose-php56.yml pull;
-docker-compose -f docker-compose-php56.yml up -d && docker-compose ps;
+docker-compose -f docker-compose-php56.yml up -d;
+docker-compose -f docker-compose-php56.yml ps;
 docker exec basis_php56_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm56_1) basis.audith.org | tee -a /etc/hosts";
 
 sleep 5;

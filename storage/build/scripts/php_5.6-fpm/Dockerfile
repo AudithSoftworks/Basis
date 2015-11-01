@@ -41,6 +41,10 @@ RUN pecl install -o -f redis xdebug \
     && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini \
     && echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.idekey = basisPhpFpm56" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo no | pecl install -o -f mongo \
     && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
 
@@ -49,3 +53,5 @@ RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+
+EXPOSE 54321

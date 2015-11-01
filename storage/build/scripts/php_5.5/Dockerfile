@@ -43,14 +43,6 @@ RUN apt-get update -y \
         xsl \
         zip
 
-RUN pecl install -o -f redis xdebug \
-    && rm -rf /tmp/pear \
-    && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini \
-    && echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20121212/xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo no | pecl install -o -f mongo \
-    && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
-
 # Locale
 RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
@@ -91,3 +83,17 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
 RUN npm install -g bower gulp ttf2eot
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
+
+RUN pecl install -o -f redis xdebug \
+    && rm -rf /tmp/pear \
+    && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini \
+    && echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.idekey = basisPhp55" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo no | pecl install -o -f mongo \
+    && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
+
+EXPOSE 54321

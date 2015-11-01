@@ -2,7 +2,6 @@
 
 use App\Contracts\Registrar;
 use App\Exceptions\Common\NotImplementedException;
-use App\Exceptions\Users\PasswordNotValidException;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -81,11 +80,10 @@ class UsersController extends Controller
          */
         $user = $this->registrar->get($id);
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Found', 'data' => $user->toJson()];
+            return ['message' => 'Found', 'data' => $user->toArray()];
         }
 
-        // TODO Create appropriate Views for non-JSON requests
-        return;
+        return ['message' => 'Found', 'data' => $user->toArray()]; // @todo Create appropriate Views for non-JSON requests
     }
 
     /**
@@ -100,7 +98,7 @@ class UsersController extends Controller
         /** @var \App\Models\User $user */
         $user = $this->registrar->get($id);
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Ready', 'data' => $user->toJson()];
+            return ['message' => 'Ready', 'data' => $user->toArray()];
         }
 
         return view('auth/edit', ['user' => $user]);

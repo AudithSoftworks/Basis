@@ -16,6 +16,8 @@ phpFpm55:
     - mysql56
     - postgres94
     - redis
+  environment:
+    XDEBUG_CONFIG: remote_host=192.168.1.33
 nginxForPhpFpm55:
   image: audithsoftworks/basis:nginx
   volumes:
@@ -34,4 +36,6 @@ php55:
     - postgres94
     - redis
     - nginxForPhpFpm55
+  environment:
+    XDEBUG_CONFIG: remote_host=192.168.1.33
   stdin_open: true

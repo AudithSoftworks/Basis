@@ -39,7 +39,7 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \Exception               $e
+     * @param  \Exception $e
      *
      * @return \Illuminate\Http\Response
      */
@@ -49,48 +49,50 @@ class Handler extends ExceptionHandler
             $e = new NotFoundHttpException($e->getMessage(), $e);
         }
 
+        //---------------------------------------------------------------------------------------
+        // Since we have custom ValidationException class, only validation-related exceptions
+        // should be listed here. Laravel handles exceptions correctly, status-code wise.
+        //---------------------------------------------------------------------------------------
+
         if ($request->ajax() || $request->wantsJson()) {
             $exceptionClass = get_class($e);
-
-            //---------------------------------------------------------------------------------------
-            // Since we have custom ValidationException class, only validation-related exceptions
-            // should be listed here. Laravel handles exceptions correctly, status-code wise.
-            //---------------------------------------------------------------------------------------
-
-            $response = response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()]);
+            $response = response(['exception' => $exceptionClass, 'message' => $e->getMessage()]);
             switch ($exceptionClass) {
                 case UnauthorizedHttpException::class:
-                    return $response->setStatusCode(Response::HTTP_UNAUTHORIZED);
+                    $statusCode = Response::HTTP_UNAUTHORIZED;
+                    break;
                 case NotActivatedException::class:
-                    return $response->setStatusCode(Response::HTTP_FORBIDDEN);
+                    $statusCode = Response::HTTP_FORBIDDEN;
+                    break;
                 case NotFoundHttpException::class:
-                    return $response->setStatusCode(Response::HTTP_NOT_FOUND);
+                    $statusCode = Response::HTTP_NOT_FOUND;
+                    break;
                 case Common\NotImplementedException::class:
-                    return $response->setStatusCode(Response::HTTP_METHOD_NOT_ALLOWED);
+                    $statusCode = Response::HTTP_METHOD_NOT_ALLOWED;
+                    break;
                 case Common\ValidationException::class:
                 case Users\LoginNotValidException::class:
                 case Users\PasswordNotValidException::class:
                 case Users\TokenNotValidException::class:
                 case HttpResponseException::class:
                 case TokenMismatchException::class:
-                    return $response->setStatusCode(Response::HTTP_UNPROCESSABLE_ENTITY);
+                    $statusCode = Response::HTTP_UNPROCESSABLE_ENTITY;
+                    break;
                 default:
                     $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
-                    if (!empty($statusCode)) {
-                        $response->setStatusCode($statusCode);
-                    } else {
-                        $response->setStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-                    }
-
-                    return $response;
+                    break;
             }
+            if (empty($statusCode)) {
+                $statusCode = Response::HTTP_INTERNAL_SERVER_ERROR;
+            }
+
+            return $response->setStatusCode($statusCode);
         }
 
-        $redirect = redirect()->back();
-        if ($redirect->getTargetUrl() === config('app.url') || false === strpos($redirect->getTargetUrl(), config('app.url'))) {
-            $redirect = redirect()->refresh();
+        if ($request->method() != 'GET' && $request->header('content-type') == 'application/x-www-form-urlencoded') {
+            return redirect()->back()->withInput($request->all())->withErrors($e->getMessage());
         }
 
-        return $redirect->withInput($request->all())->withErrors($e->getMessage());
+        return parent::render($request, $e);
     }
 }
