@@ -25,18 +25,18 @@
         "ext-mbstring": "*",
         "ext-mcrypt": "*",
         "ext-openssl": "*",
-        "barryvdh/laravel-ide-helper": "~2.0",
-        "cartalyst/sentinel": "2.0.*",
+        "barryvdh/laravel-ide-helper": "~2.1",
+        "cartalyst/sentinel": "~2.0",
         "laravel/framework": "~5.1",
         "laravel/socialite": "~2.0",
         "predis/predis": "~1.0",
-        "rcrowe/twigbridge": "~0.7"
+        "rcrowe/twigbridge": "0.8.1"
     },
     "require-dev": {
         "doctrine/dbal": "~2.5",
-        "fzaninotto/faker": ">=1.5",
+        "fzaninotto/faker": "~1.5",
         "phpspec/phpspec": "~2.1",
-        "phpunit/phpunit": "~4",
+        "phpunit/phpunit": "~5",
         "sauce/sausage": ">=0.17"
     },
     "autoload": {
