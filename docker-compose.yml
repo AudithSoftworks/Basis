@@ -21,21 +21,6 @@ postgres94:
   image: postgres:9.4
 redis:
   image: redis
-phpFpm55:
-  image: audithsoftworks/basis:php_5.5-fpm
-  volumes:
-    - .:/home/basis
-  working_dir: /home/basis
-  links:
-    - mysql55
-    - mysql56
-    - mysql57
-    - postgres92
-    - postgres93
-    - postgres94
-    - redis
-  environment:
-    XDEBUG_CONFIG: remote_host=192.168.1.33
 phpFpm56:
   image: audithsoftworks/basis:php_5.6-fpm
   volumes:
@@ -64,14 +49,6 @@ hhvmAsFpm:
     - postgres93
     - postgres94
     - redis
-nginxForPhpFpm55:
-  image: audithsoftworks/basis:nginx
-  volumes:
-    - ./storage/build/configs/nginxForPhpFpm55.conf:/etc/nginx/conf.d/default.conf:ro
-    - .:/home/basis
-  working_dir: /home/basis
-  links:
-    - phpFpm55
 nginxForPhpFpm56:
   image: audithsoftworks/basis:nginx
   volumes:
@@ -88,23 +65,6 @@ nginxForHhvm:
   working_dir: /home/basis
   links:
     - hhvmAsFpm
-php55:
-  image: audithsoftworks/basis:php_5.5
-  volumes:
-    - .:/home/basis
-  working_dir: /home/basis
-  links:
-    - mysql55
-    - mysql56
-    - mysql57
-    - postgres92
-    - postgres93
-    - postgres94
-    - redis
-    - nginxForPhpFpm55
-  environment:
-    XDEBUG_CONFIG: remote_host=192.168.1.33
-  stdin_open: true
 php56:
   image: audithsoftworks/basis:php_5.6
   volumes:
