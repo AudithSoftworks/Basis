@@ -5,7 +5,6 @@ use App\Exceptions\Users\TokenNotValidException;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PasswordController extends Controller
 {
@@ -26,7 +25,7 @@ class PasswordController extends Controller
     /**
      * Create a new password controller instance.
      *
-     * @param  Registrar                                 $registrar
+     * @param  Registrar $registrar
      */
     public function __construct(Registrar $registrar)
     {
@@ -39,12 +38,12 @@ class PasswordController extends Controller
     /**
      * Display the form to request a password reset link.
      *
-     * @return \Response
+     * @return \Illuminate\Http\Response|\Illuminate\View\View
      */
     public function getEmail()
     {
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return [];
+            return response([]);
         }
 
         return view('password/email');
@@ -53,14 +52,14 @@ class PasswordController extends Controller
     /**
      * Send a reset link to the given user.
      *
-     * @return \Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function postEmail()
     {
         $this->registrar->sendResetPasswordLinkViaEmail();
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Password reset request received'];
+            return response(['message' => 'Password reset request received']);
         }
 
         return redirect()->back()->with('message', trans('passwords.sent'));
@@ -71,9 +70,8 @@ class PasswordController extends Controller
      *
      * @param  string $token
      *
-     * @return \Response
-     *
-     * @throws NotFoundHttpException
+     * @return \Illuminate\Http\Response
+     * @throws \App\Exceptions\Users\TokenNotValidException
      */
     public function getReset($token = null)
     {
@@ -86,7 +84,7 @@ class PasswordController extends Controller
         }
 
         if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['token' => $token];
+            return response(['token' => $token]);
         }
 
         return view('password/reset')->with('token', $token);
@@ -95,7 +93,7 @@ class PasswordController extends Controller
     /**
      * Reset the given user's password.
      *
-     * @return \Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function postReset()
     {
