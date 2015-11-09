@@ -91,7 +91,7 @@ class AuthenticationTest extends IlluminateTestCase
         $credentials = ['email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'];
         $this->post('/users', $credentials, self::$requestHeaders);
         $this->shouldReturnJson();
-        $this->seeStatusCode(200);
+        $this->seeStatusCode(201);
         $this->seeJson(['message' => 'Created']);
         $this->seeInDatabase('users', ['email' => $credentials['email']]);
     }
@@ -228,7 +228,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->post('/password/email', $userData, self::$requestHeaders);
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
-        $this->seeJson(['message' => 'Password reset request received']);
+        $this->seeJson(['message' => trans('passwords.sent')]);
     }
 
     /**
@@ -326,7 +326,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->post('/password/reset', $userData, self::$requestHeaders);
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
-        $this->seeJson(['message' => 'Password successfully reset']);
+        $this->seeJson(['message' => trans('passwords.reset')]);
     }
 
     /**

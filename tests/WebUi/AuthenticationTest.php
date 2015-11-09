@@ -208,15 +208,13 @@ class AuthenticationTest extends IlluminateTestCase
     public function testLogout()
     {
         app('sentinel')->login(app('sentinel')->getUserRepository()->findById(1));
-        $this->visit('/login');
-        $this->seeStatusCode(200);
-        $this->seePageIs(''); // Since we are authenticated, we are redirected to /
-        $this->see('<h2><b>Welcome</b>, John Doe!</h2>');
 
-        $this->click('Log out');
+        $this->visit('/logout');
         $this->seeStatusCode(200);
         $this->seePageIs('');
         $this->see('<h2><b>Welcome</b>!</h2>');
+
+        $this->assertTrue(app('sentinel')->guest());
     }
 
     /**

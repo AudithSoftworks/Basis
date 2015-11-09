@@ -1,6 +1,6 @@
 <?php namespace App\Http\Middleware;
 
-use Illuminate\Contracts\Auth\Guard;
+use App\Exceptions\Users\UserAlreadyLoggedInException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
@@ -16,8 +16,12 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, \Closure $next)
     {
-        if (!\Sentinel::guest()) {
-            return new RedirectResponse(url('/'));
+        if (!app('sentinel')->guest()) {
+            if ($request->ajax() || $request->wantsJson()) {
+                throw new UserAlreadyLoggedInException;
+            }
+
+            return abort(500, 'You already have logged in');
         }
 
         return $next($request);

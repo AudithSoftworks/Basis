@@ -2,48 +2,28 @@
 
 use App\Contracts\Registrar;
 use App\Exceptions\Common\NotImplementedException;
-use App\Models\User;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class UsersController extends Controller
 {
-
-    /**
-     * The registrar implementation.
-     *
-     * @var Registrar
-     */
-    protected $registrar;
-
-    /**
-     * Request instance.
-     *
-     * @var Request
-     */
-    protected $request;
-
     /**
      * Create a new authentication controller instance.
-     *
-     * @param  Registrar $registrar
      */
-    public function __construct(Registrar $registrar)
+    public function __construct()
     {
-        $this->registrar = $registrar;
-        $this->request = \Route::getCurrentRequest();
-
         $this->middleware('guest', ['except' => ['show', 'edit', 'update', 'destroy']]);
     }
 
     /**
      * Show the form for creating a new resource.
      *
-     * @return array
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function create()
+    public function create(Request $request)
     {
-        if ($this->request->ajax() || $this->request->wantsJson()) {
+        if ($request->ajax() || $request->wantsJson()) {
             throw new NotImplementedException;
         }
 
@@ -51,93 +31,94 @@ class UsersController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Store a newly created user.
      *
-     * @return array
+     * @param \Illuminate\Http\Request $request *
+     * @param \App\Contracts\Registrar $registrar
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
-    public function store()
+    public function store(Request $request, Registrar $registrar)
     {
-        $this->registrar->register();
+        $user = $registrar->register();
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Created'];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => 'Created', 'data' => $user])->setStatusCode(\Illuminate\Http\Response::HTTP_CREATED);
         }
 
         return redirect($this->redirectPath())->with('message', 'Created');
     }
 
     /**
-     * Display the specified resource.
+     * Display the specified user information.
      *
-     * @param  int $id
+     * @param \App\Contracts\Registrar $registrar
+     * @param int                      $id
      *
-     * @return array
+     * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Registrar $registrar, $id)
     {
-        /**
-         * @var User $user
-         */
-        $user = $this->registrar->get($id);
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Found', 'data' => $user->toArray()];
-        }
+        $user = $registrar->get($id);
 
-        return ['message' => 'Found', 'data' => $user->toArray()]; // @todo Create appropriate Views for non-JSON requests
+        return response()->json(['message' => 'Found', 'data' => $user]);
     }
 
     /**
-     * Show the form for editing the specified resource.
+     * Show the form for editing user information.
      *
-     * @param  int $id
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Contracts\Registrar $registrar
+     * @param int                      $id
      *
-     * @return \Response
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function edit($id)
+    public function edit(Request $request, Registrar $registrar, $id)
     {
         /** @var \App\Models\User $user */
-        $user = $this->registrar->get($id);
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Ready', 'data' => $user->toArray()];
+        $user = $registrar->get($id);
+
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => 'Ready', 'data' => $user]);
         }
 
         return view('auth/edit', ['user' => $user]);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update the specified user information.
      *
-     * @param int     $id
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Contracts\Registrar $registrar
+     * @param int                      $id
      *
-     * @return \Response
-     *
-     * @throws NotFoundHttpException
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
-    public function update($id)
+    public function update(Request $request, Registrar $registrar, $id)
     {
-        $this->registrar->update($id);
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Updated'];
+        $registrar->update($id);
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => 'Updated']);
         }
 
         return redirect()->back()->with('message', 'Updated');
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove the specified user record from storage.
      *
-     * @param int $id
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Contracts\Registrar $registrar
+     * @param int                      $id
      *
-     * @return array
-     *
-     * @throws \App\Exceptions\Users\PasswordNotValidException
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $request, Registrar $registrar, $id)
     {
-        $this->registrar->delete($id);
+        $registrar->delete($id);
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Deleted'];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => 'Deleted']);
         }
 
         return redirect($this->redirectPath())->with('message', 'Deleted');

@@ -11,40 +11,22 @@ use Illuminate\Http\Request;
 class ActivationController extends Controller
 {
     /**
-     * The registrar implementation.
-     *
-     * @var Registrar
-     */
-    protected $registrar;
-
-    /**
-     * Request instance.
-     *
-     * @var Request
-     */
-    protected $request;
-
-    /**
      * Create a new authentication controller instance.
-     *
-     * @param  Registrar $registrar
      */
-    public function __construct(Registrar $registrar)
+    public function __construct()
     {
-        $this->registrar = $registrar;
-        $this->request = app('router')->getCurrentRequest();
-
         $this->middleware('auth', ['only' => ['getCode']]);
     }
 
     /**
      * Request account activation link via email.
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      * @throws \App\Exceptions\Users\UserAlreadyActivatedException
-     * @throws \App\Exceptions\Users\UserNotFoundException
      */
-    public function getCode()
+    public function getCode(Request $request)
     {
         if (!($user = app('sentinel')->getUser())) {
             throw new UserNotFoundException;
@@ -56,8 +38,8 @@ class ActivationController extends Controller
 
         app('events')->fire(new RequestedActivationLink($user));
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Activation link sent'];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => 'Activation link sent']);
         }
 
         return redirect()->back()->with('message', 'Activation link sent');
@@ -66,17 +48,19 @@ class ActivationController extends Controller
     /**
      * Activate an account [Web only].
      *
-     * @param string $token
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Contracts\Registrar $registrar
+     * @param string                   $token
      *
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
-    public function getProcess($token)
+    public function getProcess(Request $request, Registrar $registrar, $token)
     {
-        if ($this->request->ajax() || $this->request->wantsJson()) {
+        if ($request->ajax() || $request->wantsJson()) {
             throw new NotImplementedException;
         }
 
-        $this->registrar->activate($token);
+        $registrar->activate($token);
 
         return redirect($this->redirectPath())->with('message', 'Activation successful');
     }
@@ -84,15 +68,18 @@ class ActivationController extends Controller
     /**
      * Activate an account [JSON-API only].
      *
+     * @param \Illuminate\Http\Request $request     *
+     * @param \App\Contracts\Registrar $registrar
+     *
      * @return array
      */
-    public function postProcess()
+    public function postProcess(Request $request, Registrar $registrar)
     {
-        if (!$this->request->ajax() && !$this->request->wantsJson()) {
+        if (!$request->ajax() && !$request->wantsJson()) {
             throw new NotImplementedException;
         }
 
-        $this->registrar->activate();
+        $registrar->activate();
 
         return ['message' => 'Activated'];
     }
