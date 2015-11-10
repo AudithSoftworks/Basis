@@ -31,7 +31,7 @@ class AuthController extends Controller
      * @param \Laravel\Socialite\Contracts\Factory $socialite
      * @param string                               $provider
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function getOAuth(Request $request, Registrar $registrar, SocialiteContract $socialite, $provider)
     {
@@ -73,7 +73,7 @@ class AuthController extends Controller
      * @param \Laravel\Socialite\Contracts\Factory $socialite
      * @param string                               $provider
      *
-     * @return \Illuminate\Http\Response|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
     public function getLogin(Request $request, SocialiteContract $socialite, $provider = null)
     {
@@ -94,7 +94,7 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param \App\Contracts\Registrar $registrar
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function postLogin(Request $request, Registrar $registrar)
     {
@@ -113,7 +113,7 @@ class AuthController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param \App\Contracts\Registrar $registrar
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function getLogout(Request $request, Registrar $registrar)
     {

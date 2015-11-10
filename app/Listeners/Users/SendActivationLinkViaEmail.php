@@ -6,7 +6,7 @@ class SendActivationLinkViaEmail
 {
     public function handle($event) // Don't type-hint: this listener can be triggered by different events.
     {
-        /** @var \App\Models\User|\Cartalyst\Sentinel\Users\UserInterface $user */
+        /** @var \App\Models\User $user */
         $user = $event->user;
         if (false === ($activation = app('sentinel.activations')->exists($user))) {
             $activation = app('sentinel.activations')->create($event->user);

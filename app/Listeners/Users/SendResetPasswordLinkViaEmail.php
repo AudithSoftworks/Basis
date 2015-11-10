@@ -7,7 +7,7 @@ class SendResetPasswordLinkViaEmail
 {
     public function handle(RequestedResetPasswordLink $event)
     {
-        /** @var \App\Models\User|\Cartalyst\Sentinel\Users\UserInterface $user */
+        /** @var \App\Models\User $user */
         $user = $event->user;
         $reminder = app('sentinel.reminders')->create($event->user);
         $token = $reminder->code;

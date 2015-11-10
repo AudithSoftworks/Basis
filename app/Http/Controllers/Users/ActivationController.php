@@ -23,7 +23,7 @@ class ActivationController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      * @throws \App\Exceptions\Users\UserAlreadyActivatedException
      */
     public function getCode(Request $request)
@@ -68,10 +68,10 @@ class ActivationController extends Controller
     /**
      * Activate an account [JSON-API only].
      *
-     * @param \Illuminate\Http\Request $request     *
+     * @param \Illuminate\Http\Request $request *
      * @param \App\Contracts\Registrar $registrar
      *
-     * @return array
+     * @return \Illuminate\Http\JsonResponse
      */
     public function postProcess(Request $request, Registrar $registrar)
     {
@@ -81,7 +81,7 @@ class ActivationController extends Controller
 
         $registrar->activate();
 
-        return ['message' => 'Activated'];
+        return response()->json(['message' => 'Activated']);
     }
 
     /**

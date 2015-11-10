@@ -21,7 +21,7 @@ class PasswordController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      *
-     * @return \Illuminate\Http\Response|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
     public function getEmail(Request $request)
     {
@@ -38,7 +38,7 @@ class PasswordController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param \App\Contracts\Registrar $registrar
      *
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function postEmail(Request $request, Registrar $registrar)
     {
@@ -57,7 +57,7 @@ class PasswordController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param string                   $token
      *
-     * @return \Illuminate\Http\Response|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
     public function getReset(Request $request, $token = null)
     {
@@ -82,7 +82,7 @@ class PasswordController extends Controller
      * @param \Illuminate\Http\Request $request
      * @param \App\Contracts\Registrar $registrar
      *
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
     public function postReset(Request $request, Registrar $registrar)
     {

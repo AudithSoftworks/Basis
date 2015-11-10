@@ -36,7 +36,7 @@ class UsersController extends Controller
      * @param \Illuminate\Http\Request $request *
      * @param \App\Contracts\Registrar $registrar
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function store(Request $request, Registrar $registrar)
     {
@@ -55,7 +55,7 @@ class UsersController extends Controller
      * @param \App\Contracts\Registrar $registrar
      * @param int                      $id
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function show(Registrar $registrar, $id)
     {
@@ -71,7 +71,7 @@ class UsersController extends Controller
      * @param \App\Contracts\Registrar $registrar
      * @param int                      $id
      *
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\Response|\Illuminate\View\View
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\JsonResponse|\Illuminate\View\View
      */
     public function edit(Request $request, Registrar $registrar, $id)
     {
@@ -92,7 +92,7 @@ class UsersController extends Controller
      * @param \App\Contracts\Registrar $registrar
      * @param int                      $id
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function update(Request $request, Registrar $registrar, $id)
     {
@@ -111,7 +111,7 @@ class UsersController extends Controller
      * @param \App\Contracts\Registrar $registrar
      * @param int                      $id
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      */
     public function destroy(Request $request, Registrar $registrar, $id)
     {

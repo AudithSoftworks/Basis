@@ -7,14 +7,21 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * App\Models\User
  *
  * @mixin \Eloquent
- *
- * @property integer        $id
- * @property string         $name
- * @property string         $email
- * @property string         $password
- * @property \Carbon\Carbon $created_at
- * @property \Carbon\Carbon $updated_at
- * @property \Carbon\Carbon $deleted_at
+ * @property integer                                                     $id
+ * @property string                                                      $name
+ * @property string                                                      $email
+ * @property string                                                      $password
+ * @property string                                                      $permissions
+ * @property string                                                      $last_login
+ * @property \Carbon\Carbon                                              $created_at
+ * @property \Carbon\Carbon                                              $updated_at
+ * @property \Carbon\Carbon                                              $deleted_at
+ * @property-read \App\Models\UserOAuth[]                                $linkedAccounts
+ * @property-read \Cartalyst\Sentinel\Roles\EloquentRole[]               $roles
+ * @property-read \Cartalyst\Sentinel\Persistences\EloquentPersistence[] $persistences
+ * @property-read \Cartalyst\Sentinel\Activations\EloquentActivation[]   $activations
+ * @property-read \Cartalyst\Sentinel\Reminders\EloquentReminder[]       $reminders
+ * @property-read \Cartalyst\Sentinel\Throttling\EloquentThrottle[]      $throttle
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereEmail($value)
@@ -22,14 +29,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereDeletedAt($value)
- * @property-read \Illuminate\Database\Eloquent\Collection|\App\Models\UserOAuth[] $linkedAccounts
- * @property string $permissions
- * @property string $last_login
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$rolesModel[] $roles
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$persistencesModel[] $persistences
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$activationsModel[] $activations
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$remindersModel[] $reminders
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$throttlingModel[] $throttle
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User wherePermissions($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLastLogin($value)
  */

@@ -32,10 +32,6 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->bind(\App\Contracts\Registrar::class, \App\Services\Registrar::class);
-
-        $this->app->singleton(\App\Contracts\File::class, function ($app) {
-            return new File($app['config']['file']);
-        });
     }
 
     /**
@@ -46,8 +42,7 @@ class AppServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            \App\Contracts\Registrar::class,
-            \App\Contracts\File::class
+            \App\Contracts\Registrar::class
         ];
     }
 }

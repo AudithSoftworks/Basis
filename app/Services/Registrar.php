@@ -327,7 +327,7 @@ class Registrar implements RegistrarContract
      * @param string        $provider
      * @param User          $ownerAccount
      *
-     * @return Authenticatable|bool
+     * @return \App\Models\User|bool
      */
     private function linkOAuthAccount(SocialiteUser $oauthUserData, $provider, $ownerAccount)
     {

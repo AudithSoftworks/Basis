@@ -23,10 +23,10 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function boot(Router $router)
     {
-        $router->patterns(
-            ['provider' => 'twitter|google|facebook'],
-            ['token' => '[a-zA-Z0-9]+']
-        );
+        $router->patterns([
+            'provider' => 'twitter|google|facebook',
+            'token' => '[a-zA-Z0-9]+'
+        ]);
 
         parent::boot($router);
     }
