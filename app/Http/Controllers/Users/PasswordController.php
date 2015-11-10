@@ -5,62 +5,47 @@ use App\Exceptions\Users\TokenNotValidException;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Auth\PasswordBroker;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class PasswordController extends Controller
 {
     /**
-     * Registrar service instance.
-     *
-     * @var Registrar
-     */
-    protected $registrar;
-
-    /**
-     * Request instance.
-     *
-     * @var Request
-     */
-    protected $request;
-
-    /**
      * Create a new password controller instance.
-     *
-     * @param  Registrar                                 $registrar
      */
-    public function __construct(Registrar $registrar)
+    public function __construct()
     {
-        $this->registrar = $registrar;
-        $this->request = app('router')->getCurrentRequest();
-
         $this->middleware('guest');
     }
 
     /**
      * Display the form to request a password reset link.
      *
-     * @return \Response
+     * @param \Illuminate\Http\Request $request
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function getEmail()
+    public function getEmail(Request $request)
     {
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return [];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json([]);
         }
 
         return view('password/email');
     }
 
     /**
-     * Send a reset link to the given user.
+     * Send a password reset link to the given email's owner, via email.
      *
-     * @return \Response
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Contracts\Registrar $registrar
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function postEmail()
+    public function postEmail(Request $request, Registrar $registrar)
     {
-        $this->registrar->sendResetPasswordLinkViaEmail();
+        $registrar->sendResetPasswordLinkViaEmail();
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Password reset request received'];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => trans('passwords.sent')]);
         }
 
         return redirect()->back()->with('message', trans('passwords.sent'));
@@ -69,40 +54,42 @@ class PasswordController extends Controller
     /**
      * Display the password reset view for the given token.
      *
-     * @param  string $token
+     * @param \Illuminate\Http\Request $request
+     * @param string                   $token
      *
-     * @return \Response
-     *
-     * @throws NotFoundHttpException
+     * @return \Illuminate\Http\Response|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function getReset($token = null)
+    public function getReset(Request $request, $token = null)
     {
         if (is_null($token)) {
-            if ($this->request->ajax() || $this->request->wantsJson()) {
+            if ($request->ajax() || $request->wantsJson()) {
                 throw new TokenNotValidException();
             }
 
             return view('password/reset')->withErrors(['token' => trans(PasswordBroker::INVALID_TOKEN)]);
         }
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['token' => $token];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['token' => $token]);
         }
 
         return view('password/reset')->with('token', $token);
     }
 
     /**
-     * Reset the given user's password.
+     * Reset the password through password-reset-token and email provided.
      *
-     * @return \Response
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Contracts\Registrar $registrar
+     *
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
-    public function postReset()
+    public function postReset(Request $request, Registrar $registrar)
     {
-        $this->registrar->resetPassword();
+        $registrar->resetPassword();
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Password successfully reset'];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => trans('passwords.reset')]);
         }
 
         return redirect($this->redirectPath())->with('message', trans('passwords.reset'));

@@ -3,55 +3,20 @@
 use App\Contracts\Registrar;
 use App\Exceptions\Users\LoginNotValidException;
 use App\Http\Controllers\Controller;
-use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Http\Request;
 use Laravel\Socialite\Contracts\Factory as SocialiteContract;
 use Laravel\Socialite\AbstractUser as SocialiteUser;
 
 class AuthController extends Controller
 {
-    /**
-     * The Guard implementation.
-     *
-     * @var Guard
-     */
-    protected $auth;
-
-    /**
-     * The registrar implementation.
-     *
-     * @var Registrar
-     */
-    protected $registrar;
-
-    /**
-     * @var SocialiteContract
-     */
-    protected $socialite;
-
-    /**
-     * Request instance.
-     *
-     * @var Request
-     */
-    protected $request;
-
-    protected $redirectTo = '/';
+    private $redirectTo;
 
     /**
      * Create a new authentication controller instance.
-     *
-     * @param  Guard             $auth
-     * @param  Registrar         $registrar
-     * @param  SocialiteContract $socialite
      */
-    public function __construct(Guard $auth, Registrar $registrar, SocialiteContract $socialite)
+    public function __construct()
     {
-        $this->auth = $auth;
-        $this->registrar = $registrar;
-        $this->request = \Route::getCurrentRequest();
-        $this->socialite = $socialite;
-        if (!empty($locale = \Lang::getLocale()) && $locale != \Config::get('app.locale')) {
+        if (!empty($locale = app('translator')->getLocale()) && $locale != app('config')->get('app.locale')) {
             $this->redirectTo = '/' . $locale . $this->redirectTo;
         }
 
@@ -61,37 +26,40 @@ class AuthController extends Controller
     /**
      * Handle OAuth login.
      *
-     * @param string $provider
+     * @param \Illuminate\Http\Request             $request
+     * @param \App\Contracts\Registrar             $registrar
+     * @param \Laravel\Socialite\Contracts\Factory $socialite
+     * @param string                               $provider
      *
-     * @return \Illuminate\Routing\Redirector|\Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
-    public function getOAuth($provider)
+    public function getOAuth(Request $request, Registrar $registrar, SocialiteContract $socialite, $provider)
     {
         switch ($provider) {
             case 'google':
             case 'facebook':
-                if (!$this->request->exists('code')) {
+                if (!$request->exists('code')) {
                     return redirect('/login')->withErrors(trans('passwords.oauth_failed'));
                 }
                 break;
             case 'twitter':
-                if (!$this->request->exists('oauth_token') || !$this->request->exists('oauth_verifier')) {
+                if (!$request->exists('oauth_token') || !$request->exists('oauth_verifier')) {
                     return redirect('/login')->withErrors(trans('passwords.oauth_failed'));
                 }
                 break;
         }
 
         /** @var SocialiteUser $userInfo */
-        $userInfo = $this->socialite->driver($provider)->user();
-        if ($this->registrar->loginViaOAuth($userInfo, $provider)) {
-            if ($this->request->ajax() || $this->request->wantsJson()) {
-                return ['message' => 'Login successful']; // TODO: Move to API app (Lumen based?)
+        $userInfo = $socialite->driver($provider)->user();
+        if ($registrar->loginViaOAuth($userInfo, $provider)) {
+            if ($request->ajax() || $request->wantsJson()) {
+                return response()->json(['message' => 'Login successful']); // TODO: Move to API app (Lumen based?)
             }
 
             return redirect()->intended($this->redirectPath());
         }
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
+        if ($request->ajax() || $request->wantsJson()) {
             throw new LoginNotValidException(trans('passwords.oauth_failed')); // TODO: Move to API app (Lumen based?)
         }
 
@@ -101,34 +69,39 @@ class AuthController extends Controller
     /**
      * Show the application login form.
      *
-     * @param string $provider
+     * @param \Illuminate\Http\Request             $request
+     * @param \Laravel\Socialite\Contracts\Factory $socialite
+     * @param string                               $provider
      *
-     * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\View\View
+     * @return \Illuminate\Http\Response|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function getLogin($provider = null)
+    public function getLogin(Request $request, SocialiteContract $socialite, $provider = null)
     {
         if (!is_null($provider)) {
-            return $this->socialite->driver($provider)->redirect();
+            return $socialite->driver($provider)->redirect();
         }
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Ready'];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => 'Ready']);
         }
 
         return view('auth/login');
     }
 
     /**
-     * Handle a login request to the application.
+     * Log the user in.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Contracts\Registrar $registrar
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
-    public function postLogin()
+    public function postLogin(Request $request, Registrar $registrar)
     {
-        $this->registrar->login();
+        $user = $registrar->login();
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Login successful'];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => 'Login successful', 'data' => $user]);
         }
 
         return redirect()->intended($this->redirectPath());
@@ -137,14 +110,17 @@ class AuthController extends Controller
     /**
      * Log the user out of the application.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Contracts\Registrar $registrar
+     *
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response
      */
-    public function getLogout()
+    public function getLogout(Request $request, Registrar $registrar)
     {
-        $this->registrar->logout();
+        $registrar->logout();
 
-        if ($this->request->ajax() || $this->request->wantsJson()) {
-            return ['message' => 'Logout successful'];
+        if ($request->ajax() || $request->wantsJson()) {
+            return response()->json(['message' => 'Logout successful']);
         }
 
         return redirect()->intended($this->redirectPath());

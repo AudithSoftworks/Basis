@@ -47,7 +47,7 @@ interface Registrar
     public function update($id);
 
     /**     *
-     * @return boolean
+     * @return bool|\Cartalyst\Sentinel\Users\UserInterface
      */
     public function login();
 

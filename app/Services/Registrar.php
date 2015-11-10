@@ -203,7 +203,7 @@ class Registrar implements RegistrarContract
     }
 
     /**
-     * @return boolean
+     * @return bool|\Cartalyst\Sentinel\Users\UserInterface
      *
      * @throws \App\Exceptions\Common\ValidationException
      * @throws \App\Exceptions\Users\LoginNotValidException
@@ -223,7 +223,7 @@ class Registrar implements RegistrarContract
         if ($user = app('sentinel')->authenticate($credentials, $this->request->has('remember'))) {
             app('events')->fire(new LoggedIn($user));
 
-            return true;
+            return $user;
         }
 
         throw new LoginNotValidException($this->getFailedLoginMessage());
@@ -299,7 +299,7 @@ class Registrar implements RegistrarContract
         $validator = app('validator')->make($this->request->all(), [
             'token' => 'required|string',
             'email' => 'required|email|max:255',
-            'password' => 'required|confirmed|min:' . \Config::get('auth.password.min_length')
+            'password' => 'required|confirmed|min:' . app('config')->get('auth.password.min_length')
         ]);
         if ($validator->fails()) {
             throw new ValidationException($validator);
