@@ -32,12 +32,11 @@ dependencies:
     # Docker build: Nginx & caching
 #    - docker build -f storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .
 
-    # Docker build: HHVM, PHP 5.5, 5.6
-#    - docker build -f storage/build/scripts/php_5.5/Dockerfile -t audithsoftworks/basis:php_5.5 .
+    # Docker build: HHVM, 5.6
 #    - docker build -f storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .
 #    - docker build -f storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .
 
-    # Docker build: PHP-FPM 5.5, 5.6
+    # Docker build: PHP-FPM 5.6
 #    - docker build -f storage/build/scripts/php_5.5-fpm/Dockerfile -t audithsoftworks/basis:php_5.5-fpm .
 #    - docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .
 
@@ -58,6 +57,9 @@ dependencies:
 
     # dotEnv file for initial test setup
     - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
+    - echo HIPCHAT_TOKEN=$HIPCHAT_TOKEN | tee -a .env
+    - echo HIPCHAT_ROOM=$HIPCHAT_ROOM | tee -a .env
+    - echo HIPCHAT_NAME=$HIPCHAT_NAME | tee -a .env
 
     # Build project dependencies
     - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php56_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac

@@ -403,8 +403,7 @@ class AuthenticationTest extends IlluminateTestCase
      */
     public function testActivationGetCodeForSuccess()
     {
-        $user = app('sentinel')->getUserRepository()->findById(1);
-        app('sentinel')->login($user);
+        app('sentinel')->login(app('sentinel')->getUserRepository()->findById(1));
         $this->assertFalse(app('sentinel')->guest());
         $this->assertInstanceOf(UserInterface::class, app('sentinel')->check());
 

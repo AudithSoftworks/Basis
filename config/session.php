@@ -52,7 +52,7 @@ return [
     | location may be specified. This is only needed for file sessions.
     |
     */
-    'files' => storage_path() . '/framework/sessions',
+    'files' => storage_path('framework/sessions'),
 
     /*
     |--------------------------------------------------------------------------

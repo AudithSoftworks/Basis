@@ -13,26 +13,26 @@ return [
     |
     */
     'mailgun' => [
-        'domain' => '',
-        'secret' => '',
+        'domain' => env('MAILGUN_DOMAIN'),
+        'secret' => env('MAILGUN_SECRET'),
     ],
     'mandrill' => [
-        'secret' => '',
+        'secret' => env('MANDRILL_SECRET'),
     ],
     'ses' => [
-        'key' => '',
-        'secret' => '',
+        'key'    => env('SES_KEY'),
+        'secret' => env('SES_SECRET'),
         'region' => 'eu-central-1',
     ],
     'stripe' => [
-        'model'  => 'App\User',
-        'key' => '',
-        'secret' => '',
+        'model'  => App\Models\User::class,
+        'key'    => env('STRIPE_KEY'),
+        'secret' => env('STRIPE_SECRET'),
     ],
     'hipchat' => [
-        'token' => env('HIPCHAT_TOKEN', '1c58df69bf93342db66499b35af2f1'),
-        'room' => env('HIPCHAT_ROOM', '1257206'),
-        'name' => 'Dev Debug', // Note: HipChat's v1 API supports names up to 15 UTF-8 characters.
+        'token' => env('HIPCHAT_TOKEN'),
+        'room' => env('HIPCHAT_ROOM'),
+        'name' => env('HIPCHAT_NAME'), // Note: HipChat's v1 API supports names up to 15 UTF-8 characters.
         'level' => \Monolog\Logger::DEBUG
     ],
     'google' => [

@@ -6,6 +6,7 @@ public/bower_components
 public/build
 public/fonts/*
 public/javascripts/*
+public/swagger*
 resources/assets/stylesheets/*
 storage/app/*
 storage/build/tools/*

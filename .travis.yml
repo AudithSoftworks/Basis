@@ -49,6 +49,9 @@ install:
 
   # dotEnv file for initial test setup
   - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
+  - echo HIPCHAT_TOKEN=$HIPCHAT_TOKEN | tee -a .env
+  - echo HIPCHAT_ROOM=$HIPCHAT_ROOM | tee -a .env
+  - echo HIPCHAT_NAME=$HIPCHAT_NAME | tee -a .env
 
 before_script:
   # Build project dependencies
