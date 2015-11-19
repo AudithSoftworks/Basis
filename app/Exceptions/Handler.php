@@ -3,7 +3,6 @@
 use Cartalyst\Sentinel\Checkpoints\NotActivatedException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
-use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Session\TokenMismatchException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -39,7 +38,7 @@ class Handler extends ExceptionHandler
      * Render an exception into an HTTP response.
      *
      * @param  \Illuminate\Http\Request $request
-     * @param  \Exception $e
+     * @param  \Exception               $e
      *
      * @return \Illuminate\Http\Response
      */
@@ -49,44 +48,30 @@ class Handler extends ExceptionHandler
             $e = new NotFoundHttpException($e->getMessage(), $e);
         }
 
-        //---------------------------------------------------------------------------------------
-        // Since we have custom ValidationException class, only validation-related exceptions
-        // should be listed here. Laravel handles exceptions correctly, status-code wise.
-        //---------------------------------------------------------------------------------------
-
         if ($request->ajax() || $request->wantsJson()) {
             $exceptionClass = get_class($e);
-            $response = response()->json(['exception' => $exceptionClass, 'message' => $e->getMessage()]);
-            switch ($exceptionClass) {
-                case UnauthorizedHttpException::class:
-                    $statusCode = IlluminateResponse::HTTP_UNAUTHORIZED;
-                    break;
-                case NotActivatedException::class:
-                    $statusCode = IlluminateResponse::HTTP_FORBIDDEN;
-                    break;
-                case NotFoundHttpException::class:
-                    $statusCode = IlluminateResponse::HTTP_NOT_FOUND;
-                    break;
-                case Common\NotImplementedException::class:
-                    $statusCode = IlluminateResponse::HTTP_METHOD_NOT_ALLOWED;
-                    break;
-                case Common\ValidationException::class:
-                case Users\LoginNotValidException::class:
-                case Users\PasswordNotValidException::class:
-                case Users\TokenNotValidException::class:
-                case HttpResponseException::class:
-                case TokenMismatchException::class:
-                    $statusCode = IlluminateResponse::HTTP_UNPROCESSABLE_ENTITY;
-                    break;
-                default:
-                    $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
-                    break;
+            $responseBody = ['exception' => $exceptionClass, 'message' => $e->getMessage()];
+
+            # General exceptions
+            if ($e instanceof UnauthorizedHttpException) {
+                $statusCode = IlluminateResponse::HTTP_UNAUTHORIZED;
+            } elseif ($e instanceof NotActivatedException) {
+                $statusCode = IlluminateResponse::HTTP_FORBIDDEN;
+            } elseif ($e instanceof NotFoundHttpException) {
+                $statusCode = IlluminateResponse::HTTP_NOT_FOUND;
+            } elseif ($e instanceof \BadMethodCallException) {
+                $statusCode = IlluminateResponse::HTTP_METHOD_NOT_ALLOWED;
+            } elseif ($e instanceof \UnexpectedValueException || $e instanceof TokenMismatchException) {
+                $statusCode = IlluminateResponse::HTTP_UNPROCESSABLE_ENTITY;
+            } else {
+                $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
             }
+
             if (empty($statusCode)) {
                 $statusCode = IlluminateResponse::HTTP_INTERNAL_SERVER_ERROR;
             }
 
-            return $response->setStatusCode($statusCode);
+            return response()->json($responseBody)->setStatusCode($statusCode);
         }
 
         if ($request->method() != 'GET' && $request->header('content-type') == 'application/x-www-form-urlencoded') {

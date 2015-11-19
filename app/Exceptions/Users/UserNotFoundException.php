@@ -1,7 +1,7 @@
 <?php namespace App\Exceptions\Users;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
-class UserNotFoundException extends NotFoundHttpException
+class UserNotFoundException extends ModelNotFoundException
 {
 }

@@ -5,7 +5,7 @@ use Illuminate\Support\ServiceProvider;
 class RegistrarServiceProvider extends ServiceProvider
 {
     /**
-     * Deferring the loading of such a provider will improve the performance of your application,
+     * Deferring the loading of a provider improves performance of the application,
      * since it is not loaded from the filesystem on every request.
      *
      * @var bool

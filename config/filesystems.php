@@ -40,7 +40,7 @@ return [
     'disks' => [
         'local' => [
             'driver' => 'local',
-            'root' => storage_path() . '/app',
+            'root' => storage_path('app'),
         ],
         'ftp' => [
             'driver'   => 'ftp',
