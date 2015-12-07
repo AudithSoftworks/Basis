@@ -85,6 +85,7 @@ return [
         'image/gif'
     ],
     'load_balancing' => [
+        'enabled' => true,
         'length' => 2,
         'depth' => 2
     ]

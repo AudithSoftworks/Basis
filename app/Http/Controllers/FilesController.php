@@ -104,6 +104,6 @@ class FilesController extends Controller
             !$file->uploaders->count() && app('filesystem')->disk($file->disk)->delete($file->path) && $file->delete();
         }
 
-        return response()->setStatusCode(IlluminateResponse::HTTP_NO_CONTENT);
+        return response()->json()->setStatusCode(IlluminateResponse::HTTP_NO_CONTENT);
     }
 }

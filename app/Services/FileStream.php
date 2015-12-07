@@ -1,10 +1,8 @@
 <?php namespace App\Services;
 
+use App\Events\Files\Uploaded;
 use App\Exceptions\FileStream as FileStreamExceptions;
-use App\Models\File;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response as IlluminateResponse;
-use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class FileStream
@@ -76,7 +74,7 @@ class FileStream
             # Combine chunks.
             $this->combineChunks($request);
 
-            return $this->postProcess($request);
+            return collect(event(new Uploaded($fineUploaderUuid, $request)))->last(); // Return the result of the second event listener.
         }
 
         //----------------
@@ -156,7 +154,7 @@ class FileStream
             }
             $file->move(storage_path('app'), $fineUploaderUuid);
 
-            return $this->postProcess($request);
+            return collect(event(new Uploaded($fineUploaderUuid, $request)))->last(); // Return the result of the second event listener.
         }
     }
 
@@ -223,7 +221,7 @@ class FileStream
      * @return string
      * @throws \App\Exceptions\FileStream\NotFoundException
      */
-    private function getAbsolutePath($path)
+    public function getAbsolutePath($path)
     {
         return config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . trim($path, DIRECTORY_SEPARATOR);
     }
@@ -236,31 +234,6 @@ class FileStream
                 $filesystem->deleteDirectory($file);
             }
         }
-    }
-
-    /**
-     * @param \Illuminate\Http\Request $request
-     *
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    private function postProcess(Request $request)
-    {
-        $fineUploaderUuid = null;
-        if ($request->has('qquuid')) {
-            $fineUploaderUuid = $request->get('qquuid');
-        }
-
-        # Real MIME validation of the uploaded file.
-        $this->validateUploadRealMimeAgainstAllowedTypes($this->getAbsolutePath($fineUploaderUuid));
-
-        # Move file to its final permanent destination.
-        $hash = hash_file('sha256', $this->getAbsolutePath($fineUploaderUuid));
-        $destination = $this->renameAndMoveUploadedFileByItsHash($fineUploaderUuid, $hash);
-
-        # Persist file record in database.
-        $this->persistDatabaseRecord(new SymfonyFile($this->getAbsolutePath($destination)), $request);
-
-        return response()->json(['message' => 'Created', 'success' => true, 'uuid' => $fineUploaderUuid])->setStatusCode(IlluminateResponse::HTTP_CREATED);
     }
 
     /**
@@ -291,75 +264,5 @@ class FileStream
         }
         fclose($targetStream);
         $filesystem->deleteDirectory($chunksFolder);
-    }
-
-    /**
-     * @param string $path
-     *
-     * @return void
-     */
-    private function validateUploadRealMimeAgainstAllowedTypes($path)
-    {
-        $file = new SymfonyFile($path);
-        if ($allowedMimeTypes = config('filesystems.allowed_mimetypes')) {
-            if (is_array($allowedMimeTypes) && !is_null($fileMimeType = $file->getMimeType())) {
-                if (!in_array($fileMimeType, $allowedMimeTypes)) {
-                    unlink($path);
-                    throw new FileStreamExceptions\MimeTypeNotAllowedException;
-                }
-            }
-        }
-    }
-
-    /**
-     * @param string $originalPath
-     * @param string $hash
-     * @param bool   $loadBalance
-     *
-     * @return string
-     */
-    private function renameAndMoveUploadedFileByItsHash($originalPath, $hash, $loadBalance = true)
-    {
-        $destination = $hash;
-        if ($loadBalance) {
-            $config = config('filesystems.load_balancing');
-            $folders = [];
-            for ($i = 0; $i < $config['depth']; $i++) {
-                $folders[] = substr($hash, -1 * ($i + 1) * $config['length'], $config['length']);
-            }
-            $destination = implode(DIRECTORY_SEPARATOR, array_merge($folders, [$hash]));
-        }
-        $filesystem = app('filesystem')->disk();
-        (!$filesystem->exists($destination)) ? $filesystem->move($originalPath, $destination) : $filesystem->delete($originalPath);
-
-        return $destination;
-    }
-
-    /**
-     * @param \Symfony\Component\HttpFoundation\File\File $uploadedFile
-     * @param \Illuminate\Http\Request                    $request
-     */
-    private function persistDatabaseRecord(SymfonyFile $uploadedFile, Request $request)
-    {
-        if (!$file = File::find($hash = $uploadedFile->getFilename())) {
-            $file = new File();
-            $file->hash = $hash;
-            $file->disk = 'local';
-            $file->path = trim(str_replace(config('filesystems.disks.local.root'), '', $uploadedFile->getPathname()), DIRECTORY_SEPARATOR);
-            $file->mime = $uploadedFile->getMimeType();
-            $file->size = $uploadedFile->getSize();
-            $file->save();
-        }
-
-        /** @var \App\Models\User $user */
-        $user = app('sentinel')->getUser();
-        if ($duplicate = $user->files()->find($file->hash)) {
-            $user->files()->detach($duplicate->hash);
-        }
-
-        $file->uploaders()->attach([$user->getUserId() => [
-            'uuid' => $request->get('qquuid'),
-            'original_client_name' => $request->get('qqfilename')
-        ]]);
     }
 }
