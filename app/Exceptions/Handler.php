@@ -52,7 +52,22 @@ class Handler extends ExceptionHandler
             $exceptionClass = get_class($e);
             $responseBody = ['exception' => $exceptionClass, 'message' => $e->getMessage()];
 
-            # General exceptions
+            # FileStream exceptions response body
+            $preventRetry = true;
+            $resetUpload = false;
+            if ($e instanceof FileStream\UploadFilenameIsEmptyException) {
+                $preventRetry = false;
+            } elseif ($e instanceof FileStream\UploadIncompleteException) {
+                $preventRetry = false;
+                $resetUpload = true;
+            } elseif ($e instanceof FileStream\UploadAttemptFailedException) {
+                $preventRetry = false;
+            }
+            if (strpos($exceptionClass, 'App\Exceptions\FileStream') !== false) {
+                $responseBody = ['exception' => $exceptionClass, 'error' => $e->getMessage(), 'preventRetry' => $preventRetry, 'reset' => $resetUpload];
+            }
+
+            # Status codes
             if ($e instanceof UnauthorizedHttpException) {
                 $statusCode = IlluminateResponse::HTTP_UNAUTHORIZED;
             } elseif ($e instanceof NotActivatedException) {
@@ -63,6 +78,8 @@ class Handler extends ExceptionHandler
                 $statusCode = IlluminateResponse::HTTP_METHOD_NOT_ALLOWED;
             } elseif ($e instanceof \UnexpectedValueException || $e instanceof TokenMismatchException) {
                 $statusCode = IlluminateResponse::HTTP_UNPROCESSABLE_ENTITY;
+            } elseif ($e instanceof \OverflowException) {
+                $statusCode = IlluminateResponse::HTTP_REQUEST_ENTITY_TOO_LARGE;
             } else {
                 $statusCode = method_exists($e, 'getStatusCode') ? $e->getStatusCode() : $e->getCode();
             }

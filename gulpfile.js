@@ -63,6 +63,7 @@ elixir(function (mix) {
         ],
         'count_up': ['public/bower_components/countUp.js/countUp.js'],
         'fastclick': ['public/bower_components/fastclick/lib/fastclick.js'],
+        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.3.2/fine-uploader/fine-uploader.js'],
         'humane_js': ['public/bower_components/humane-js/humane.js'],
         'jquery_easy_pie_chart': ['public/bower_components/jquery.easy-pie-chart/dist/jquery.easypiechart.js'],
         'easy_pie_chart': ['public/bower_components/jquery.easy-pie-chart/dist/easypiechart.js'],
@@ -84,6 +85,7 @@ elixir(function (mix) {
     var jsMaps = {
         '/*': ['pace', 'humane_js', 'jquery', ['resources/assets/javascripts/app.js']],
         '/auth': ['switchery'],
+        '/file': ['bootstrap', 'bootstrap_progressbar', 'fine_uploader'],
         'admin-demo/*': ['pace', 'jquery', 'bootstrap', 'bootstrap_breakpoints', 'amaranjs', ['resources/assets/javascripts/admin-demo.js']],
         'admin-demo/dashboard': [
             'jquery_easing', 'jquery_easy_pie_chart', 'bower_jvectormap_2', 'skycons_html5', 'count_up', 'nanoscroller', 'bootstrap_switch', 'switchery',
@@ -96,6 +98,7 @@ elixir(function (mix) {
         'bootstrap_switch': ['public/bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css'],
         'bower_jvectormap_2': ['public/bower_components/bower-jvectormap-2/jquery-jvectormap-2.0.0.css'],
         'nanoscroller': ['public/bower_components/nanoscroller/bin/css/nanoscroller.css'],
+        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.3.2/fine-uploader/fine-uploader-gallery.css'],
         'pace': ['public/bower_components/pace/themes/orange/pace-theme-minimal.css'],
         'switchery': ['public/bower_components/switchery/switchery.css'],
         'humane_js': [
@@ -110,6 +113,7 @@ elixir(function (mix) {
     var cssMaps = {
         '/*': ['pace', 'humane_js'],
         '/auth': ['switchery', ['resources/assets/stylesheets/auth.css']],
+        '/file': ['switchery', ['resources/assets/stylesheets/auth.css'], 'fine_uploader'],
         'admin-demo/*': [
             ['resources/assets/stylesheets/admin-demo.css'], 'pace', 'bootstrap_switch', 'nanoscroller', 'switchery',
             ['public/stylesheets/fickle.css', 'public/stylesheets/fickle_responsive.css']
@@ -119,9 +123,11 @@ elixir(function (mix) {
     };
 
     mix.scripts(resolveAssetMapToActualFilePaths('/auth', 'js'), 'public/javascripts/auth.js', './');
+    mix.scripts(resolveAssetMapToActualFilePaths('/file', 'js'), 'public/javascripts/file.js', './');
     mix.scripts(resolveAssetMapToActualFilePaths('admin-demo/dashboard', 'js'), 'public/javascripts/admin-demo/dashboard.js', './');
 
     mix.styles(resolveAssetMapToActualFilePaths('/auth', 'css'), 'public/stylesheets/auth.css', './');
+    mix.styles(resolveAssetMapToActualFilePaths('/file', 'css'), 'public/stylesheets/file.css', './');
     mix.styles(resolveAssetMapToActualFilePaths('admin-demo/dashboard', 'css'), 'public/stylesheets/admin-demo/dashboard.css', './');
 
     /*---------------

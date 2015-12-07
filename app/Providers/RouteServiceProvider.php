@@ -100,7 +100,7 @@ class RouteServiceProvider extends ServiceProvider
         $router->controller('password', 'Users\PasswordController');
         $router->controller('activation', 'Users\ActivationController');
 
-        $router->resource('files', 'FilesController');
+        $router->resource('files', 'FilesController', ['only' => ['index', 'create', 'store', 'show', 'destroy']]);
 
         $router->controller('/', 'HomeController');
     }

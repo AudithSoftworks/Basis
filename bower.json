@@ -29,6 +29,7 @@
         "bootstrap-switch": "3.3.*",
         "bower-jvectormap-2": "*",
         "countUp.js": "^1.5.3",
+        "fine-uploader": "5.3.*",
         "fontawesome": "^4.3.0",
         "humane-js": "3.*",
         "jquery": "2.1.*",

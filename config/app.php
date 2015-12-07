@@ -119,6 +119,7 @@ return [
          */
         App\Providers\ConfigServiceProvider::class,
         App\Providers\EventServiceProvider::class,
+        App\Providers\FileStreamServiceProvider::class,
         App\Providers\RegistrarServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
         /*

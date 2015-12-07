@@ -60,6 +60,8 @@ before_script:
       cd /home/basis && npm update;
       bower --config.interactive=false --allow-root update;
 
+      cd /home/basis/public/bower_components/fine-uploader && npm install && grunt package && cd /home/basis;
+
       git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2;
       cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
       git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git /home/basis/storage/build/tools/css3_font_converter;
