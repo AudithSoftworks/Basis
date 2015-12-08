@@ -34,6 +34,9 @@ class CreateUsersOauthTable extends Migration
      */
     public function down()
     {
+        Schema::table('users_oauth', function (Blueprint $table) {
+            $table->dropForeign('users_oauth_user_id_foreign');
+        });
         Schema::drop('users_oauth');
     }
 }

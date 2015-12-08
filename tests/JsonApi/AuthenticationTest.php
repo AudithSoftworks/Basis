@@ -92,7 +92,9 @@ class AuthenticationTest extends IlluminateTestCase
         $this->post('/users', $credentials, self::$requestHeaders);
         $this->shouldReturnJson();
         $this->seeStatusCode(201);
-        $this->seeJson(['message' => 'Created']);
+        $this->seeJson([
+            'email' => 'john.doe@example.com'
+        ]);
         $this->seeInDatabase('users', ['email' => $credentials['email']]);
     }
 
@@ -107,8 +109,9 @@ class AuthenticationTest extends IlluminateTestCase
         $this->get('/users/' . $user['id'], self::$requestHeaders);
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
-        $this->see('data');
-        $this->see('john.doe@example.com');
+        $this->seeJson([
+            'email' => 'john.doe@example.com'
+        ]);
     }
 
     /**
@@ -509,8 +512,6 @@ class AuthenticationTest extends IlluminateTestCase
     {
         $user = ['id' => 1, 'email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rdV3r510nTw0'];
         $this->delete('/users/' . $user['id'], array_except($user, ['email']), self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(200);
-        $this->seeJson(['message' => 'Deleted']);
+        $this->seeStatusCode(204);
     }
 }

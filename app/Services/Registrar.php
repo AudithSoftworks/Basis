@@ -14,7 +14,6 @@ use App\Exceptions\Users\TokenNotValidException;
 use App\Models\User;
 use App\Models\UserOAuth;
 use Cartalyst\Sentinel\Activations\EloquentActivation;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Validation\ValidatesRequests;
 use Illuminate\Http\Request;
@@ -69,7 +68,7 @@ class Registrar implements RegistrarContract
         $this->request->has('name') && $user->name = $this->request->input('name');
         $user->email = $this->request->input('email');
         $user->password = $this->userRepository->getHasher()->hash($this->request->input('password'));
-        $user->save() && app('events')->fire(new Registered($user));
+        $user->save() && event(new Registered($user));
 
         return $user;
     }
@@ -89,7 +88,7 @@ class Registrar implements RegistrarContract
                     'email' => $oauthUserData->email,
                     'password' => $this->userRepository->getHasher()->hash(uniqid("", true))
                 ]);
-                app('events')->fire(new Registered($user, $provider));
+                event(new Registered($user, $provider));
 
                 return $user;
             });
@@ -106,7 +105,7 @@ class Registrar implements RegistrarContract
 
         ($doLinkOAuthAccount = $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount)) && app('sentinel')->login($ownerAccount, true);
 
-        app('events')->fire(new LoggedIn($ownerAccount, $provider));
+        event(new LoggedIn($ownerAccount, $provider));
 
         return $doLinkOAuthAccount;
     }
@@ -199,7 +198,7 @@ class Registrar implements RegistrarContract
         $this->request->has('name') && $user->name = $this->request->input("name");
         $user->email = $this->request->input("email");
 
-        return $user->save() && app('events')->fire(new Updated($userBefore, $user)); // Fire the event on success only!
+        return $user->save() && event(new Updated($userBefore, $user)); // Fire the event on success only!
     }
 
     /**
@@ -221,7 +220,7 @@ class Registrar implements RegistrarContract
         $credentials = $this->request->only('email', 'password');
 
         if ($user = app('sentinel')->authenticate($credentials, $this->request->has('remember'))) {
-            app('events')->fire(new LoggedIn($user));
+            event(new LoggedIn($user));
 
             return $user;
         }
@@ -242,7 +241,7 @@ class Registrar implements RegistrarContract
             $ownerAccount = $owningOAuthAccount->owner;
             app('sentinel')->login($ownerAccount, true);
 
-            app('events')->fire(new LoggedIn($ownerAccount, $provider));
+            event(new LoggedIn($ownerAccount, $provider));
 
             return true;
         }
@@ -256,7 +255,7 @@ class Registrar implements RegistrarContract
     public function logout()
     {
         if ($user = app('sentinel')->getUser()) {
-            app('events')->fire(new LoggedOut($user));
+            event(new LoggedOut($user));
         }
 
         return app('sentinel')->logout();
@@ -282,7 +281,7 @@ class Registrar implements RegistrarContract
             throw new ModelNotFoundException(trans('passwords.user'));
         }
 
-        app('events')->fire(new RequestedResetPasswordLink($user));
+        event(new RequestedResetPasswordLink($user));
 
         return true;
     }
@@ -317,7 +316,7 @@ class Registrar implements RegistrarContract
             throw new TokenNotValidException(trans('passwords.token'));
         }
 
-        app('sentinel.reminders')->complete($user, $credentials['token'], $credentials['password']) && app('events')->fire(new ResetPassword($user));
+        app('sentinel.reminders')->complete($user, $credentials['token'], $credentials['password']) && event(new ResetPassword($user));
 
         return true;
     }

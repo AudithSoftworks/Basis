@@ -3,6 +3,7 @@
 use App\Contracts\Registrar;
 use App\Exceptions\Common\NotImplementedException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response as IlluminateResponse;
 
 class UsersController extends Controller
 {
@@ -43,7 +44,7 @@ class UsersController extends Controller
         $user = $registrar->register();
 
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['message' => 'Created', 'data' => $user])->setStatusCode(\Illuminate\Http\Response::HTTP_CREATED);
+            return response()->json($user)->setStatusCode(IlluminateResponse::HTTP_CREATED);
         }
 
         return redirect($this->redirectPath())->with('message', 'Created');
@@ -61,7 +62,7 @@ class UsersController extends Controller
     {
         $user = $registrar->get($id);
 
-        return response()->json(['message' => 'Found', 'data' => $user]);
+        return response()->json($user);
     }
 
     /**
@@ -118,7 +119,7 @@ class UsersController extends Controller
         $registrar->delete($id);
 
         if ($request->ajax() || $request->wantsJson()) {
-            return response()->json(['message' => 'Deleted']);
+            return response()->json()->setStatusCode(IlluminateResponse::HTTP_NO_CONTENT);
         }
 
         return redirect($this->redirectPath())->with('message', 'Deleted');

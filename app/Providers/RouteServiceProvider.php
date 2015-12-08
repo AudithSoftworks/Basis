@@ -43,13 +43,6 @@ class RouteServiceProvider extends ServiceProvider
         //-----------------------------------------------------------------------
 
         $router->group(['namespace' => $this->namespace], function (Router $router) {
-            $router->get('/php-info', function () {
-                ob_start();
-                phpinfo();
-
-                return ob_get_clean();
-            });
-
             $router->get('/oauth/{provider}', 'Users\AuthController@getOAuth');
 
             $router->controllers([
@@ -62,12 +55,13 @@ class RouteServiceProvider extends ServiceProvider
         // Register localized routes with locale-prefices (in case of default locale, no prefix is attached).
         //-----------------------------------------------------------------------------------------------------
 
+        $defaultLocale = config('app.locale');
         $namespace = $this->namespace;
         $middleware = 'locale';
-        foreach (\Config::get('app.locales') as $prefix => $localeName) {
-            \Lang::setLocale($prefix);
+        foreach (config('app.locales') as $prefix => $localeName) {
+            app('translator')->setLocale($prefix);
             // Skip default locale for now.
-            if ($prefix === \Config::get('app.locale')) {
+            if ($prefix === $defaultLocale) {
                 continue;
             }
 
@@ -81,7 +75,6 @@ class RouteServiceProvider extends ServiceProvider
         // Default locale? No prefices are necessary.
         //------------------------------------------------
 
-        $defaultLocale = config('app.locale');
         app('translator')->setLocale($defaultLocale);
         $router->group(compact('namespace'), function (Router $router) use ($defaultLocale) {
             $this->localizedRoutes($router, $defaultLocale);

@@ -1,10 +1,12 @@
 <?php namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 
 /**
  * App\Models\UserOAuth
  *
+ * @mixin \Eloquent
  * @property integer               $id
  * @property integer               $user_id
  * @property string                $remote_provider
@@ -28,7 +30,7 @@ use Illuminate\Database\Eloquent\Builder;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\UserOAuth whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\UserOAuth ofProvider($provider)
  */
-class UserOAuth extends \Eloquent
+class UserOAuth extends Model
 {
     protected $table = 'users_oauth';
 
