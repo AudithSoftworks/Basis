@@ -2,7 +2,6 @@
 
 use App\Exceptions\Common\ValidationException;
 use App\Exceptions\FileStream as FileStreamExceptions;
-use App\Models\File;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response as IlluminateResponse;
@@ -37,7 +36,7 @@ class FilesController extends Controller
     /**
      * @param \Illuminate\Http\Request $request
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function store(Request $request)
     {
@@ -45,6 +44,7 @@ class FilesController extends Controller
             'qquuid' => 'required|string|size:36',
             'qqfilename' => 'required|string',
             'qqtotalfilesize' => 'required|numeric',
+            'qqtag' => 'required|string|in:' . implode(',', array_keys(config('filesystems.allowed_tags_and_limits'))),
             'qqtotalparts' => 'required_with_all:qqpartindex,qqpartbyteoffset,qqchunksize|numeric',
             'qqpartindex' => 'required_with_all:qqtotalparts,qqpartbyteoffset,qqchunksize|numeric',
             'qqpartbyteoffset' => 'required_with_all:qqpartindex,qqtotalparts,qqchunksize|numeric',
@@ -92,17 +92,7 @@ class FilesController extends Controller
      */
     public function destroy($hash)
     {
-        /** @var \App\Models\File $file */
-        $file = File::findOrFail($hash);
-        if ($file->load('uploaders')->count()) {
-            /** @var \App\Models\User $me */
-            $me = app('sentinel')->getUser();
-            if ($file->uploaders->contains('id', $me->id)) {
-                $file->uploaders()->detach($me->id);
-                $file->load('uploaders');
-            }
-            !$file->uploaders->count() && app('filesystem')->disk($file->disk)->delete($file->path) && $file->delete();
-        }
+        app('filestream')->deleteFile($hash);
 
         return response()->json()->setStatusCode(IlluminateResponse::HTTP_NO_CONTENT);
     }

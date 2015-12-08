@@ -32,6 +32,7 @@ return [
         'local' => [
             'driver' => 'local',
             'root' => storage_path('app'),
+            'chunks_expire_in' => 604800
         ],
         'ftp' => [
             'driver'   => 'ftp',
@@ -83,6 +84,10 @@ return [
         'image/jpeg',
         'image/png',
         'image/gif'
+    ],
+    'allowed_tags_and_limits' => [
+        'avatar' => 1,
+        'content' => 0 // 0 means no limit.
     ],
     'load_balancing' => [
         'enabled' => true,

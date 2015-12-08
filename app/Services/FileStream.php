@@ -2,6 +2,7 @@
 
 use App\Events\Files\Uploaded;
 use App\Exceptions\FileStream as FileStreamExceptions;
+use App\Models\File;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -31,7 +32,7 @@ class FileStream
      *
      * @var int
      */
-    public $chunksExpireIn = 604800;
+    public $chunksExpireIn;
 
     /**
      * Upload size limit.
@@ -43,6 +44,7 @@ class FileStream
     public function __construct()
     {
         $this->filesystem = app('filesystem')->disk();
+        $this->chunksExpireIn = config('filesystems.disks.local.chunks_expire_in');
         $this->temporaryChunksFolder = DIRECTORY_SEPARATOR . '_chunks';
         if (app('config')->has('filesystems.chunks_ttl') && is_int(config('filesystems.chunks_ttl'))) {
             $this->chunksExpireIn = config('filesystems.chunks_ttl');
@@ -81,10 +83,8 @@ class FileStream
         // Prelim work.
         //----------------
 
-        $filesystem = app('filesystem')->disk();
-
         if (!file_exists($this->temporaryChunksFolder) || !is_dir($this->temporaryChunksFolder)) {
-            $filesystem->makeDirectory($this->temporaryChunksFolder);
+            $this->filesystem->makeDirectory($this->temporaryChunksFolder);
         }
 
         # Temp folder writable?
@@ -138,8 +138,8 @@ class FileStream
         if ($totalNumberOfChunks > 1) {
             $chunkIndex = intval($request->get('qqpartindex'));
             $targetFolder = $this->temporaryChunksFolder . DIRECTORY_SEPARATOR . $fineUploaderUuid;
-            if (!$filesystem->exists($targetFolder)) {
-                $filesystem->makeDirectory($targetFolder);
+            if (!$this->filesystem->exists($targetFolder)) {
+                $this->filesystem->makeDirectory($targetFolder);
             }
 
             if (!$file->isValid()) {
@@ -165,10 +165,9 @@ class FileStream
      */
     public function isUploadResumable(Request $request)
     {
-        $filesystem = app('filesystem')->disk();
         $fineUploaderUuid = $request->get('qquuid');
         $chunkIndex = intval($request->get('qqpartindex'));
-        $numberOfExistingChunks = count($filesystem->files($this->temporaryChunksFolder . DIRECTORY_SEPARATOR . $fineUploaderUuid));
+        $numberOfExistingChunks = count($this->filesystem->files($this->temporaryChunksFolder . DIRECTORY_SEPARATOR . $fineUploaderUuid));
         if ($numberOfExistingChunks < $chunkIndex) {
             throw new FileStreamExceptions\UploadIncompleteException;
         }
@@ -219,19 +218,45 @@ class FileStream
      * @param string $path
      *
      * @return string
-     * @throws \App\Exceptions\FileStream\NotFoundException
      */
     public function getAbsolutePath($path)
     {
         return config('filesystems.disks.local.root') . DIRECTORY_SEPARATOR . trim($path, DIRECTORY_SEPARATOR);
     }
 
+    /**
+     * @param string $hash
+     * @param string $tag
+     *
+     * @return bool
+     * @throws \Exception
+     */
+    public function deleteFile($hash, $tag = '')
+    {
+        /** @var \App\Models\File $file */
+        $file = File::findOrFail($hash);
+        if ($file->load('uploaders')->count()) {
+            /** @var \App\Models\User $me */
+            $me = app('sentinel')->getUser();
+            if ($file->uploaders->contains('id', $me->id)) {
+                $pivotToDelete = $file->uploaders()->newPivotStatement()->where('user_id', '=', $me->id);
+                if (!empty($tag)) {
+                    $pivotToDelete->where('tag', '=', $tag);
+                }
+                $pivotToDelete->delete();
+                $file->load('uploaders');
+            }
+            !$file->uploaders->count() && app('filesystem')->disk($file->disk)->delete($file->path) && $file->delete();
+        }
+
+        return true;
+    }
+
     private function cleanupChunks()
     {
-        $filesystem = app('filesystem')->disk('local');
-        foreach ($filesystem->directories($this->temporaryChunksFolder) as $file) {
-            if (time() - $filesystem->lastModified($file) > $this->chunksExpireIn) {
-                $filesystem->deleteDirectory($file);
+        foreach ($this->filesystem->directories($this->temporaryChunksFolder) as $file) {
+            if (time() - $this->filesystem->lastModified($file) > $this->chunksExpireIn) {
+                $this->filesystem->deleteDirectory($file);
             }
         }
     }
@@ -244,13 +269,12 @@ class FileStream
     private function combineChunks(Request $request)
     {
         # Prelim
-        $filesystem = app('filesystem')->disk();
         $fineUploaderUuid = $request->get('qquuid');
         $chunksFolder = $this->temporaryChunksFolder . DIRECTORY_SEPARATOR . $fineUploaderUuid;
         $totalNumberOfChunks = $request->has('qqtotalparts') ? intval($request->get('qqtotalparts')) : 1;
 
         # Do we have all chunks?
-        $numberOfExistingChunks = count($filesystem->files($chunksFolder));
+        $numberOfExistingChunks = count($this->filesystem->files($chunksFolder));
         if ($numberOfExistingChunks != $totalNumberOfChunks) {
             throw new FileStreamExceptions\UploadIncompleteException;
         }
@@ -263,6 +287,6 @@ class FileStream
             fclose($chunkStream);
         }
         fclose($targetStream);
-        $filesystem->deleteDirectory($chunksFolder);
+        $this->filesystem->deleteDirectory($chunksFolder);
     }
 }

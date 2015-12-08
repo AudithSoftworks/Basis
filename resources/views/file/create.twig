@@ -108,7 +108,10 @@
                 element: document.getElementById("fine-uploader-gallery"),
                 template: 'qq-template',
                 request: {
-                    endpoint: '/files'
+                    endpoint: '/files',
+                    params: {
+                        qqtag: 'avatar'
+                    }
                 },
                 thumbnails: {
                     placeholders: {
@@ -117,7 +120,7 @@
                     }
                 },
                 validation: {
-                    allowedExtensions: ['jpeg', 'jpg', 'gif', 'png', 'zip', 'iso', 'tar.gz', 'pdf', 'docx']
+                    allowedExtensions: ['{{ config('filesystems.allowed_extensions')|join('\', \'')|raw }}']
                 },
                 chunking: {
                     enabled: true,
@@ -131,7 +134,7 @@
                 },
                 resume: {
                     enabled: true,
-                    recordsExpireIn: 7
+                    recordsExpireIn: {{ config('filesystems.disks.local.chunks_expire_in') }}
                 }
             });
         </script>

@@ -17,7 +17,8 @@ class CreateFilesUsersTable extends Migration
             $table->string('file_hash', 64);
             $table->unsignedInteger('user_id');
             $table->string('uuid', 36)->nullable();
-            $table->string('original_client_name', 256);
+            $table->string('original_client_name');
+            $table->string('tag');
             $table->timestamps();
 
             $table->foreign('file_hash')->references('hash')->on('files')->onUpdate('cascade')->onDelete('restrict');

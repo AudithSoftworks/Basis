@@ -2,6 +2,7 @@
 
 use App\Events\Files\Uploaded;
 use App\Models\File;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Http\Response as IlluminateResponse;
 use Symfony\Component\HttpFoundation\File\File as SymfonyFile;
 
@@ -37,6 +38,31 @@ class PersistUploadedFile
         (!$filesystem->exists($destination)) ? $filesystem->move($uploadUuid, $destination) : $filesystem->delete($uploadUuid);
 
         /*
+        |---------------------------------
+        | Check the tag and its limit.
+        |---------------------------------
+        */
+
+        /** @var \App\Models\User $me */
+        $me = app('sentinel')->getUser();
+        $tag = $request->get('qqtag');
+        $tagLimit = config('filesystems.allowed_tags_and_limits.' . $tag);
+        if ($tagLimit > 0) {
+            $allFilesWithSameTagBelongingToUser = $me->load([
+                'files' => function (BelongsToMany $query) use ($tag) {
+                    $query->wherePivot('tag', '=', $tag);
+                }
+            ])->files;
+            if (($numberOfFilesToDeleteToComplyWitTagLimit = $allFilesWithSameTagBelongingToUser->count() - $tagLimit + 1) > 0) {
+                while ($numberOfFilesToDeleteToComplyWitTagLimit > 0) {
+                    $pivotToDelete = $allFilesWithSameTagBelongingToUser->shift();
+                    app('filestream')->deleteFile($pivotToDelete->hash, $tag);
+                    $numberOfFilesToDeleteToComplyWitTagLimit--;
+                }
+            }
+        }
+
+        /*
         |------------------------------------
         | Persist file record in database.
         |------------------------------------
@@ -53,16 +79,15 @@ class PersistUploadedFile
             $file->save();
         }
 
-        /** @var \App\Models\User $user */
-        $user = app('sentinel')->getUser();
-        if ($duplicate = $user->files()->find($file->hash)) {
-            $user->files()->detach($duplicate->hash);
-        }
+        $me->files()->newPivotStatement()->whereTag($tag)->whereFileHash($hash)->delete();
 
-        $file->uploaders()->attach([$user->getUserId() => [
-            'uuid' => $request->get('qquuid'),
-            'original_client_name' => $request->get('qqfilename')
-        ]]);
+        $file->uploaders()->attach([
+            $me->getUserId() => [
+                'uuid' => $request->get('qquuid'),
+                'original_client_name' => $request->get('qqfilename'),
+                'tag' => $tag
+            ]
+        ]);
 
         return response()->json(['success' => true, 'uuid' => $uploadUuid])->setStatusCode(IlluminateResponse::HTTP_CREATED);
     }
