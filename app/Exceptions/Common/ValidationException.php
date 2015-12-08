@@ -2,7 +2,7 @@
 
 use Illuminate\Validation\Validator;
 
-class ValidationException extends \RuntimeException
+class ValidationException extends \UnexpectedValueException
 {
     public function __construct(Validator $validator)
     {

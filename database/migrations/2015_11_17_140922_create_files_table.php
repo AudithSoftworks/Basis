@@ -14,17 +14,13 @@ class CreateFilesTable extends Migration
     {
         Schema::create('files', function (Blueprint $table) {
             $table->engine = 'InnoDb';
-
-            $table->integer('id', true, true);
-            $table->string('hash', 32);
-            $table->string('mime', 24);
+            $table->string('hash', 64)->primary();
+            $table->string('disk', 64)->default('localhost');
+            $table->string('path', 1024);
+            $table->string('mime', 255);
             $table->bigInteger('size');
             $table->text('metadata');
-            $table->integer('created_at', false, true);
-            $table->integer('updated_at', false, true)->nullable();
-            $table->integer('deleted_at', false, true)->nullable();
-
-            $table->unique('hash');
+            $table->timestamps();
         });
     }
 

@@ -6,10 +6,6 @@ return [
     | Default Filesystem Disk
     |--------------------------------------------------------------------------
     |
-    | Here you may specify the default filesystem disk that should be used
-    | by the framework. A "local" driver, as well as a variety of cloud
-    | based drivers are available for your choosing. Just store away!
-    |
     | Supported: "local", "s3", "rackspace"
     |
     */
@@ -31,16 +27,12 @@ return [
     |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
-    |
-    | Here you may configure as many filesystem "disks" as you wish, and you
-    | may even configure multiple disks of the same driver. Defaults have
-    | been setup for each driver as an example of the required options.
-    |
     */
     'disks' => [
         'local' => [
             'driver' => 'local',
-            'root' => storage_path() . '/app',
+            'root' => storage_path('app'),
+            'chunks_expire_in' => 604800
         ],
         'ftp' => [
             'driver'   => 'ftp',
@@ -71,4 +63,35 @@ return [
             'url_type'  => 'publicURL',
         ],
     ],
+    'allowed_extensions' => [
+        'pdf', 'odt', 'ods', 'odp', 'doc', 'xls', 'ppt', 'docx', 'pptx', 'zip', 'tar.gz', 'iso',
+        'jpeg', 'jpg', 'png', 'gif'
+    ],
+    'allowed_mimetypes' => [
+        'application/pdf',
+        'application/vnd.oasis.opendocument.text',
+        'application/vnd.oasis.opendocument.spreadsheet',
+        'application/vnd.oasis.opendocument.presentation',
+        'application/msword',
+        'application/vnd.ms-office',
+        'application/vnd.ms-powerpoint',
+        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        'application/zip',
+        'application/gzip',
+        'application/x-gzip',
+        'application/x-iso9660-image',
+        'image/jpeg',
+        'image/png',
+        'image/gif'
+    ],
+    'allowed_tags_and_limits' => [
+        'avatar' => 1,
+        'content' => 0 // 0 means no limit.
+    ],
+    'load_balancing' => [
+        'enabled' => true,
+        'length' => 2,
+        'depth' => 2
+    ]
 ];

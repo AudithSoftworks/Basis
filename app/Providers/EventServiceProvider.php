@@ -1,5 +1,7 @@
 <?php namespace App\Providers;
 
+use App\Events as Events;
+use App\Listeners as Listeners;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
@@ -11,19 +13,22 @@ class EventServiceProvider extends ServiceProvider
      * @var array
      */
     protected $listen = [
-        \App\Events\Users\Deleted::class => [],
-        \App\Events\Users\LoggedIn::class => [],
-        \App\Events\Users\LoggedOut::class => [],
-        \App\Events\Users\Registered::class => [
-            \App\Listeners\Users\SendActivationLinkViaEmail::class
+        Events\Files\Uploaded::class => [
+            Listeners\Files\ValidateUploadRealMimeAgainstAllowedTypes::class,
+            Listeners\Files\PersistUploadedFile::class
         ],
-        \App\Events\Users\RequestedActivationLink::class => [
-            \App\Listeners\Users\SendActivationLinkViaEmail::class
+        Events\Users\LoggedIn::class => [],
+        Events\Users\LoggedOut::class => [],
+        Events\Users\Registered::class => [
+            Listeners\Users\SendActivationLinkViaEmail::class
         ],
-        \App\Events\Users\RequestedResetPasswordLink::class => [
-            \App\Listeners\Users\SendResetPasswordLinkViaEmail::class
+        Events\Users\RequestedActivationLink::class => [
+            Listeners\Users\SendActivationLinkViaEmail::class
         ],
-        \App\Events\Users\Updated::class => [],
+        Events\Users\RequestedResetPasswordLink::class => [
+            Listeners\Users\SendResetPasswordLinkViaEmail::class
+        ],
+        Events\Users\Updated::class => [],
     ];
 
     /**
