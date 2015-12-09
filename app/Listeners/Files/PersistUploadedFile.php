@@ -89,6 +89,6 @@ class PersistUploadedFile
             ]
         ]);
 
-        return response()->json(['success' => true, 'uuid' => $uploadUuid])->setStatusCode(IlluminateResponse::HTTP_CREATED);
+        return response()->json(['success' => true, 'hash' => $file->hash])->setStatusCode(IlluminateResponse::HTTP_CREATED);
     }
 }
