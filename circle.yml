@@ -37,7 +37,6 @@ dependencies:
 #    - docker build -f storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .
 
     # Docker build: PHP-FPM 5.6
-#    - docker build -f storage/build/scripts/php_5.5-fpm/Dockerfile -t audithsoftworks/basis:php_5.5-fpm .
 #    - docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .
 
     # Docker Compose

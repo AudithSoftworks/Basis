@@ -1,15 +1,17 @@
-FROM ubuntu:vivid
+FROM ubuntu:wily
 MAINTAINER Shahriyar Imanov <shehi@imanov.me>
 
 WORKDIR /home/basis
 
+ENV DEBIAN_FRONTEND noninteractive
+
 # Install dependencies
 RUN apt-get update -y \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+    && apt-get install -y \
         apt-utils \
         wget
 RUN wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | apt-key add -
-RUN echo deb http://dl.hhvm.com/ubuntu vivid main | tee /etc/apt/sources.list.d/hhvm.list
+RUN echo deb http://dl.hhvm.com/ubuntu wily main | tee /etc/apt/sources.list.d/hhvm.list
 RUN apt-get update -y \
     && DEBIAN_FRONTEND=noninteractive apt-get install -y \
         autoconf \
