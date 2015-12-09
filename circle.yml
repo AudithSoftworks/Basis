@@ -1,7 +1,7 @@
 machine:
   pre:
-    - sudo curl -L -o /usr/bin/docker https://s3-external-1.amazonaws.com/circle-downloads/docker-1.8.2-circleci; sudo chmod 0755 /usr/bin/docker
-    - curl -L https://github.com/docker/compose/releases/download/1.4.2/docker-compose-`uname -s`-`uname -m` > docker-compose; sudo mv docker-compose /usr/bin/docker-compose; sudo chmod 0755 /usr/bin/docker-compose
+    - sudo curl -L -o /usr/bin/docker https://s3-external-1.amazonaws.com/circle-downloads/docker-1.9.1-circleci; sudo chmod 0755 /usr/bin/docker
+    - curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > docker-compose; sudo mv docker-compose /usr/bin/docker-compose; sudo chmod 0755 /usr/bin/docker-compose
   services:
     - docker
 
