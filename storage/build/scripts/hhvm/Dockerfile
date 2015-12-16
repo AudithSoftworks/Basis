@@ -12,12 +12,12 @@ RUN apt-get update -y \
         wget
 RUN wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | apt-key add -
 RUN echo deb http://dl.hhvm.com/ubuntu wily main | tee /etc/apt/sources.list.d/hhvm.list
-RUN apt-get update -y \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update -y && apt-get install -y \
         autoconf \
         automake \
         build-essential \
         bison \
+        bzip2 \
         curl \
         fontforge \
         gcc-4.8-locales \
@@ -90,7 +90,7 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
     && npm cache clear
 
 # Install Node dependencies
-RUN npm install -g bower gulp grunt-cli ttf2eot
+RUN npm install -g bower gulp grunt-cli ttf2eot jshint
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
 

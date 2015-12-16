@@ -11,6 +11,7 @@ RUN apt-get update -y \
     && apt-get install -y \
         git \
         fontforge \
+        bzip2 \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
@@ -80,7 +81,7 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
     && npm cache clear
 
 # Install Node dependencies
-RUN npm install -g bower gulp grunt-cli ttf2eot
+RUN npm install -g bower gulp grunt-cli ttf2eot jshint
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
 
