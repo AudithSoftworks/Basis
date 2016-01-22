@@ -1,8 +1,10 @@
+add_import_path "public/bower_components"
+
 require 'compass/import-once/activate'
 require 'autoprefixer-rails'
 
-# Require any additional compass plugins here.
-sourcemap = (environment == :production) ? false : true
+# sourcemap = (environment == :production) ? false : true
+sourcemap = false
 
 on_stylesheet_saved do |file|
   css = File.read(file)
@@ -20,8 +22,6 @@ on_stylesheet_saved do |file|
     File.open(file, 'w') { |io| io << AutoprefixerRails.process(css) }
   end
 end
-
-add_import_path "public/bower_components"
 
 # Set this to the root of your project when deployed:
 http_path = "public"

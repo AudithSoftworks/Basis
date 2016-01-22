@@ -1,0 +1,15 @@
+.well {
+    border: 0;
+    padding: 20px;
+
+    @if $theme-type == "default" {
+        box-shadow: none !important;
+    }
+}
+
+@if $theme-type == "material-design" {
+    .well {
+        @extend .md-shadow-z-1;
+        border-radius: $general-border-radius;
+    }
+}

@@ -5,10 +5,10 @@
 {% use "layout/body/main" %}
 {% use "layout/body/footer" %}
 
-{% block document_head_title %}<title>Home - Audith Basis</title>{% endblock %}
+{% block document_head_title %}<title>Audith Basis</title>{% endblock %}
 
 {% block document_head_javascripts %}
-    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
+    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}" defer="defer"></script>
 {% endblock %}
 
 {% block document_head_stylesheets %}
@@ -16,29 +16,26 @@
 {% endblock %}
 
 {% block document_body_header %}
-    <header class="container-fluid">
-        <h1 class="text-center">Audith Basis</h1>
+    <header class="container">
+        <h1 class="col-md-12">Audith <em>Basis</em></h1>
     </header>
 {% endblock %}
 
 {% block document_body_main %}
-    <main class="container-fluid">
-        <h2>{{ trans_choice('auth.headings.welcome', userType, {'name' : name})|raw }}</h2>
+    <main>
+        <form class="login-form col-md-12">
+            <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-        <form class="form-horizontal" role="form" method="POST" action="{{ action('Users\\AuthController@postLogin', [], false) }}">
-            <fieldset class="submit-button col-md-12">
-                <div class="col-md-6 col-md-offset-3">
-                    <a href="{% if name == trans('auth.guest') %}{{ action('Users\\AuthController@getLogin', [], false) }}{% else %}{{ action('Users\\AuthController@getLogout', [], false) }}{% endif %}" class="btn btn-primary btn-xs col-md-12">
-                        {% if name == trans('auth.guest') %}{{ trans('auth.buttons.login') }}{% else %}{{ trans('auth.buttons.logout') }}{% endif %}
-                    </a>
-                </div>
+            <h3 class="form-title font-green col-md-12">{{ trans_choice('auth.headings.welcome', userType, {'name' : name})|raw }}</h3>
+            <fieldset class="col-md-12">
+                <a class="btn green uppercase" href="{% if name == trans('auth.guest') %}{{ action('Users\\AuthController@getLogin', [], false) }}{% else %}{{ action('Users\\AuthController@getLogout', [], false) }}{% endif %}">
+                    {% if name == trans('auth.guest') %}{{ trans('auth.buttons.login') }}{% else %}{{ trans('auth.buttons.logout') }}{% endif %}
+                </a>
             </fieldset>
         </form>
     </main>
 {% endblock %}
 
 {% block document_body_footer %}
-    <footer>
-        &copy;
-    </footer>
+    <footer>2015 © Audith Softworks.</footer>
 {% endblock %}

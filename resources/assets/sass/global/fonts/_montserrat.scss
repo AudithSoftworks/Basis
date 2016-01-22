@@ -1,0 +1,31 @@
+@import 'compass/css3';
+
+@include font-face(
+    'Montserrat',
+    font-files('montserrat/Montserrat-Regular.woff2', 'montserrat/Montserrat-Regular.woff', 'montserrat/Montserrat-Regular.ttf'),
+    'montserrat/Montserrat-Regular.eot', 400, normal
+);
+
+@include font-face(
+    'Montserrat',
+    font-files('montserrat/Montserrat-Bold.woff2', 'montserrat/Montserrat-Bold.woff', 'montserrat/Montserrat-Bold.ttf'),
+    'montserrat/Montserrat-Bold.eot', 700, normal
+);
+
+@include font-face(
+    'Montserrat',
+    font-files('montserrat/Montserrat-Thin.woff2', 'montserrat/Montserrat-Thin.woff', 'montserrat/Montserrat-Thin.ttf'),
+    'montserrat/Montserrat-Thin.eot', 100, normal
+);
+
+@include font-face(
+    'Montserrat',
+    font-files('montserrat/Montserrat-Light.woff2', 'montserrat/Montserrat-Light.woff', 'montserrat/Montserrat-Light.ttf'),
+    'montserrat/Montserrat-Light.eot', 300, normal
+);
+
+@include font-face(
+    'Montserrat',
+    font-files('montserrat/Montserrat-Black.woff2', 'montserrat/Montserrat-Black.woff', 'montserrat/Montserrat-Black.ttf'),
+    'montserrat/Montserrat-Black.eot', 900, normal
+);
