@@ -55,7 +55,7 @@ RUN chmod 755 /scripts/*.sh
 EXPOSE 9000
 
 # Locale
-RUN locale-gen en_US.UTF-8 && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
+RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 
@@ -78,8 +78,8 @@ RUN set -ex \
     gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
   done
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 5.2.0
-ENV NPM_VERSION 3.5.1
+ENV NODE_VERSION 5.5.0
+ENV NPM_VERSION 3.5.3
 RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
     && curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
     && gpg --verify SHASUMS256.txt.asc \

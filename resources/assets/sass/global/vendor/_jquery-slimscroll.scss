@@ -1,0 +1,14 @@
+.scroller {
+    padding: 0 12px 0 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+.scroller-footer {
+    margin-top: 10px;
+    @include clearfix();
+}
+
+.portlet-body .slimScrollBar {
+    margin-right: 0;
+}

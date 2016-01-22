@@ -5,10 +5,10 @@
 {% use "layout/body/main" %}
 {% use "layout/body/footer" %}
 
-{% block document_head_title %}<title>Password Reset - Audith Basis</title>{% endblock %}
+{% block document_head_title %}<title>{{ trans('auth.headings.password') }} - Audith Basis</title>{% endblock %}
 
 {% block document_head_javascripts %}
-    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
+    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}" defer="defer"></script>
 {% endblock %}
 
 {% block document_head_stylesheets %}
@@ -16,39 +16,28 @@
 {% endblock %}
 
 {% block document_body_header %}
-    <header class="container-fluid">
-        <h1 class="text-center">Audith Basis</h1>
+    <header class="container">
+        <h1 class="col-md-12">Audith <em>Basis</em></h1>
     </header>
 {% endblock %}
 
 {% block document_body_main %}
-    <main class="container-fluid">
-        <h2><b>Reset</b> your password</h2>
-
-        <form class="form-horizontal" role="form" method="POST" action="{{ action('Users\\PasswordController@postEmail', [], false) }}">
+    <main>
+        <form class="forget-form col-md-12" action="{{ action('Users\\PasswordController@postEmail', [], false) }}" method="post">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-            <fieldset class="col-md-12">
-                <label for="email" class="control-label sr-only">E-mail address</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="E-mail address" class="form-control">
+            <h3 class="form-title font-green col-md-12">{{ trans('auth.headings.password') }}</h3>
+            <fieldset class="form-group col-md-12">
+                <input class="form-control placeholder-no-fix" type="email" autocomplete="off" placeholder="{{ trans('auth.labels.email') }}" name="email">
             </fieldset>
-
-            <fieldset class="submit-button col-md-12">
-                <div class="col-md-8 col-md-offset-2">
-                    <button type="submit" class="btn btn-primary btn-xs col-md-12">Send Password Reset Link</button>
-                </div>
+            <fieldset class="form-actions col-md-12">
+                <a class="btn btn-default" href="{{ route('login', [], false) }}">{{ trans('auth.buttons.login') }}</a>
+                <button type="submit" class="btn btn-success uppercase pull-right">{{ trans('auth.buttons.password') }}</button>
             </fieldset>
         </form>
-
-        <ul class="col-md-12">
-            <li class="col-md-6 text-left"><a href="{{ route('login', [], false) }}">Sign in</a></li>
-            <li class="col-md-6 text-right"><a href="{{ route('register', [], false) }}">Register</a></li>
-        </ul>
     </main>
 {% endblock %}
 
 {% block document_body_footer %}
-    <footer>
-        &copy;
-    </footer>
+    <footer>2015 © Audith Softworks.</footer>
 {% endblock %}

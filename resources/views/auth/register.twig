@@ -5,10 +5,10 @@
 {% use "layout/body/main" %}
 {% use "layout/body/footer" %}
 
-{% block document_head_title %}<title>Register - Audith Basis</title>{% endblock %}
+{% block document_head_title %}<title>{{ trans('auth.headings.register') }} - Audith Basis</title>{% endblock %}
 
 {% block document_head_javascripts %}
-    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
+    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}" defer="defer"></script>
 {% endblock %}
 
 {% block document_head_stylesheets %}
@@ -16,64 +16,47 @@
 {% endblock %}
 
 {% block document_body_header %}
-    <header class="container-fluid">
-        <h1 class="text-center">Audith Basis</h1>
+    <header class="container">
+        <h1 class="col-md-12">Audith <em>Basis</em></h1>
     </header>
 {% endblock %}
 
 {% block document_body_main %}
-    <main class="container-fluid">
-        <h2><b>Create</b> a new account</h2>
-
-        <form class="form-horizontal" role="form" method="POST" action="{{ action('UsersController@store', [], false) }}">
+    <main>
+        <form class="register-form col-md-12" action="{{ action('UsersController@store', [], false) }}" method="post">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-            <fieldset class="col-md-12">
-                <label for="name" class="control-label sr-only">Name</label>
-                <input type="text" name="name" id="name" value="{{ old('name') }}" placeholder="Name" class="form-control">
+            <h3 class="form-title font-green col-md-12">{{ trans('auth.headings.register') }}</h3>
+            <fieldset class="form-group col-md-12">
+                <label class="control-label visible-ie8 visible-ie9">{{ trans('auth.labels.username') }}</label>
+                <input class="form-control placeholder-no-fix" type="text" autocomplete="off" placeholder="{{ trans('auth.labels.username') }}" name="username">
             </fieldset>
-
-            <fieldset class="col-md-12">
-                <label for="email" class="control-label sr-only">E-mail</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="E-mail address" class="form-control">
+            <fieldset class="form-group col-md-12">
+                <label class="control-label visible-ie8 visible-ie9">{{ trans('auth.labels.email') }}</label>
+                <input class="form-control placeholder-no-fix" type="text" placeholder="{{ trans('auth.labels.email') }}" name="email">
             </fieldset>
-
-            <fieldset class="col-md-12">
-                <label for="password" class="control-label sr-only">Password</label>
-                <input type="password" id="password" name="password" placeholder="Password" class="form-control">
+            <fieldset class="form-group col-md-12">
+                <label class="control-label visible-ie8 visible-ie9">{{ trans('auth.labels.password') }}</label>
+                <input class="form-control placeholder-no-fix" type="password" autocomplete="off" id="register_password" placeholder="{{ trans('auth.labels.password') }}" name="password">
             </fieldset>
-
-            <fieldset class="col-md-12">
-                <input type="password" name="password_confirmation" placeholder="Confirm password" class="form-control">
+            <fieldset class="form-group col-md-12">
+                <label class="control-label visible-ie8 visible-ie9">{{ trans('auth.labels.password_confirmation') }}</label>
+                <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="{{ trans('auth.labels.password_confirmation') }}" name="password_confirmation">
             </fieldset>
-
-            <fieldset class="submit-button col-md-12">
-                <div class="col-md-6">
-                    <label>Remember me <input type="checkbox" name="remember"></label>
-                    <script type="text/javascript">
-                        var elem = document.querySelector("input[name='remember']");
-                        var init = new Switchery(elem, {
-                            size: 'small'
-                        });
-                    </script>
-                </div>
-                <div class="col-md-6">
-                    <button type="submit" class="btn btn-primary btn-xs col-md-12">{{ trans('auth.buttons.signup') }}</button>
-                </div>
+            <fieldset class="form-group margin-top-20 margin-bottom-20 col-md-12">
+                <label class="check">
+                    <input type="checkbox" name="tnc"> {{ trans('auth.i_agree') | raw }}
+                </label>
+                <span id="register_tnc_error"></span>
             </fieldset>
-
-            <p>or</p>
-
-            <fieldset class="socialite">
-                <a class="btn btn-primary brand-color-twitter fa-twitter" href="{{ route('login', 'twitter', false) }}"></a>
-                <a class="btn btn-primary brand-color-googleplus fa-google-plus" href="{{ route('login', 'google', false) }}"></a>
-                <a class="btn btn-primary brand-color-facebook fa-facebook" href="{{ route('login', 'facebook', false) }}"></a>
+            <fieldset class="form-actions col-md-12">
+                <a class="btn btn-default" href="{{ route('login', [], false) }}">{{ trans('auth.buttons.login') }}</a>
+                <button type="submit" class="btn btn-success uppercase pull-right">{{ trans('auth.buttons.signup') }}</button>
             </fieldset>
         </form>
-
-        <ul class="col-md-12">
-            <li class="col-md-6 text-left"><a href="{{ route('login', [], false) }}">{{ trans('auth.buttons.login') }}</a></li>
-            <li class="col-md-6 text-right"><a href="{{ action('Users\\PasswordController@getEmail', [], false) }}">{{ trans('auth.buttons.password') }}</a></li>
-        </ul>
     </main>
+{% endblock %}
+
+{% block document_body_footer %}
+    <footer>2015 © Audith Softworks.</footer>
 {% endblock %}

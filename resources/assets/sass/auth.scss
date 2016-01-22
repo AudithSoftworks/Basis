@@ -1,165 +1,264 @@
-@import "compass/reset";
-@import "compass/css3";
-@import "_partials/variables";
-@import "_partials/_fonts/opensans";
-@import "_partials/_fonts/marcellus";
-@import "_partials/_fonts/fontawesome";
-@import "bootstrap-sass-official/assets/stylesheets/bootstrap";
+@import 'global/variables';
+@import 'global/fonts/fontawesome';
+@import 'global/fonts/opensans';
+@import 'global/fonts/simple-line-icons';
+@import 'bootstrap-sass-official/assets/stylesheets/bootstrap';
+@import 'jquery.uniform/themes/default/css/uniform.default';
+@import 'select2/src/scss/core';
+@import 'select2-bootstrap-theme/src/select2-bootstrap';
+@import 'global/components/mixins';
+@import 'global/components-md';
+@import 'global/plugins-md';
+
+/*
+|------------------------------
+| Login page
+|------------------------------
+*/
+
+$bg-color: #364150;
 
 body {
-    background-image: url('/media_assets/images/background-image-1.jpg');
-    font-family: "Open Sans", sans-serif;
-    font-size: 13px;
+    background-color: $bg-color !important;
 
     > header {
-        width: 400px;
-        margin-top: 10%;
-        margin-bottom: 1em;
+        margin-top: ($grid-gutter-width * 1.5);
 
         > h1 {
-            margin: 0 auto;
-            font-family: "Marcellus", serif;
+            font-family: 'Open Sans', sans-serif;
             font-weight: 400;
-            font-style: normal;
-            font-size: 30px;
+            font-size: 1.9em;
             color: white;
+            text-align: center;
+            text-transform: uppercase;
+
+            > em {
+                font-style: normal;
+                color: red;
+            }
         }
     }
 
-    > main {
-        width: 400px;
-        background-color: rgba(255, 255, 255, 0.2);
-        @include border-radius(8px);
+    main {
+        background-color: #eceef1;
+        border-radius: 7px;
+        width: $screen-xs-min;
+        margin: ($grid-gutter-width * 4 / 3) auto ($grid-gutter-width / 3);
+        padding-top: ($grid-gutter-width / 3);
+        padding-bottom: $grid-gutter-width;
+        overflow: hidden;
+        position: relative;
 
-        > h2 {
-            color: white;
-            font-size: 1.4em;
-            font-weight: 300;
-            margin-top: 20px;
-            margin-bottom: 15px;
+        h3 {
+            color: #4db3a5;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 400 !important;
         }
 
-        > form {
-            fieldset {
-                margin-bottom: 15px;
+        h4 {
+            color: #555555;
+        }
 
-                input[type='email'], input[type='text'], input[type='password'] {
-                    background-color: rgba(255, 255, 255, 0.4);
-                    padding: ($grid-gutter-width/3) ($grid-gutter-width/2);
-                    font-size: 1em;
-                    color: #333333;
-                }
+        .hint {
+            color: #999999;
+            padding: 0;
+            margin: 15px 0 7px 0;
+        }
 
-                button[type='submit'] {
-                    background-color: #416672;
-                }
+        .login-form {
+            > .login-options {
+                margin-bottom: 30px;
+                overflow: hidden;
 
-                label {
+                > h4 {
                     float: left;
-                    color: #1e2c46;
-                    font-weight: 300;
-
-                    .switchery {
-                        margin-left: 3px;
-                    }
+                    font-weight: 600;
+                    font-size: 15px;
+                    color: #7d91aa !important;
                 }
 
-                &.socialite {
-                    width: 119px;
-                    margin: 0 auto;
-                    clear: both;
+                > ul {
+                    float: right;
+                    padding-top: 3px;
 
-                    a.btn {
-                        width: 35px;
-                        margin-right: 3px;
-                        background: no-repeat left center;
-                        font-weight: 400;
-                        font-size: 1em;
+                    > li {
+                        list-style: none;
 
-                        &.brand-color-twitter {
-                            background-color: $brand-color-twitter;
-                            border-color: $brand-color-twitter;
-                        }
+                        > a {
+                            width: 30px;
+                            height: 30px;
+                            display: block;
+                            border-radius: 15px 15px 15px 15px !important;
+                            line-height: 30px;
+                            color: white;
 
-                        &.brand-color-googleplus {
-                            background-color: $brand-color-googleplus;
-                            border-color: $brand-color-googleplus;
-                        }
+                            &:hover {
+                                text-decoration: none;
+                            }
 
-                        &.brand-color-facebook {
-                            background-color: $brand-color-facebook;
-                            border-color: $brand-color-facebook;
-                        }
+                            &.fa-google-plus {
+                                background-color: $brand-color-googleplus;
+                            }
 
-                        &:before {
-                            display: inline-block;
-                            font-family: "FontAwesome", fantasy;
-                        }
+                            &.fa-twitter {
+                                background-color: $brand-color-twitter;
+                            }
 
-                        &:last-child {
-                            margin-right: 0;
+                            &.fa-facebook {
+                                background-color: $brand-color-facebook;
+                            }
                         }
                     }
-                }
-
-                &.submit-button {
-                    margin-bottom: 20px;
-                }
-            }
-
-            p {
-                width: 40px;
-                height: 25px;
-                background: rgba(0, 0, 0, 0.2) none repeat scroll 0 0;
-                position: relative;
-                margin: 25px auto;
-                clear: both;
-                text-align: center;
-                line-height: 25px;
-                text-transform: uppercase;
-                color: #FFF;
-
-                &:before {
-                    content: "";
-                    position: absolute;
-                    left: 0;
-                    width: 0;
-                    height: 0;
-                    top: -10px;
-                    border-left: 20px solid transparent;
-                    border-right: 20px solid transparent;
-                    border-bottom: 10px solid rgba(0, 0, 0, 0.2);
-                }
-
-                &:after {
-                    content: "";
-                    position: absolute;
-                    left: 0;
-                    width: 0;
-                    height: 0;
-                    bottom: -10px;
-                    border-left: 20px solid transparent;
-                    border-right: 20px solid transparent;
-                    border-top: 10px solid rgba(0, 0, 0, 0.2);
                 }
             }
         }
 
-        > ul {
-            margin-top: 20px;
+        .form-control {
+            background-color: #dde3ec;
+            height: 43px;
+            color: #8290a3;
+            border: 1px solid #dde3ec;
 
-            > li {
-                float: left;
+            &:focus, &:active {
+                border: 1px solid #c3ccda;
+            }
 
-                a {
-                    color: #1e2c46;
-                    font-weight: 300;
+            @include placeholder(#8290a3);
+        }
+
+        select.form-control {
+            padding-left: 9px;
+            padding-right: 9px;
+        }
+
+        .forget-form {
+            .form-actions {
+                border: 0;
+                margin-bottom: 0;
+                padding-bottom: 20px;
+            }
+        }
+
+        .register-form {
+            .form-actions {
+                border: 0;
+                margin-bottom: 0;
+                padding-bottom: 0px;
+            }
+        }
+
+        .form-title {
+            font-weight: 300;
+            margin-bottom: 25px;
+        }
+
+        .form-actions {
+            clear: both;
+            border: 0;
+            border-bottom: 1px solid #eeeeee;
+            margin-top: $grid-gutter-width;
+            margin-bottom: $grid-gutter-width;
+
+            .checkbox {
+                margin-left: 0;
+                padding-left: 0;
+            }
+
+            .btn {
+                margin-top: 1px;
+                font-weight: 600;
+                padding: 10px 20px !important;
+            }
+
+            .btn-default {
+                font-weight: 600;
+                padding: 10px 25px !important;
+                color: #6c7a8d;
+                background-color: #ffffff;
+                border: none;
+
+                &:hover {
+                    background-color: #fafaff;
+                    color: #45b6af;
+                }
+            }
+        }
+
+        .forget-password {
+            font-size: 14px;
+            float: right;
+            display: inline-block;
+            margin-top: 10px;
+        }
+
+        .check {
+            color: #8290a3;
+        }
+
+        .rememberme {
+            margin-left: 8px;
+            margin-top: 10px;
+        }
+
+        .create-account {
+            clear: both;
+            margin: 0 (-1 * $grid-gutter-width / 2) (-1 * $grid-gutter-width) (-1 * $grid-gutter-width / 2);
+            background-color: #6c7a8d;
+            border-radius: 0 0 7px 7px;
+            text-align: center;
+
+            > a {
+                display: inline-block;
+                width: 100%;
+                height: 100%;
+                padding: ($grid-gutter-width / 2) 0;
+                font-weight: 600;
+                color: #c3cedd;
+
+                &:hover {
+                    text-decoration: none;
                 }
             }
         }
     }
 
-    > footer {
-        width: 400px;
+    footer {
+        text-align: center;
+        margin: 0 auto 30px 0;
+        padding: 10px;
+        color: lighten($bg-color, 30%);
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 440px) {
+    body {
+        main {
+            width: 280px;
+            margin-top: 10px;
+
+            h3 {
+                font-size: 22px;
+            }
+
+            .login-form {
+                > .login-options {
+                    .social-icons {
+                        float: left;
+                        padding-top: 3px;
+                    }
+                }
+            }
+
+            .forget-password {
+                display: inline-block;
+                margin-top: 20px;
+            }
+        }
+
+        .checkbox {
+            font-size: 13px;
+        }
     }
 }

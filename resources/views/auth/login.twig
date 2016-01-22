@@ -5,10 +5,10 @@
 {% use "layout/body/main" %}
 {% use "layout/body/footer" %}
 
-{% block document_head_title %}<title>Login - Audith Basis</title>{% endblock %}
+{% block document_head_title %}<title>{{ trans('auth.headings.login') }} - Audith Basis</title>{% endblock %}
 
 {% block document_head_javascripts %}
-    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
+    <script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}" defer="defer"></script>
 {% endblock %}
 
 {% block document_head_stylesheets %}
@@ -16,61 +16,45 @@
 {% endblock %}
 
 {% block document_body_header %}
-    <header class="container-fluid">
-        <h1 class="text-center">Audith Basis</h1>
+    <header class="container">
+        <h1 class="col-md-12">Audith <em>Basis</em></h1>
     </header>
 {% endblock %}
 
 {% block document_body_main %}
-    <main class="container-fluid">
-        <h2><b>Log in</b> to your account</h2>
-
-        <form class="form-horizontal" role="form" method="POST" action="{{ action('Users\\AuthController@postLogin', [], false) }}">
+    <main>
+        <form class="login-form col-md-12" action="{{ action('Users\\AuthController@postLogin', [], false) }}" method="post">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
 
-            <fieldset class="col-md-12">
-                <label for="email" class="control-label sr-only">E-mail address</label>
-                <input type="email" id="email" name="email" value="{{ old('email') }}" placeholder="E-mail address" class="form-control">
+            <h3 class="form-title font-green col-md-12">{{ trans('auth.headings.login') }}</h3>
+            <fieldset class="form-group col-md-12">
+                <label class="control-label visible-ie8 visible-ie9">{{ trans('auth.labels.username') }}</label>
+                <input class="form-control form-control-solid placeholder-no-fix" type="text" autocomplete="off" placeholder="{{ trans('auth.labels.username') }}" name="username"/>
             </fieldset>
-
-            <fieldset class="col-md-12">
-                <label for="password" class="control-label sr-only">Password</label>
-                <input type="password" id="password" name="password" placeholder="Password" class="form-control">
+            <fieldset class="form-group col-md-12">
+                <label class="control-label visible-ie8 visible-ie9">{{ trans('auth.labels.password') }}</label>
+                <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="{{ trans('auth.labels.password') }}" name="password"/>
             </fieldset>
-
-            <fieldset class="submit-button col-md-12">
-                <div class="col-md-6">
-                    <label>Remember me <input type="checkbox" name="remember"></label>
-                    <script type="text/javascript">
-                        var elem = document.querySelector("input[name='remember']");
-                        var init = new Switchery(elem, {
-                            size: 'small'
-                        });
-                    </script>
-                </div>
-                <div class="col-md-6">
-                    <button type="submit" class="btn btn-primary btn-xs col-md-12">{{ trans('auth.buttons.login') }}</button>
-                </div>
+            <fieldset class="form-actions col-md-12">
+                <button type="submit" class="btn green uppercase">{{ trans('auth.buttons.login') }}</button>
+                <label class="rememberme check"><input type="checkbox" name="remember" value="1"> {{ trans('auth.remember_me') }}</label>
+                <a href="{{ action('Users\\PasswordController@getEmail', [], false) }}" id="forget-password" class="forget-password">{{ trans('auth.buttons.password') }}</a>
             </fieldset>
-
-            <p>or</p>
-
-            <fieldset class="socialite">
-                <a class="btn btn-primary brand-color-twitter fa-twitter" href="{{ route('login', 'twitter', false) }}"></a>
-                <a class="btn btn-primary brand-color-googleplus fa-google-plus" href="{{ route('login', 'google', false) }}"></a>
-                <a class="btn btn-primary brand-color-facebook fa-facebook" href="{{ route('login', 'facebook', false) }}"></a>
+            <fieldset class="login-options col-md-12">
+                <h4>{{ trans('auth.social_login') }}</h4>
+                <ul class="social-icons">
+                    <li><a class="social-icon-color fa fa-google-plus" data-original-title="Facebook" href="{{ route('login', 'google', false) }}"></a></li>
+                    <li><a class="social-icon-color fa fa-twitter" data-original-title="Twitter" href="{{ route('login', 'twitter', false) }}"></a></li>
+                    <li><a class="social-icon-color fa fa-facebook" data-original-title="Google Plus" href="{{ route('login', 'facebook', false) }}"></a></li>
+                </ul>
+            </fieldset>
+            <fieldset class="create-account">
+                <a href="{{ route('register', [], false) }}" class="uppercase">{{ trans('auth.buttons.register') }}</a>
             </fieldset>
         </form>
-
-        <ul class="col-md-12">
-            <li class="col-md-6 text-left"><a href="{{ route('register', [], false) }}">{{ trans('auth.buttons.register') }}</a></li>
-            <li class="col-md-6 text-right"><a href="{{ action('Users\\PasswordController@getEmail', [], false) }}">{{ trans('auth.buttons.password') }}</a></li>
-        </ul>
     </main>
 {% endblock %}
 
 {% block document_body_footer %}
-    <footer>
-        &copy;
-    </footer>
+    <footer>2015 © Audith Softworks.</footer>
 {% endblock %}

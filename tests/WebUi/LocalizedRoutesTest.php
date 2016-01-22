@@ -19,8 +19,6 @@ class LocalizedRoutesTest extends IlluminateTestCase
         putenv('APP_ENV=testing');
         $app = require __DIR__ . '/../../bootstrap/app.php';
         $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-
-        \Artisan::call('migrate:refresh');
     }
 
     public function data_testLocalizedHyperlinksInAuthenticationPages()
@@ -47,13 +45,15 @@ class LocalizedRoutesTest extends IlluminateTestCase
         $this->seeStatusCode(200);
         $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.login.')));
 
-        $this->click(trans('auth.buttons.register'));
-        $this->seeStatusCode(200);
-        $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register.')));
-
         $this->click(trans('auth.buttons.password'));
         $this->seeStatusCode(200);
         $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.password.') . '/' . trans('routes.password.email')));
+
+        $this->click(trans('auth.buttons.login'));
+        $this->seeStatusCode(200);
+        $this->click(trans('auth.buttons.register'));
+        $this->seeStatusCode(200);
+        $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register.')));
     }
 
     /**

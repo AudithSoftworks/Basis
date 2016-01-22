@@ -1,5 +1,8 @@
 <!DOCTYPE html>
-<html lang="{% if session_has('locale') %}{{ session_get('locale') }}{% else %}{{ config_get('app.fallback_locale') }}{% endif %}">
+{% set locale = app.make('translator').getLocale() %}
+<!--[if IE 8]><html lang="{{ locale }}" class="ie8 no-js"><![endif]-->
+<!--[if IE 9]><html lang="{{ locale }}" class="ie9 no-js"><![endif]-->
+<!--[if !IE]><!--><html lang="{{ locale }}"><!--<![endif]-->
     <head>
         {{ block('document_head') }}
     </head>
