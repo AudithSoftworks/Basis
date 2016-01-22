@@ -12,12 +12,12 @@ RUN apt-get update -y \
         wget
 RUN wget -O - http://dl.hhvm.com/conf/hhvm.gpg.key | apt-key add -
 RUN echo deb http://dl.hhvm.com/ubuntu wily main | tee /etc/apt/sources.list.d/hhvm.list
-RUN apt-get update -y \
-    && DEBIAN_FRONTEND=noninteractive apt-get install -y \
+RUN apt-get update -y && apt-get install -y \
         autoconf \
         automake \
         build-essential \
         bison \
+        bzip2 \
         curl \
         fontforge \
         gcc-4.8-locales \
@@ -55,7 +55,7 @@ RUN chmod 755 /scripts/*.sh
 EXPOSE 9000
 
 # Locale
-RUN locale-gen en_US.UTF-8 && DEBIAN_FRONTEND=noninteractive dpkg-reconfigure locales
+RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LC_CTYPE en_US.UTF-8
 
@@ -78,8 +78,8 @@ RUN set -ex \
     gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
   done
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 5.2.0
-ENV NPM_VERSION 3.5.1
+ENV NODE_VERSION 5.5.0
+ENV NPM_VERSION 3.5.3
 RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
     && curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
     && gpg --verify SHASUMS256.txt.asc \
@@ -90,7 +90,7 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
     && npm cache clear
 
 # Install Node dependencies
-RUN npm install -g bower gulp grunt-cli ttf2eot
+RUN npm install -g bower gulp grunt-cli ttf2eot jshint
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
 

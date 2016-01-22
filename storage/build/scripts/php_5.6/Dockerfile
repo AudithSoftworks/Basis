@@ -11,6 +11,7 @@ RUN apt-get update -y \
     && apt-get install -y \
         git \
         fontforge \
+        bzip 2 \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
@@ -68,8 +69,8 @@ RUN set -ex \
     gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
   done
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 5.2.0
-ENV NPM_VERSION 3.5.1
+ENV NODE_VERSION 5.5.0
+ENV NPM_VERSION 3.5.3
 RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
     && curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
     && gpg --verify SHASUMS256.txt.asc \
@@ -80,7 +81,7 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
     && npm cache clear
 
 # Install Node dependencies
-RUN npm install -g bower gulp grunt-cli ttf2eot
+RUN npm install -g bower gulp grunt-cli ttf2eot jshint
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
 
