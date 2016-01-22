@@ -1,10 +1,8 @@
 #!/usr/bin/env bash
 
-#docker build -f storage/build/scripts/php_5.5/Dockerfile -t audithsoftworks/basis:php_5.5 .;
 #docker build -f storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .;
 #docker build -f storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .;
 
-#docker build -f storage/build/scripts/php_5.5-fpm/Dockerfile -t audithsoftworks/basis:php_5.5-fpm .;
 #docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .;
 
 docker-compose -f docker-compose-php56.yml pull;
@@ -18,32 +16,38 @@ mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1)
 
 cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env;
 docker exec basis_php56_1 /bin/bash -c "
-        cd /home/basis;
-        npm update;
-        bower --config.interactive=false --allow-root update;
-        git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2;
-        cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
-        git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git /home/basis/storage/build/tools/css3_font_converter;
+    cd /home/basis && npm update && bower --config.interactive=false --allow-root update;
 
-        cd /home/basis;
-        cp -r ./public/bower_components/bootstrap/fonts ./public/fonts/glyphicons;
-        cp -r ./public/bower_components/fontawesome/fonts ./public/fonts/font_awesome;
-        cp -r ./public/bower_components/google-fonts/ofl/armata ./public/fonts/armata;
-        cp -r ./public/bower_components/google-fonts/ofl/ptsans ./public/fonts/pt_sans;
-        cp -r ./public/bower_components/google-fonts/ofl/marcellus ./public/fonts/marcellus;
-        cp -r ./public/bower_components/google-fonts/ofl/pontanosans ./public/fonts/pontano_sans;
-        cp -r ./public/bower_components/google-fonts/ofl/montserrat ./public/fonts/montserrat;
-        cp -r ./public/bower_components/google-fonts/apache/opensans ./public/fonts/opensans;
+    cd /home/basis/public/bower_components/fine-uploader && npm install && grunt package;
 
-        chmod -R +x /home/basis/storage/build/tools;
-        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf;
-        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pt_sans/stylesheet.css public/fonts/pt_sans/*.ttf;
-        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pontano_sans/stylesheet.css public/fonts/pontano_sans/*.ttf;
-        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf;
-        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
-        PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf;
+    cd /home/basis && git clone --depth=1 --branch=1.14.0 https://github.com/jzaefferer/jquery-validation.git /home/basis/public/bower_components/jquery.validation;
+    cd /home/basis/public/bower_components/jquery.validation && rm -rf .git && npm install && grunt;
 
-        compass compile;
-        gulp;
-        composer selfupdate && composer update --prefer-source --no-interaction;
-    ";
+    cd /home/basis && git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2;
+    cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
+
+    cd /home/basis && git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git /home/basis/storage/build/tools/css3_font_converter;
+
+    cp -r ./public/bower_components/bootstrap/fonts ./public/fonts/glyphicons;
+    cp -r ./public/bower_components/fontawesome/fonts ./public/fonts/font_awesome;
+    cp -r ./public/bower_components/simple-line-icons-webfont/fonts ./public/fonts/simple-line-icons;
+    cp -r ./public/bower_components/google-fonts/apache/opensans ./public/fonts/opensans;
+    cp -r ./public/bower_components/google-fonts/ofl/armata ./public/fonts/armata;
+    cp -r ./public/bower_components/google-fonts/ofl/ptsans ./public/fonts/pt_sans;
+    cp -r ./public/bower_components/google-fonts/ofl/marcellus ./public/fonts/marcellus;
+    cp -r ./public/bower_components/google-fonts/ofl/pontanosans ./public/fonts/pontano_sans;
+    cp -r ./public/bower_components/google-fonts/ofl/montserrat ./public/fonts/montserrat;
+
+    chmod -R +x /home/basis/storage/build/tools;
+    PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/simple-line-icons/stylesheet.css public/fonts/simple-line-icons/*.ttf;
+    PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf;
+    PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf;
+    PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pt_sans/stylesheet.css public/fonts/pt_sans/*.ttf;
+    PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/pontano_sans/stylesheet.css public/fonts/pontano_sans/*.ttf;
+    PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf;
+    PATH=$PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2 ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
+
+    compass compile;
+    gulp;
+    composer selfupdate && composer update --prefer-source --no-interaction;
+";

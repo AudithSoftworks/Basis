@@ -87,7 +87,7 @@ RUN npm install -g bower gulp grunt-cli ttf2eot jshint
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
 
-RUN pecl install -o -f redis xdebug \
+RUN pecl install -of redis xdebug \
     && rm -rf /tmp/pear \
     && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini \
     && echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
