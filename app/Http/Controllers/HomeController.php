@@ -2,11 +2,12 @@
 
 class HomeController extends Controller
 {
-    public function getIndex()
+    public function index()
     {
         $name = trans('auth.guest');
         $userType = self::TRANSLATION_TAG_GUEST_USER;
 
+        /** @var \App\Models\User $user */
         if ($user = app('sentinel')->getUser()) {
             $name = $user->name;
             $userType = self::TRANSLATION_TAG_REGISTERED_USER;

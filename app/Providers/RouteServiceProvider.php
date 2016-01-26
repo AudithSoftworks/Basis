@@ -25,7 +25,7 @@ class RouteServiceProvider extends ServiceProvider
     {
         $router->patterns([
             'provider' => 'twitter|google|facebook',
-            'token' => '[a-zA-Z0-9]+'
+            'token' => '[a-zA-Z0-9-]+'
         ]);
 
         parent::boot($router);
@@ -44,11 +44,6 @@ class RouteServiceProvider extends ServiceProvider
 
         $router->group(['namespace' => $this->namespace], function (Router $router) {
             $router->get('/oauth/{provider}', 'Users\AuthController@getOAuth');
-
-            $router->controllers([
-                '/admin' => 'AdminController',
-                '/admin-demo' => 'Admin\DemoController'
-            ]);
         });
 
         //-----------------------------------------------------------------------------------------------------
@@ -90,11 +85,18 @@ class RouteServiceProvider extends ServiceProvider
         $router->post('register', 'UsersController@store');
 
         $router->resource('users', 'UsersController');
-        $router->controller('password', 'Users\PasswordController');
-        $router->controller('activation', 'Users\ActivationController');
+
+        $router->get('password/email', 'Users\PasswordController@requestPasswordResetLink');
+        $router->post('password/email', 'Users\PasswordController@sendPasswordResetLink');
+        $router->get('password/reset', 'Users\PasswordController@showPasswordResetForm');
+        $router->post('password/reset', 'Users\PasswordController@resetPassword');
+
+        $router->get('activation', 'Users\ActivationController@requestActivationCode');
+        $router->get('activation/{token}', 'Users\ActivationController@activate');
+        $router->post('activation', 'Users\ActivationController@activate');
 
         $router->resource('files', 'FilesController', ['only' => ['index', 'create', 'store', 'show', 'destroy']]);
 
-        $router->controller('/', 'HomeController');
+        $router->get('', 'HomeController@index');
     }
 }

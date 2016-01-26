@@ -11,7 +11,7 @@ class SendResetPasswordLinkViaEmail
         $user = $event->user;
         $reminder = app('sentinel.reminders')->create($event->user);
         $token = $reminder->code;
-        $view = config('auth.password.email');
+        $view = config('auth.passwords.users.email');
         app('mailer')->send($view, compact('user', 'token'), function (Message $m) use ($user, $token) {
             $m->to($user->email)->subject($this->getPasswordResetEmailSubject());
         });

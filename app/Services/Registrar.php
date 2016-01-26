@@ -58,7 +58,7 @@ class Registrar implements RegistrarContract
         $validator = app('validator')->make($this->request->all(), [
             'name' => 'sometimes|required|max:255',
             'email' => 'required|email|max:255|unique:users',
-            'password' => 'required|confirmed|min:' . config('auth.password.min_length'),
+            'password' => 'required|confirmed|min:' . config('auth.passwords.users.min_length'),
         ]);
         if ($validator->fails()) {
             throw new ValidationException($validator);
@@ -146,7 +146,7 @@ class Registrar implements RegistrarContract
     public function delete($id)
     {
         $validator = app('validator')->make($this->request->all(), [
-            'password' => 'required|min:' . config('auth.password.min_length'),
+            'password' => 'required|min:' . config('auth.passwords.users.min_length'),
         ]);
         if ($validator->fails()) {
             throw new ValidationException($validator);
@@ -298,7 +298,7 @@ class Registrar implements RegistrarContract
         $validator = app('validator')->make($this->request->all(), [
             'token' => 'required|string',
             'email' => 'required|email|max:255',
-            'password' => 'required|confirmed|min:' . app('config')->get('auth.password.min_length')
+            'password' => 'required|confirmed|min:' . app('config')->get('auth.passwords.users.min_length')
         ]);
         if ($validator->fails()) {
             throw new ValidationException($validator);

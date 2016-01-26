@@ -1,4 +1,4 @@
-## Audith Basis on Laravel 5.1
+## Audith Basis on Laravel 5.2
 
 [![Build Status](https://circleci.com/gh/AudithSoftworks/Basis.png?circle-token=a8a3c6fee8d17e9a55b9589a53f8cb27b0c180d3)](https://circleci.com/gh/AudithSoftworks/Basis)
 

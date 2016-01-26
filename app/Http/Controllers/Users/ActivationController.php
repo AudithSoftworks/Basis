@@ -15,7 +15,7 @@ class ActivationController extends Controller
      */
     public function __construct()
     {
-        $this->middleware('auth', ['only' => ['getCode']]);
+        $this->middleware('auth', ['only' => ['requestActivationCode']]);
     }
 
     /**
@@ -26,7 +26,7 @@ class ActivationController extends Controller
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
      * @throws \App\Exceptions\Users\UserAlreadyActivatedException
      */
-    public function getCode(Request $request)
+    public function requestActivationCode(Request $request)
     {
         if (!($user = app('sentinel')->getUser())) {
             throw new UserNotFoundException;
@@ -50,38 +50,28 @@ class ActivationController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @param \App\Contracts\Registrar $registrar
-     * @param string                   $token
+     * @param string|null              $token
      *
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector|\Illuminate\Http\JsonResponse
      */
-    public function getProcess(Request $request, Registrar $registrar, $token)
+    public function activate(Request $request, Registrar $registrar, $token = null)
     {
-        if ($request->ajax() || $request->wantsJson()) {
-            throw new NotImplementedException;
+        switch ($requestMethod = $request->getMethod()) {
+            case 'GET':
+                if ($request->ajax() || $request->wantsJson()) {
+                    throw new NotImplementedException;
+                }
+                break;
+            case 'POST':
+                if (!$request->ajax() && !$request->wantsJson()) {
+                    throw new NotImplementedException;
+                }
+                break;
         }
 
         $registrar->activate($token);
 
-        return redirect($this->redirectPath())->with('message', 'Activation successful');
-    }
-
-    /**
-     * Activate an account [JSON-API only].
-     *
-     * @param \Illuminate\Http\Request $request *
-     * @param \App\Contracts\Registrar $registrar
-     *
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function postProcess(Request $request, Registrar $registrar)
-    {
-        if (!$request->ajax() && !$request->wantsJson()) {
-            throw new NotImplementedException;
-        }
-
-        $registrar->activate();
-
-        return response()->json(['message' => 'Activated']);
+        return $requestMethod == 'GET' ? redirect($this->redirectPath())->with('message', 'Activation successful') : response()->json(['message' => 'Activated']);
     }
 
     /**

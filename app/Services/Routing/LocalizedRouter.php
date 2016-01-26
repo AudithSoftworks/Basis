@@ -15,9 +15,9 @@ class LocalizedRouter extends Router
      */
     public function __construct(Dispatcher $events, Container $container = null)
     {
-        $this->events = $events;
+        parent::__construct($events, $container);
+
         $this->routes = new LocalizedRouteCollection;
-        $this->container = $container ?: new Container;
     }
 
     /**
@@ -45,6 +45,8 @@ class LocalizedRouter extends Router
      * @param  array  $names
      *
      * @return void
+     *
+     * @deprecated since version 5.2.
      */
     public function controller($uri, $controller, $names = [])
     {
@@ -108,6 +110,8 @@ class LocalizedRouter extends Router
      * @param  string $uri
      *
      * @return void
+     *
+     * @deprecated since version 5.2.
      */
     protected function addFallthroughRoute($controller, $uri)
     {
