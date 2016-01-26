@@ -9,13 +9,13 @@ return [
         'secret' => env('MANDRILL_SECRET'),
     ],
     'ses' => [
-        'key'    => env('SES_KEY'),
+        'key' => env('SES_KEY'),
         'secret' => env('SES_SECRET'),
-        'region' => 'eu-central-1',
+        'region' => 'us-east-1',
     ],
     'stripe' => [
-        'model'  => App\Models\User::class,
-        'key'    => env('STRIPE_KEY'),
+        'model' => App\Models\User::class,
+        'key' => env('STRIPE_KEY'),
         'secret' => env('STRIPE_SECRET'),
     ],
     'hipchat' => [

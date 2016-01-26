@@ -130,7 +130,7 @@ return [
     */
     'activations' => [
         'model' => \Cartalyst\Sentinel\Activations\EloquentActivation::class,
-        'view' => 'emails.activation',
+        'view' => 'auth/emails/activation',
         'expires' => 259200,
         'lottery' => [2, 100],
     ],

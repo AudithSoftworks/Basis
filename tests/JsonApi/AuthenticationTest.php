@@ -197,11 +197,11 @@ class AuthenticationTest extends IlluminateTestCase
     }
 
     /**
-     * Tests App\Controllers\Users\PasswordController::postEmail() controller method.
+     * Tests App\Controllers\Users\PasswordController::sendPasswordResetLink() controller method.
      *
      * @depends testUsersUpdateForSuccess
      */
-    public function testPasswordPostEmailForExceptions()
+    public function testPasswordSendPasswordResetLinkForExceptions()
     {
         # Validation failure: Invalid email address
         $userData = ['email' => 'jane.doe@'];
@@ -221,11 +221,11 @@ class AuthenticationTest extends IlluminateTestCase
     }
 
     /**
-     * Tests App\Controllers\Users\PasswordController::postEmail() controller method.
+     * Tests App\Controllers\Users\PasswordController::sendPasswordResetLink() controller method.
      *
      * @depends testUsersUpdateForSuccess
      */
-    public function testPasswordPostEmailForSuccess()
+    public function testPasswordSendPasswordResetLinkForSuccess()
     {
         $userData = ['email' => 'john.doe@example.com'];
         $this->post('/password/email', $userData, self::$requestHeaders);
@@ -235,11 +235,11 @@ class AuthenticationTest extends IlluminateTestCase
     }
 
     /**
-     * Tests App\Controllers\Users\PasswordController::postReset() controller method.
+     * Tests App\Controllers\Users\PasswordController::resetPassword() controller method.
      *
-     * @depends testPasswordPostEmailForSuccess
+     * @depends testPasswordSendPasswordResetLinkForSuccess
      */
-    public function testPasswordPostResetForExceptions()
+    public function testPasswordResetPasswordForExceptions()
     {
         $passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
 
@@ -313,11 +313,11 @@ class AuthenticationTest extends IlluminateTestCase
     }
 
     /**
-     * Tests App\Controllers\Users\PasswordController::postReset() controller method.
+     * Tests App\Controllers\Users\PasswordController::resetPassword() controller method.
      *
-     * @depends testPasswordPostEmailForSuccess
+     * @depends testPasswordSendPasswordResetLinkForSuccess
      */
-    public function testPasswordPostResetForSuccess()
+    public function testPasswordResetPasswordForSuccess()
     {
         $userData = [
             'id' => 1,
@@ -335,7 +335,7 @@ class AuthenticationTest extends IlluminateTestCase
     /**
      * Tests App\Controllers\Users\AuthController::postLogin() controller method.
      *
-     * @depend testPasswordPostResetForSuccess
+     * @depend testPasswordResetPasswordForSuccess
      */
     public function testAuthLoginForExceptions()
     {
@@ -370,7 +370,7 @@ class AuthenticationTest extends IlluminateTestCase
     /**
      * Tests App\Controllers\Users\AuthController::postLogin() controller method.
      *
-     * @depends testPasswordPostResetForSuccess
+     * @depends testPasswordResetPasswordForSuccess
      */
     public function testAuthLoginForSuccess()
     {
@@ -384,15 +384,15 @@ class AuthenticationTest extends IlluminateTestCase
     }
 
     /**
-     * Tests App\Controllers\Users\ActivationController::getCode() controller method.
+     * Tests App\Controllers\Users\ActivationController::requestActivationCode() controller method.
      *
      * @depends testAuthLoginForSuccess
      */
-    public function testActivationGetCodeForExceptions()
+    public function testActivationRequestActivationCodeForExceptions()
     {
         # Failure: Tries to ask for code without logging in.
         $this->assertTrue(app('sentinel')->guest());
-        $this->get('/activation/code', self::$requestHeaders);
+        $this->get('/activation', self::$requestHeaders);
         $this->shouldReturnJson();
         $this->see('message');
         $this->seeStatusCode(401);
@@ -400,30 +400,30 @@ class AuthenticationTest extends IlluminateTestCase
     }
 
     /**
-     * Tests App\Controllers\Users\ActivationController::getCode() controller method.
+     * Tests App\Controllers\Users\ActivationController::requestActivationCode() controller method.
      *
      * @depends testAuthLoginForSuccess
      */
-    public function testActivationGetCodeForSuccess()
+    public function testActivationRequestActivationCodeForSuccess()
     {
         app('sentinel')->login(app('sentinel')->getUserRepository()->findById(1));
         $this->assertFalse(app('sentinel')->guest());
         $this->assertInstanceOf(UserInterface::class, app('sentinel')->check());
 
-        $this->get('/activation/code', self::$requestHeaders);
+        $this->get('/activation', self::$requestHeaders);
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
         $this->seeJson(['message' => 'Activation link sent']);
     }
 
     /**
-     * Tests App\Controllers\Users\ActivationController::getProcess() controller method.
+     * Tests App\Controllers\Users\ActivationController::activate() controller method.
      *
-     * @depends testActivationGetCodeForSuccess
+     * @depends testActivationRequestActivationCodeForSuccess
      */
-    public function testActivationGetProcessForExceptions()
+    public function testActivationWebActivateForExceptions()
     {
-        $this->get('/activation/process/wrong-token', self::$requestHeaders);
+        $this->get('/activation/wrong-token', self::$requestHeaders);
         $this->shouldReturnJson();
         $this->see('message');
         $this->seeStatusCode(405);
@@ -432,13 +432,13 @@ class AuthenticationTest extends IlluminateTestCase
     }
 
     /**
-     * Tests App\Controllers\Users\ActivationController::getProcess() controller method.
+     * Tests App\Controllers\Users\ActivationController::activate() controller method.
      *
-     * @depends testActivationGetCodeForSuccess
+     * @depends testActivationRequestActivationCodeForSuccess
      */
-    public function testActivationPostProcessForExceptions()
+    public function testActivationJsonActivateForExceptions()
     {
-        $this->post('/activation/process', ['token' => 'wrong-token'], self::$requestHeaders);
+        $this->post('/activation', ['token' => 'wrong-token'], self::$requestHeaders);
         $this->shouldReturnJson();
         $this->see('message');
         $this->seeStatusCode(422);
@@ -447,14 +447,14 @@ class AuthenticationTest extends IlluminateTestCase
     }
 
     /**
-     * Tests App\Controllers\Users\ActivationController::getProcess() controller method.
+     * Tests App\Controllers\Users\ActivationController::activate() controller method.
      *
-     * @depends testActivationGetCodeForSuccess
+     * @depends testActivationRequestActivationCodeForSuccess
      */
-    public function testActivationPostProcessForSuccess()
+    public function testActivationJsonActivateForSuccess()
     {
         $data = ['token' => app('db')->table('activations')->where('user_id', '=', 1)->value('code')];
-        $this->post('/activation/process', $data, self::$requestHeaders);
+        $this->post('/activation', $data, self::$requestHeaders);
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
         $this->seeJson(['message' => 'Activated']);

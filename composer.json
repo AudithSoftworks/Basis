@@ -27,7 +27,7 @@
         "ext-openssl": "*",
         "barryvdh/laravel-ide-helper": "~2.1",
         "cartalyst/sentinel": "~2.0",
-        "laravel/framework": "5.1.*",
+        "laravel/framework": "5.2.*",
         "laravel/socialite": "~2.0",
         "predis/predis": "~1",
         "rcrowe/twigbridge": "~0.9"
@@ -37,7 +37,9 @@
         "fzaninotto/faker": "~1.5",
         "phpspec/phpspec": "~2.1",
         "phpunit/phpunit": "~4",
-        "sauce/sausage": ">=0.17"
+        "sauce/sausage": ">=0.17",
+        "symfony/dom-crawler": "~3.0",
+        "symfony/css-selector": "~3.0"
     },
     "autoload": {
         "classmap": [
@@ -70,5 +72,7 @@
     },
     "config": {
         "preferred-install": "dist"
-    }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
 }

@@ -1,10 +1,12 @@
 <?php namespace App\Exceptions;
 
 use Cartalyst\Sentinel\Checkpoints\NotActivatedException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Session\TokenMismatchException;
+use Illuminate\Validation\ValidationException as IlluminateValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -17,7 +19,9 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
+        AuthorizationException::class,
         HttpException::class,
+        IlluminateValidationException::class,
         ModelNotFoundException::class,
     ];
 
@@ -76,7 +80,7 @@ class Handler extends ExceptionHandler
                 $statusCode = IlluminateResponse::HTTP_NOT_FOUND;
             } elseif ($e instanceof \BadMethodCallException) {
                 $statusCode = IlluminateResponse::HTTP_METHOD_NOT_ALLOWED;
-            } elseif ($e instanceof \UnexpectedValueException || $e instanceof TokenMismatchException) {
+            } elseif ($e instanceof \UnexpectedValueException || $e instanceof IlluminateValidationException || $e instanceof TokenMismatchException) {
                 $statusCode = IlluminateResponse::HTTP_UNPROCESSABLE_ENTITY;
             } elseif ($e instanceof \OverflowException) {
                 $statusCode = IlluminateResponse::HTTP_REQUEST_ENTITY_TOO_LARGE;

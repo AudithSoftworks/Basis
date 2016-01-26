@@ -1,13 +1,16 @@
 <?php namespace App\Exceptions\Common;
 
-use Illuminate\Validation\Validator;
+use Illuminate\Validation\ValidationException as IlluminateValidationException;
 
-class ValidationException extends \UnexpectedValueException
+class ValidationException extends IlluminateValidationException
 {
-    public function __construct(Validator $validator)
+    /**
+     * ValidationException constructor.
+     *
+     * @param \Illuminate\Validation\Validator $validator
+     */
+    public function __construct(\Illuminate\Validation\Validator $validator)
     {
-        if ($validator->fails()) {
-            parent::__construct(json_encode($validator->errors()->getMessages()));
-        }
+        parent::__construct($validator);
     }
 }

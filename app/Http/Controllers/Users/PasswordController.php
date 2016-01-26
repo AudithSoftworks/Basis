@@ -23,7 +23,7 @@ class PasswordController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function getEmail(Request $request)
+    public function requestPasswordResetLink(Request $request)
     {
         if ($request->ajax() || $request->wantsJson()) {
             return response()->json([]);
@@ -40,7 +40,7 @@ class PasswordController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function postEmail(Request $request, Registrar $registrar)
+    public function sendPasswordResetLink(Request $request, Registrar $registrar)
     {
         $registrar->sendResetPasswordLinkViaEmail();
 
@@ -59,7 +59,7 @@ class PasswordController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\View\View|\Illuminate\Contracts\View\Factory
      */
-    public function getReset(Request $request, $token = null)
+    public function showPasswordResetForm(Request $request, $token = null)
     {
         if (is_null($token)) {
             if ($request->ajax() || $request->wantsJson()) {
@@ -84,7 +84,7 @@ class PasswordController extends Controller
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
      */
-    public function postReset(Request $request, Registrar $registrar)
+    public function resetPassword(Request $request, Registrar $registrar)
     {
         $registrar->resetPassword();
 
