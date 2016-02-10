@@ -52,7 +52,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $defaultLocale = config('app.locale');
         $namespace = $this->namespace;
-        $middleware = 'locale';
+        $middleware = 'web';
         foreach (config('app.locales') as $prefix => $localeName) {
             app('translator')->setLocale($prefix);
             // Skip default locale for now.
@@ -67,7 +67,7 @@ class RouteServiceProvider extends ServiceProvider
         }
 
         //------------------------------------------------
-        // Default locale? No prefices are necessary.
+        // Default locale: No prefices are necessary.
         //------------------------------------------------
 
         app('translator')->setLocale($defaultLocale);
