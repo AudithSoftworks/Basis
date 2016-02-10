@@ -82,6 +82,8 @@ class Handler extends ExceptionHandler
                 $statusCode = IlluminateResponse::HTTP_METHOD_NOT_ALLOWED;
             } elseif ($e instanceof \UnexpectedValueException || $e instanceof IlluminateValidationException || $e instanceof TokenMismatchException) {
                 $statusCode = IlluminateResponse::HTTP_UNPROCESSABLE_ENTITY;
+                $messageBag = $e->validator->errors();
+                $responseBody['message'] = $messageBag->getMessages();
             } elseif ($e instanceof \OverflowException) {
                 $statusCode = IlluminateResponse::HTTP_REQUEST_ENTITY_TOO_LARGE;
             } else {
