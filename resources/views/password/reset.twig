@@ -23,7 +23,7 @@
 
 {% block document_body_main %}
     <main>
-        <form class="forget-form col-md-12" action="{{ action('Users\\PasswordController@postReset', [], false) }}" method="post">
+        <form class="forget-form col-md-12" action="{{ action('Users\\PasswordController@resetPassword', [], false) }}" method="post">
             <input type="hidden" name="_token" value="{{ csrf_token() }}">
             <input type="hidden" name="token" value="{{ token }}">
 
