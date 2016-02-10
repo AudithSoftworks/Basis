@@ -88,7 +88,7 @@ class RouteServiceProvider extends ServiceProvider
 
         $router->get('password/email', 'Users\PasswordController@requestPasswordResetLink');
         $router->post('password/email', 'Users\PasswordController@sendPasswordResetLink');
-        $router->get('password/reset', 'Users\PasswordController@showPasswordResetForm');
+        $router->get('password/reset/{token}', 'Users\PasswordController@showPasswordResetForm');
         $router->post('password/reset', 'Users\PasswordController@resetPassword');
 
         $router->get('activation', 'Users\ActivationController@requestActivationCode');
