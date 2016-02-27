@@ -38,11 +38,15 @@ class RouteServiceProvider extends ServiceProvider
      */
     public function map(Router $router)
     {
+        $defaultLocale = config('app.locale');
+        $namespace = $this->namespace;
+        $middleware = 'web';
+
         //-----------------------------------------------------------------------
         // Non-localized, generic routes (such as those for admin panel etc).
         //-----------------------------------------------------------------------
 
-        $router->group(['namespace' => $this->namespace], function (Router $router) {
+        $router->group(compact('namespace', 'middleware'), function (Router $router) {
             $router->get('/oauth/{provider}', 'Users\AuthController@getOAuth');
         });
 
@@ -50,9 +54,6 @@ class RouteServiceProvider extends ServiceProvider
         // Register localized routes with locale-prefices (in case of default locale, no prefix is attached).
         //-----------------------------------------------------------------------------------------------------
 
-        $defaultLocale = config('app.locale');
-        $namespace = $this->namespace;
-        $middleware = 'web';
         foreach (config('app.locales') as $prefix => $localeName) {
             app('translator')->setLocale($prefix);
             // Skip default locale for now.
@@ -71,7 +72,7 @@ class RouteServiceProvider extends ServiceProvider
         //------------------------------------------------
 
         app('translator')->setLocale($defaultLocale);
-        $router->group(compact('namespace'), function (Router $router) use ($defaultLocale) {
+        $router->group(compact('namespace', 'middleware'), function (Router $router) use ($defaultLocale) {
             $this->localizedRoutes($router, $defaultLocale);
         });
     }

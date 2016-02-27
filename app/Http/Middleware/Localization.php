@@ -14,7 +14,10 @@ class Localization
      */
     public function handle(Request $request, \Closure $next)
     {
-        app('translator')->setLocale($request->segment(1));
+        if (empty($locale = $request->segment(1)) || !in_array($locale, config('app.locales'))) {
+            $locale = config('app.fallback_locale');
+        }
+        app('translator')->setLocale($locale);
 
         return $next($request);
     }
