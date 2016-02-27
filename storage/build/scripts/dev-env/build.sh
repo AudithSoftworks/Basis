@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
-#docker build -f storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .;
-#docker build -f storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .;
+# docker build -f storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .;
+# docker build -f storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .;
 
-#docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .;
+# docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .;
 
 docker-compose -f docker-compose-php56.yml pull;
 docker-compose -f docker-compose-php56.yml up -d;
@@ -12,7 +12,7 @@ docker exec basis_php56_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSet
 
 sleep 5;
 mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
-#psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;";
+# psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;";
 
 cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env;
 docker exec basis_php56_1 /bin/bash -c "
