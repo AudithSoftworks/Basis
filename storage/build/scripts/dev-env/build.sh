@@ -1,9 +1,11 @@
 #!/usr/bin/env bash
 
+# docker build -f storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .
+# docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .;
+
 # docker build -f storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .;
 # docker build -f storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .;
 
-# docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .;
 
 docker-compose -f docker-compose-php56.yml pull;
 docker-compose -f docker-compose-php56.yml up -d;

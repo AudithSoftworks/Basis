@@ -29,7 +29,7 @@
         "bootstrap-switch": "3.*",
         "bower-jvectormap-2": "*",
         "excanvas": "*",
-        "fine-uploader": "^5.4.0",
+        "fine-uploader": "^5.5",
         "fontawesome": "^4.5.0",
         "google-fonts": "*",
         "humane-js": "3.*",
