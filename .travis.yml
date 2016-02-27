@@ -36,10 +36,11 @@ install:
   - case $PHP_VERSION in '5.5') export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; '5.6') export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 'hhvm') export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
     && docker-compose -f $DOCKER_COMPOSE_FILE pull
   - case $PHP_VERSION in '5.5') export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; '5.6') export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 'hhvm') export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
-    && docker-compose -f $DOCKER_COMPOSE_FILE up -d && docker-compose ps
+    && docker-compose -f $DOCKER_COMPOSE_FILE up -d
 
   # Create database for MySQL and PgSQL
   - sleep 15;
+    docker-compose ps;
     mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
     if [[ $PHP_VERSION != 'hhvm' ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
 
