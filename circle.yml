@@ -43,10 +43,11 @@ dependencies:
     - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
       && docker-compose -f $DOCKER_COMPOSE_FILE pull
     - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
-      && docker-compose -f $DOCKER_COMPOSE_FILE up -d && docker-compose ps
+      && docker-compose -f $DOCKER_COMPOSE_FILE up -d
 
     # Create database for MySQL and PgSQL
     - sleep 5;
+      docker-compose ps;
       mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
       if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 1 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
 

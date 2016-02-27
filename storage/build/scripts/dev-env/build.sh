@@ -50,4 +50,7 @@ docker exec basis_php56_1 /bin/bash -c "
     compass compile;
     gulp;
     composer selfupdate && composer update --prefer-source --no-interaction;
+
+    ./artisan key:generate;
+    ./artisan migrate;
 ";
