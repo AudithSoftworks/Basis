@@ -2,10 +2,8 @@
 
 # docker build -f storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .
 # docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .;
-
 # docker build -f storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .;
 # docker build -f storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .;
-
 
 docker-compose -f docker-compose-php56.yml pull;
 docker-compose -f docker-compose-php56.yml up -d;
@@ -53,4 +51,11 @@ docker exec basis_php56_1 /bin/bash -c "
 
     ./artisan key:generate;
     ./artisan migrate;
+
+    chown -R 1000:1000 ./
 ";
+
+#docker-compose stop;
+#sleep 10;
+#docker rm $(docker ps -a | grep "Exited" | awk "{print \$1}");
+#docker rmi $(docker images | grep "<none>" | awk "{print \$3}");

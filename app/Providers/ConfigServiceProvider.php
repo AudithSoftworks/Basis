@@ -15,8 +15,13 @@ class ConfigServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        # Adding Hipchat handler to Monolog logger for non-production environments.
+        # Adding Hipchat and Gitter handlers to Monolog logger for non-production environments.
         if (!app()->environment('production')) {
+            /*
+            |--------------------------
+            | Hipchat integration
+            |--------------------------
+            */
             $hipchatConfig = app('config')->get('services.hipchat');
             $hipchatHandler = new \Monolog\Handler\HipChatHandler(
                 $hipchatConfig['token'],
@@ -25,8 +30,8 @@ class ConfigServiceProvider extends ServiceProvider
                 false,
                 $hipchatConfig['level']
             );
-
-            app('log')->getMonolog()->pushHandler($hipchatHandler);
+            $bufferHandlerForHipchat = new \Monolog\Handler\BufferHandler($hipchatHandler);
+            app('log')->getMonolog()->pushHandler($bufferHandlerForHipchat);
         }
 
         config([

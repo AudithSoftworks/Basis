@@ -37,7 +37,7 @@
         "jquery.blockUI": "*",
         "jquery.easy-pie-chart": "2.1.*",
         "jquery.slimscroll": "1.*",
-        "jquery.uniform": "2.*",
+        "jquery.uniform": "master",
         "jquery-backstretch-2": "2.*",
         "jquery-easing": "*",
         "jquery-flot": "*",

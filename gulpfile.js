@@ -63,7 +63,7 @@ elixir(function (mix) {
         'easy_pie_chart': ['public/bower_components/jquery.easy-pie-chart/dist/easypiechart.js'],
         'excanvas': ['public/bower_components/excanvas/excanvas.js'],
         'fastclick': ['public/bower_components/fastclick/lib/fastclick.js'],
-        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.5.1/fine-uploader/fine-uploader.js'],
+        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.6.0/fine-uploader/fine-uploader.js'],
         'humane_js': ['public/bower_components/humane-js/humane.js'],
         'jquery_backstretch': ['public/bower_components/jquery-backstretch-2/jquery.backstretch.js'],
         'jquery_blockui': ['public/bower_components/jquery.blockUI/jquery.blockUI.js'],
@@ -102,7 +102,7 @@ elixir(function (mix) {
     var cssAliases = {
         'bootstrap_switch': ['public/bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css'],
         'bower_jvectormap_2': ['public/bower_components/bower-jvectormap-2/jquery-jvectormap-2.0.0.css'],
-        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.5.1/fine-uploader/fine-uploader-gallery.css'],
+        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.6.0/fine-uploader/fine-uploader-gallery.css'],
         'humane_js': [
             'public/bower_components/humane-js/themes/bigbox.css',
             'public/bower_components/humane-js/themes/boldlight.css',
