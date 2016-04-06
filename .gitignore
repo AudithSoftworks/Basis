@@ -1,6 +1,7 @@
 .*
 *.mwb.bak
 node_modules
+vendor
 bootstrap/cache/*
 public/bower_components
 public/build
@@ -8,6 +9,7 @@ public/fonts/*
 public/javascripts/*
 public/swagger*
 resources/assets/stylesheets/*
+!resources/assets/sass/global/vendor
 storage/app/*
 storage/build/tools/*
 !storage/build/tools/sfnt2woff
@@ -26,7 +28,7 @@ storage/logs/*
 composer.lock
 _ide_helper.php
 !.git*
-!.env.example
+!.env.*
 !*.yml
 !.bowerrc
-/vendor
+old

@@ -12,7 +12,6 @@ general:
 notify:
   webhooks:
     - url: https://webhooks.gitter.im/e/251b9f310b8c9e8855f9
-    - url: https://webhooks.gitter.im/e/6dbdffdc3ba4745e2165
 
 dependencies:
   cache_directories:

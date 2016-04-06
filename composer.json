@@ -25,10 +25,10 @@
         "ext-mbstring": "*",
         "ext-mcrypt": "*",
         "ext-openssl": "*",
-        "barryvdh/laravel-ide-helper": "~2.1",
+        "barryvdh/laravel-ide-helper": "^2.1",
         "cartalyst/sentinel": "~2.0",
-        "laravel/framework": "5.2.*",
-        "laravel/socialite": "~2.0",
+        "laravel/framework": "~5.2",
+        "laravel/socialite": "~2",
         "predis/predis": "~1",
         "rcrowe/twigbridge": "~0.9"
     },
