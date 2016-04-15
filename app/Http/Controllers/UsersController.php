@@ -34,7 +34,7 @@ class UsersController extends Controller
     /**
      * Store a newly created user.
      *
-     * @param \Illuminate\Http\Request $request *
+     * @param \Illuminate\Http\Request $request
      * @param \App\Contracts\Registrar $registrar
      *
      * @return \Illuminate\Http\RedirectResponse|\Symfony\Component\HttpFoundation\Response

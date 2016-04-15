@@ -56,9 +56,6 @@ dependencies:
 
     # dotEnv file for initial test setup
     - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
-    - echo HIPCHAT_TOKEN=$HIPCHAT_TOKEN | tee -a .env
-    - echo HIPCHAT_ROOM=$HIPCHAT_ROOM | tee -a .env
-    - echo HIPCHAT_NAME=$HIPCHAT_NAME | tee -a .env
 
     # Build project dependencies
     - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php56_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
