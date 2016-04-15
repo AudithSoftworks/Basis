@@ -1,4 +1,4 @@
-FROM php:5.6
+FROM php:7
 MAINTAINER Shahriyar Imanov <shehi@imanov.me>
 
 WORKDIR /home/basis
@@ -78,23 +78,33 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
     && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
     && rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc \
     && npm install -g npm@latest \
-    && npm cache clear
+    && npm cache clear \
+    && rm -rf /tmp/npm-*
 
 # Install Node global dependencies
 RUN npm install -g bower gulp grunt-cli ttf2eot jshint
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
 
-RUN pecl install -of redis xdebug \
+# Install PECL php-xdebug and php-mongodb extensions
+RUN pecl install -of xdebug mongodb \
     && rm -rf /tmp/pear \
-    && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini \
-    && echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "zend_extension=xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.idekey = basisPhp" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo no | pecl install -o -f mongo \
-    && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
+    && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongo.ini
+
+# Install php-redis extension through Git
+RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
+    && cd /tmp/phpredis \
+    && git checkout php7 \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install \
+    && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini
 
 EXPOSE 54321
