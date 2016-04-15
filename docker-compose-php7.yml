@@ -7,8 +7,8 @@ postgres94:
   image: postgres:9.4
 redis:
   image: redis
-phpFpm56:
-  image: audithsoftworks/basis:php_5.6-fpm
+phpFpm7:
+  image: audithsoftworks/basis:php_7-fpm
   volumes:
     - .:/home/basis
   working_dir: /home/basis
@@ -25,9 +25,9 @@ nginxForPhpFpm:
     - .:/home/basis
   working_dir: /home/basis
   links:
-    - phpFpm56
-php56:
-  image: audithsoftworks/basis:php_5.6
+    - phpFpm7
+php7:
+  image: audithsoftworks/basis:php_7
   volumes:
     - .:/home/basis
   working_dir: /home/basis

@@ -30,8 +30,8 @@ class ConfigServiceProvider extends ServiceProvider
                 false,
                 $hipchatConfig['level']
             );
-            $bufferHandlerForHipchat = new \Monolog\Handler\BufferHandler($hipchatHandler);
-            app('log')->getMonolog()->pushHandler($bufferHandlerForHipchat);
+//            $bufferHandlerForHipchat = new \Monolog\Handler\BufferHandler($hipchatHandler);
+            app('log')->getMonolog()->pushHandler($hipchatHandler);
         }
 
         config([

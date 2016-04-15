@@ -1,10 +1,11 @@
-FROM php:5.6-fpm
+FROM php:7-fpm
 MAINTAINER Shahriyar Imanov <shehi@imanov.me>
 
 ENV DEBIAN_FRONTEND noninteractive
 
 RUN apt-get update -y && apt-get install -y apt-utils && apt-get upgrade -y
 RUN apt-get install -y \
+        git \
         libcurl4-gnutls-dev \
         libfreetype6-dev \
         libjpeg62-turbo-dev \
@@ -18,8 +19,8 @@ RUN apt-get install -y \
         locales-all \
         telnet \
         wget \
-   && apt-get clean \
-   && apt-get autoremove -y
+    && apt-get clean \
+    && apt-get autoremove -y
 RUN docker-php-ext-install \
         bcmath \
         exif \
@@ -35,17 +36,27 @@ RUN docker-php-ext-install \
         xsl \
         zip
 
-RUN pecl install -o -f redis xdebug \
+# Install PECL php-xdebug and php-mongodb extensions
+RUN pecl install -of xdebug mongodb \
     && rm -rf /tmp/pear \
-    && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini \
-    && echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "zend_extension=xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.idekey = basisPhpFpm" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo no | pecl install -o -f mongo \
-    && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
+    && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongo.ini
+
+# Install php-redis extension through Git
+RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
+    && cd /tmp/phpredis \
+    && git checkout php7 \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install \
+    && rm -rf /tmp/phpredis \
+    && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini
 
 # Locale
 RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales

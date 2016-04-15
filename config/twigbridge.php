@@ -93,7 +93,7 @@ return [
             'TwigBridge\Extension\Laravel\Dump',
             'TwigBridge\Extension\Laravel\Input',
             'TwigBridge\Extension\Laravel\Session',
-            'TwigBridge\Extension\Laravel\String',
+            'TwigBridge\Extension\Laravel\Str',
             'TwigBridge\Extension\Laravel\Translator',
             'TwigBridge\Extension\Laravel\Url',
             // 'TwigBridge\Extension\Laravel\Form',
