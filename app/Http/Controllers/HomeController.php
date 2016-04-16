@@ -8,7 +8,7 @@ class HomeController extends Controller
         $userType = self::TRANSLATION_TAG_GUEST_USER;
 
         /** @var \App\Models\User $user */
-        if ($user = app('sentinel')->getUser()) {
+        if ($user = app('auth.driver')->user()) {
             $name = $user->name;
             $userType = self::TRANSLATION_TAG_REGISTERED_USER;
         }

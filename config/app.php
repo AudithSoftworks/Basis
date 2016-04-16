@@ -137,7 +137,6 @@ return [
          * Custom Service Providers...
          */
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
-        Cartalyst\Sentinel\Laravel\SentinelServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
         TwigBridge\ServiceProvider::class,
     ],
@@ -186,9 +185,6 @@ return [
         /*
          * Custom Facades...
          */
-        'Activation' => Cartalyst\Sentinel\Laravel\Facades\Activation::class,
-        'Reminder' => Cartalyst\Sentinel\Laravel\Facades\Reminder::class,
-        'Sentinel' => Cartalyst\Sentinel\Laravel\Facades\Sentinel::class,
         'Socialite' => Laravel\Socialite\Facades\Socialite::class,
         'Twig' => TwigBridge\Facade\Twig::class,
     ],

@@ -34,19 +34,9 @@ class UserOAuth extends Model
 {
     protected $table = 'users_oauth';
 
-    /**
-     * The attributes excluded from the model's JSON form.
-     *
-     * @var array
-     */
     protected $hidden = [];
 
-    /**
-     * All fields are 'guarded' (protected against mass-assignment)
-     *
-     * @var array
-     */
-    protected $guarded = ['*'];
+    protected $fillable = ['*'];
 
     public function owner()
     {

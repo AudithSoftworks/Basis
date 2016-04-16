@@ -5,9 +5,8 @@ use App\Exceptions\Common\ValidationException;
 use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Exceptions\Users\TokenNotValidException;
+use App\Exceptions\Users\UserAlreadyActivatedException;
 use App\Tests\IlluminateTestCase;
-use Cartalyst\Sentinel\Activations\EloquentActivation;
-use Cartalyst\Sentinel\Users\UserInterface;
 use Illuminate\Contracts\Console\Kernel;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
@@ -241,7 +240,7 @@ class AuthenticationTest extends IlluminateTestCase
      */
     public function testPasswordResetPasswordForExceptions()
     {
-        $passwordResetToken = app('db')->table('reminders')->where('user_id', '=', 1)->value('code');
+        $passwordResetToken = app('db')->table('password_resets')->where('email', '=', 'john.doe@example.com')->value('token');
 
         # Validation failure: Token missing
         $userData = [
@@ -324,7 +323,7 @@ class AuthenticationTest extends IlluminateTestCase
             'email' => 'john.doe@example.com',
             'password' => 's0m34ardPa55w0rdV3r510nTw0',
             'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
-            'token' => app('db')->table('reminders')->where('user_id', '=', 1)->value('code')
+            'token' => app('db')->table('password_resets')->where('email', '=', 'john.doe@example.com')->value('token')
         ];
         $this->post('/password/reset', $userData, self::$requestHeaders);
         $this->shouldReturnJson();
@@ -346,7 +345,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see('message');
         $this->seeStatusCode(422);
         $this->seeJson(['exception' => ValidationException::class]);
-        $this->assertTrue(app('sentinel')->guest());
+        $this->assertTrue(app('auth.driver')->guest());
 
         # Validation failure: Password missing
         $user = ['email' => 'john.doe@example.com'];
@@ -355,7 +354,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see('message');
         $this->seeStatusCode(422);
         $this->seeJson(['exception' => ValidationException::class]);
-        $this->assertTrue(app('sentinel')->guest());
+        $this->assertTrue(app('auth.driver')->guest());
 
         # Invalid login credentials
         $user = ['email' => 'john.doe@example.com', 'password' => 's0m34ardPa55w0rd'];
@@ -364,7 +363,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see('message');
         $this->seeStatusCode(422);
         $this->seeJson(['exception' => LoginNotValidException::class]);
-        $this->assertTrue(app('sentinel')->guest());
+        $this->assertTrue(app('auth.driver')->guest());
     }
 
     /**
@@ -379,24 +378,7 @@ class AuthenticationTest extends IlluminateTestCase
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
         $this->seeJson(['message' => 'Login successful']);
-        $this->assertFalse(app('sentinel')->guest());
-        $this->assertFalse(app('sentinel.activations')->completed(app('sentinel')->getUser()));
-    }
-
-    /**
-     * Tests App\Controllers\Users\ActivationController::requestActivationCode() controller method.
-     *
-     * @depends testAuthLoginForSuccess
-     */
-    public function testActivationRequestActivationCodeForExceptions()
-    {
-        # Failure: Tries to ask for code without logging in.
-        $this->assertTrue(app('sentinel')->guest());
-        $this->get('/activation', self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->see('message');
-        $this->seeStatusCode(401);
-        $this->seeJson(['exception' => UnauthorizedHttpException::class]);
+        $this->assertFalse(app('auth.driver')->guest());
     }
 
     /**
@@ -406,9 +388,9 @@ class AuthenticationTest extends IlluminateTestCase
      */
     public function testActivationRequestActivationCodeForSuccess()
     {
-        app('sentinel')->login(app('sentinel')->getUserRepository()->findById(1));
-        $this->assertFalse(app('sentinel')->guest());
-        $this->assertInstanceOf(UserInterface::class, app('sentinel')->check());
+        app('auth.driver')->loginUsingId(1);
+        $this->assertFalse(app('auth.driver')->guest());
+        $this->assertTrue(app('auth.driver')->check());
 
         $this->get('/activation', self::$requestHeaders);
         $this->shouldReturnJson();
@@ -428,7 +410,6 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see('message');
         $this->seeStatusCode(405);
         $this->seeJson(['exception' => NotImplementedException::class]);
-        $this->assertFalse(app('sentinel.activations')->completed(app('sentinel')->getUserRepository()->findById(1)));
     }
 
     /**
@@ -443,7 +424,6 @@ class AuthenticationTest extends IlluminateTestCase
         $this->see('message');
         $this->seeStatusCode(422);
         $this->seeJson(['exception' => TokenNotValidException::class]);
-        $this->assertFalse(app('sentinel.activations')->completed(app('sentinel')->getUserRepository()->findById(1)));
     }
 
     /**
@@ -453,12 +433,37 @@ class AuthenticationTest extends IlluminateTestCase
      */
     public function testActivationJsonActivateForSuccess()
     {
-        $data = ['token' => app('db')->table('activations')->where('user_id', '=', 1)->value('code')];
+        $data = ['token' => app('db')->table('users_activations')->where('user_id', '=', 1)->value('code')];
         $this->post('/activation', $data, self::$requestHeaders);
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
         $this->seeJson(['message' => 'Activated']);
-        $this->assertInstanceOf(EloquentActivation::class, app('sentinel.activations')->completed(app('sentinel')->getUserRepository()->findById(1)));
+    }
+
+    /**
+     * Tests App\Controllers\Users\ActivationController::requestActivationCode() controller method.
+     *
+     * @depends testActivationRequestActivationCodeForSuccess
+     */
+    public function testActivationRequestActivationCodeForExceptions()
+    {
+        # Failure: Tries to ask for code without logging in.
+        $this->assertTrue(app('auth.driver')->guest());
+        $this->get('/activation', self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(401);
+        $this->seeJson(['exception' => UnauthorizedHttpException::class]);
+
+        # Failure: Tries to ask for code when user is already activated.
+        app('auth.driver')->loginUsingId(1);
+        $this->assertFalse(app('auth.driver')->guest());
+        $this->assertTrue(app('auth.driver')->check());
+        $this->get('/activation', self::$requestHeaders);
+        $this->shouldReturnJson();
+        $this->see('message');
+        $this->seeStatusCode(500);
+        $this->seeJson(['exception' => UserAlreadyActivatedException::class]);
     }
 
     /**
@@ -468,13 +473,13 @@ class AuthenticationTest extends IlluminateTestCase
      */
     public function testAuthLogout()
     {
-        app('sentinel')->login(app('sentinel')->getUserRepository()->findById(1));
-        $this->assertFalse(app('sentinel')->guest());
-        $this->assertInstanceOf(UserInterface::class, app('sentinel')->check());
+        app('auth.driver')->loginUsingId(1);
+        $this->assertFalse(app('auth.driver')->guest());
+        $this->assertTrue(app('auth.driver')->check());
 
         $this->get('logout', self::$requestHeaders);
-        $this->assertTrue(app('sentinel')->guest());
-        $this->assertFalse(app('sentinel')->check());
+        $this->assertTrue(app('auth.driver')->guest());
+        $this->assertFalse(app('auth.driver')->check());
         $this->shouldReturnJson();
         $this->seeStatusCode(200);
     }

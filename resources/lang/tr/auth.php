@@ -18,7 +18,7 @@ return [
         'update' => 'Güncelle'
     ],
     'labels' => [
-        'username' => 'Kullanıcı adı',
+        'name' => 'Adınız',
         'password' => 'Parola',
         'password_confirmation' => 'Parolayı tekrarla',
         'email' => 'E-posta'

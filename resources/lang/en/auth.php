@@ -18,7 +18,7 @@ return [
         'update' => 'Update'
     ],
     'labels' => [
-        'username' => 'Username',
+        'name' => 'Name',
         'password' => 'Password',
         'password_confirmation' => 'Re-type Your Password',
         'email' => 'Email'

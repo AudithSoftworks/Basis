@@ -33,7 +33,7 @@ class Authenticate
      */
     public function handle(Request $request, \Closure $next)
     {
-        if (app('sentinel')->guest()) {
+        if (app('auth.driver')->guest()) {
             if ($request->ajax() || $request->wantsJson()) {
                 throw new UnauthorizedHttpException('Unauthorized');
             } else {

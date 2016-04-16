@@ -6,10 +6,14 @@ use App\Exceptions\Common\NotImplementedException;
 use App\Exceptions\Users\UserAlreadyActivatedException;
 use App\Exceptions\Users\UserNotFoundException;
 use App\Http\Controllers\Controller;
+use App\Models\User;
+use App\Traits\Users\Activates;
 use Illuminate\Http\Request;
 
 class ActivationController extends Controller
 {
+    use Activates;
+
     /**
      * Create a new authentication controller instance.
      */
@@ -28,11 +32,10 @@ class ActivationController extends Controller
      */
     public function requestActivationCode(Request $request)
     {
-        if (!($user = app('sentinel')->getUser())) {
-            throw new UserNotFoundException;
-        }
+        /** @var User $user */
+        $user = app('auth.driver')->user();
 
-        if (false !== app('sentinel.activations')->completed($user)) {
+        if (false !== $this->completed($user)) {
             throw new UserAlreadyActivatedException;
         }
 

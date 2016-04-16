@@ -12,16 +12,17 @@ class RedirectIfAuthenticated
      * @param  \Illuminate\Http\Request $request
      * @param  \Closure                 $next
      *
-     * @return mixed
+     * @return \Closure
+     * @throws \App\Exceptions\Users\UserAlreadyLoggedInException
      */
     public function handle(Request $request, \Closure $next)
     {
-        if (!app('sentinel')->guest()) {
+        if (!app('auth.driver')->guest()) {
             if ($request->ajax() || $request->wantsJson()) {
                 throw new UserAlreadyLoggedInException;
             }
 
-            return abort(500, 'You already have logged in');
+            abort(500, 'You already have logged in');
         }
 
         return $next($request);

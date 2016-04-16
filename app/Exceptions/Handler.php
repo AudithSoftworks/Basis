@@ -1,6 +1,6 @@
 <?php namespace App\Exceptions;
 
-use Cartalyst\Sentinel\Checkpoints\NotActivatedException;
+use App\Exceptions\Users\UserNotActivatedException;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
@@ -45,6 +45,8 @@ class Handler extends ExceptionHandler
      * @param \Exception               $e
      *
      * @return \Illuminate\Http\Response
+     *
+     * @todo Separate API exception handling from Web one (possibly separating Laravel and Lumen apps).
      */
     public function render($request, \Exception $e)
     {
@@ -74,7 +76,7 @@ class Handler extends ExceptionHandler
             # Status codes
             if ($e instanceof UnauthorizedHttpException) {
                 $statusCode = IlluminateResponse::HTTP_UNAUTHORIZED;
-            } elseif ($e instanceof NotActivatedException) {
+            } elseif ($e instanceof UserNotActivatedException) {
                 $statusCode = IlluminateResponse::HTTP_FORBIDDEN;
             } elseif ($e instanceof NotFoundHttpException) {
                 $statusCode = IlluminateResponse::HTTP_NOT_FOUND;
