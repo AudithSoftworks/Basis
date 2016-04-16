@@ -7,7 +7,7 @@ postgres94:
   image: postgres:9.4
 redis:
   image: redis
-phpFpm56:
+phpFpm:
   image: audithsoftworks/basis:php_5.6-fpm
   volumes:
     - .:/home/basis
@@ -18,15 +18,15 @@ phpFpm56:
     - redis
   environment:
     XDEBUG_CONFIG: remote_host=172.17.0.1
-nginxForPhpFpm:
+nginx:
   image: audithsoftworks/basis:nginx
   volumes:
-    - ./storage/build/configs/nginxForPhpFpm.conf:/etc/nginx/conf.d/default.conf:ro
+    - ./storage/build/configs/nginx.conf:/etc/nginx/conf.d/default.conf:ro
     - .:/home/basis
   working_dir: /home/basis
   links:
-    - phpFpm56
-php56:
+    - phpFpm
+phpCli:
   image: audithsoftworks/basis:php_5.6
   volumes:
     - .:/home/basis
@@ -35,7 +35,7 @@ php56:
     - mysql56
     - postgres94
     - redis
-    - nginxForPhpFpm
+    - nginx
   environment:
     XDEBUG_CONFIG: remote_host=172.17.0.1
   stdin_open: true
