@@ -7,17 +7,19 @@
 # docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
 # docker build -f storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .;
 
-docker-compose -f docker-compose-php56.yml pull;
-docker-compose -f docker-compose-php56.yml up -d;
-docker-compose -f docker-compose-php56.yml ps;
-docker exec basis_php56_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm56_1) basis.audith.org | tee -a /etc/hosts";
+export VERSION_SUFFIX='php7'; # php56|php7|hhvm
 
-sleep 5;
+#docker-compose -f docker-compose-${VERSION_SUFFIX}.yml pull;
+docker-compose -f docker-compose-${VERSION_SUFFIX}.yml up -d;
+docker-compose -f docker-compose-${VERSION_SUFFIX}.yml ps;
+docker exec basis_phpCli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginx_1) basis.audith.org | tee -a /etc/hosts";
+
+sleep 10;
 mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
 # psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;";
 
-cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env;
-docker exec basis_php56_1 /bin/bash -c "
+test -f .env || cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env;
+docker exec basis_phpCli_1 /bin/bash -c "
     cd /home/basis && npm update && bower --config.interactive=false --allow-root update;
 
     cd /home/basis/public/bower_components/fine-uploader && npm install && grunt package;
@@ -57,6 +59,7 @@ docker exec basis_php56_1 /bin/bash -c "
     chown -R 1000:1000 ./
 ";
 
-#docker-compose stop;
+#docker-compose -f docker-compose-${VERSION_SUFFIX}.yml stop;
 #sleep 10;
-#docker rm $(docker ps -a | grep "Exited" | awk "{print \$1}") && docker rmi $(docker images | grep "<none>" | awk "{print \$3}");
+#docker rm $(docker ps -a | grep "Exited" | awk "{print \$1}")
+#docker rmi $(docker images | grep "<none>" | awk "{print \$3}");

@@ -40,9 +40,9 @@ dependencies:
 
     # Docker Compose
     - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
-      && docker-compose -f $DOCKER_COMPOSE_FILE pull
+      && docker-compose -f $DOCKER_COMPOSE_FILE pull;
     - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
-      && docker-compose -f $DOCKER_COMPOSE_FILE up -d
+      && docker-compose -f $DOCKER_COMPOSE_FILE up -d;
 
     # Create database for MySQL and PgSQL
     - sleep 5;
@@ -51,15 +51,13 @@ dependencies:
       if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 1 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
 
     # Fix for /etc/hosts file
-    - if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 0 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_php56_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForPhpFpm56_1) basis.audith.org | tee -a /etc/hosts"; fi
-    - if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 1 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_hhvmAsCli_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginxForHhvm_1) basis.audith.org | tee -a /etc/hosts"; fi
+    - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginx_1) basis.audith.org | tee -a /etc/hosts";
 
     # dotEnv file for initial test setup
-    - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
+    - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env;
 
     # Build project dependencies
-    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php56_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac
-      && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c "
+    - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c "
         cd /home/basis && npm update && bower --config.interactive=false --allow-root update;
 
         cd /home/basis/public/bower_components/fine-uploader && npm install && grunt package;
@@ -92,18 +90,18 @@ dependencies:
         compass compile;
         gulp;
         composer selfupdate && composer update --prefer-source --no-interaction;
-      "
+      ";
 test:
   override:
     # Testing against MySQL
-    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php56_1 ;; 1) export PHP_CONTAINER=basis_hhvmAsCli_1 ;; esac && sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
+    - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
         parallel: true
 
     # Switching to PgSQL 9.4
     - cat .env | sed s/DB_HOST=.*/DB_HOST=postgres94/g | sed s/DB=.*/DB=pgsql/g | tee .env
 
     # Testing against PgSQL 9.4
-    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export PHP_CONTAINER=basis_php56_1 ;; esac && if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 1 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' $PHP_CONTAINER)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose'; fi:
+    - if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 1 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose'; fi:
         parallel: true
 
   post:
