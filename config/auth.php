@@ -96,5 +96,10 @@ return [
             'expire' => 60,
             'min_length' => 6
         ],
+    ],
+
+    'activations' => [
+        'view' => 'auth/emails/activation',
+        'expires' => 259200,
     ]
 ];

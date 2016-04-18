@@ -1,12 +1,12 @@
 <?php namespace App\Events\Users;
 
 use App\Events\Event as EventAbstract;
-use Cartalyst\Sentinel\Users\UserInterface;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class Registered extends EventAbstract
 {
     /**
-     * @var \Cartalyst\Sentinel\Users\UserInterface
+     * @var \Illuminate\Contracts\Auth\Authenticatable
      */
     public $user;
 
@@ -16,10 +16,10 @@ class Registered extends EventAbstract
     public $oauthProviderName;
 
     /**
-     * @param \Cartalyst\Sentinel\Users\UserInterface $user
-     * @param string|null                             $oauthProviderName
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param string|null                                $oauthProviderName
      */
-    public function __construct(UserInterface $user, $oauthProviderName = null)
+    public function __construct(Authenticatable $user, $oauthProviderName = null)
     {
         $this->user = $user;
         $this->oauthProviderName = $oauthProviderName;

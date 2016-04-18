@@ -1,17 +1,17 @@
 <?php namespace App\Events\Users;
 
 use App\Events\Event as EventAbstract;
-use Cartalyst\Sentinel\Users\UserInterface;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class Updated extends EventAbstract
 {
     /**
-     * @var \Cartalyst\Sentinel\Users\UserInterface
+     * @var \Illuminate\Contracts\Auth\Authenticatable
      */
     public $userBefore;
 
     /**
-     * @var \Cartalyst\Sentinel\Users\UserInterface
+     * @var \Illuminate\Contracts\Auth\Authenticatable
      */
     public $userAfter;
 
@@ -21,11 +21,11 @@ class Updated extends EventAbstract
     public $oauthProviderName;
 
     /**
-     * @param \Cartalyst\Sentinel\Users\UserInterface $user
-     * @param \Cartalyst\Sentinel\Users\UserInterface $userAfter
-     * @param string|null                             $oauthProviderName
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param \Illuminate\Contracts\Auth\Authenticatable $userAfter
+     * @param string|null                                $oauthProviderName
      */
-    public function __construct(UserInterface $user, UserInterface $userAfter, $oauthProviderName = null)
+    public function __construct(Authenticatable $user, Authenticatable $userAfter, $oauthProviderName = null)
     {
         $this->userBefore = $user;
         $this->userAfter = $userAfter;

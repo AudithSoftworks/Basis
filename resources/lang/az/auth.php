@@ -18,7 +18,7 @@ return [
         'update' => 'Dəyişdir'
     ],
     'labels' => [
-        'username' => 'İstifadəçi adı',
+        'name' => 'Ad',
         'password' => 'Parol',
         'password_confirmation' => 'Parolu təkrarlayın',
         'email' => 'E-poçt adresi'

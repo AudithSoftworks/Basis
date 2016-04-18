@@ -9,12 +9,13 @@ class SendResetPasswordLinkViaEmail
     {
         /** @var \App\Models\User $user */
         $user = $event->user;
-        $reminder = app('sentinel.reminders')->create($event->user);
-        $token = $reminder->code;
-        $view = config('auth.passwords.users.email');
-        app('mailer')->send($view, compact('user', 'token'), function (Message $m) use ($user, $token) {
-            $m->to($user->email)->subject($this->getPasswordResetEmailSubject());
-        });
+
+        $broker = isset($this->broker) ? $this->broker : null;
+        app('auth.password')->broker($broker)->sendResetLink(
+            ['email' => $user->email], function (Message $message) {
+                $message->subject($this->getPasswordResetEmailSubject());
+            }
+        );
     }
 
     /**

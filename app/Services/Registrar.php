@@ -12,45 +12,31 @@ use App\Exceptions\Users\LoginNotValidException;
 use App\Exceptions\Users\PasswordNotValidException;
 use App\Exceptions\Users\TokenNotValidException;
 use App\Models\User;
+use App\Models\UserActivation;
 use App\Models\UserOAuth;
-use Cartalyst\Sentinel\Activations\EloquentActivation;
+use App\Traits\Users\Activates;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Foundation\Auth\AuthenticatesAndRegistersUsers;
+use Illuminate\Foundation\Auth\ThrottlesLogins;
 use Illuminate\Foundation\Validation\ValidatesRequests;
-use Illuminate\Http\Request;
 use Laravel\Socialite\AbstractUser as SocialiteUser;
 
 class Registrar implements RegistrarContract
 {
-    use ValidatesRequests;
+    use AuthenticatesAndRegistersUsers, Activates, ThrottlesLogins, ValidatesRequests;
 
-    /**
-     * Request instance.
-     *
-     * @var Request
-     */
+    /** @var \Illuminate\Http\Request */
     protected $request;
-
-    /**
-     * @var \Cartalyst\Sentinel\Users\UserRepositoryInterface|\Cartalyst\Sentinel\Users\IlluminateUserRepository
-     */
-    protected $userRepository;
-
-    /**
-     * @var \Cartalyst\Sentinel\Reminders\ReminderRepositoryInterface|\Cartalyst\Sentinel\Reminders\IlluminateReminderRepository
-     */
-    protected $reminderRepository;
 
     public function __construct()
     {
         $this->request = app('router')->getCurrentRequest();
-        $this->userRepository = app('sentinel')->getUserRepository();
-        $this->reminderRepository = app('sentinel')->getReminderRepository();
     }
 
     /**
      * Create a new user instance after a valid registration.
      *
-     * @return \Cartalyst\Sentinel\Users\UserInterface
+     * @return \Illuminate\Contracts\Auth\Authenticatable
      * @throws \App\Exceptions\Common\ValidationException
      */
     public function register()
@@ -67,7 +53,7 @@ class Registrar implements RegistrarContract
         $user = new User();
         $this->request->has('name') && $user->name = $this->request->input('name');
         $user->email = $this->request->input('email');
-        $user->password = $this->userRepository->getHasher()->hash($this->request->input('password'));
+        $user->password = app('hash')->make($this->request->input('password'));
         $user->save() && event(new Registered($user));
 
         return $user;
@@ -77,21 +63,18 @@ class Registrar implements RegistrarContract
      * @param SocialiteUser $oauthUserData
      * @param string        $provider
      *
-     * @return \Cartalyst\Sentinel\Users\UserInterface|bool
+     * @return \Illuminate\Contracts\Auth\Authenticatable|bool
      */
     public function registerViaOAuth(SocialiteUser $oauthUserData, $provider)
     {
+        /** @var \App\Models\User $ownerAccount */
         if (!($ownerAccount = User::withTrashed()->whereEmail($oauthUserData->email)->first())) {
-            $ownerAccount = \Eloquent::unguarded(function () use ($oauthUserData, $provider) {
-                $user = User::create([
-                    'name' => $oauthUserData->name,
-                    'email' => $oauthUserData->email,
-                    'password' => $this->userRepository->getHasher()->hash(uniqid("", true))
-                ]);
-                event(new Registered($user, $provider));
-
-                return $user;
-            });
+            $ownerAccount = User::create([
+                'name' => $oauthUserData->name,
+                'email' => $oauthUserData->email,
+                'password' => app('hash')->make(uniqid("", true))
+            ]);
+            event(new Registered($ownerAccount, $provider));
         }
 
         # If user account is soft-deleted, restore it.
@@ -103,7 +86,7 @@ class Registrar implements RegistrarContract
             $ownerAccount->save();
         }
 
-        ($doLinkOAuthAccount = $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount)) && app('sentinel')->login($ownerAccount, true);
+        ($doLinkOAuthAccount = $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount)) && app('auth.driver')->login($ownerAccount, true);
 
         event(new LoggedIn($ownerAccount, $provider));
 
@@ -127,13 +110,14 @@ class Registrar implements RegistrarContract
             throw new ValidationException($validator);
         }
 
-        $activation = EloquentActivation::whereCode($data['token'])->first();
+        $activation = UserActivation::whereCode($data['token'])->first();
         if (!$activation) {
             throw new TokenNotValidException;
         }
-        $user = $this->userRepository->findById($activation->user_id);
+        /** @var \App\Models\User $user */
+        $user = User::findOrFail($activation->user_id);
 
-        return app('sentinel.activations')->complete($user, $data['token']);
+        return $this->complete($user, $data['token']);
     }
 
     /**
@@ -153,7 +137,7 @@ class Registrar implements RegistrarContract
         }
 
         $user = $this->get($id);
-        if (!$this->userRepository->getHasher()->check($this->request->input("password"), $user->password)) {
+        if (!app('hash')->check($this->request->input("password"), $user->password)) {
             throw new PasswordNotValidException;
         }
 
@@ -163,12 +147,12 @@ class Registrar implements RegistrarContract
     /**
      * @param integer $id
      *
-     * @return \App\Models\User|\Cartalyst\Sentinel\Users\UserInterface
+     * @return \App\Models\User
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function get($id)
     {
-        if (!empty($user = $this->userRepository->findById($id))) {
+        if (!empty($user = User::findOrFail($id))) {
             return $user;
         }
 
@@ -202,8 +186,7 @@ class Registrar implements RegistrarContract
     }
 
     /**
-     * @return bool|\Cartalyst\Sentinel\Users\UserInterface
-     *
+     * @return bool|\App\Models\User
      * @throws \App\Exceptions\Common\ValidationException
      * @throws \App\Exceptions\Users\LoginNotValidException
      */
@@ -219,7 +202,9 @@ class Registrar implements RegistrarContract
 
         $credentials = $this->request->only('email', 'password');
 
-        if ($user = app('sentinel')->authenticate($credentials, $this->request->has('remember'))) {
+        if (app('auth.driver')->attempt($credentials, $this->request->has('remember'))) {
+            $user = app('auth.driver')->user();
+
             event(new LoggedIn($user));
 
             return $user;
@@ -239,7 +224,7 @@ class Registrar implements RegistrarContract
         /** @var UserOAuth $owningOAuthAccount */
         if ($owningOAuthAccount = UserOAuth::whereRemoteProvider($provider)->whereRemoteId($oauthUserData->id)->first()) {
             $ownerAccount = $owningOAuthAccount->owner;
-            app('sentinel')->login($ownerAccount, true);
+            app('auth.driver')->login($ownerAccount, true);
 
             event(new LoggedIn($ownerAccount, $provider));
 
@@ -250,20 +235,19 @@ class Registrar implements RegistrarContract
     }
 
     /**
-     * @return boolean
+     * @return void
      */
     public function logout()
     {
-        if ($user = app('sentinel')->getUser()) {
-            event(new LoggedOut($user));
+        $user = app('auth.driver')->user();
+        if (!empty($user)) {
+            app('auth.driver')->logout();
+            app('events')->fire(new LoggedOut($user));
         }
-
-        return app('sentinel')->logout();
     }
 
     /**
      * @return boolean
-     *
      * @throws \App\Exceptions\Common\ValidationException
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
@@ -288,7 +272,6 @@ class Registrar implements RegistrarContract
 
     /**
      * @return boolean
-     *
      * @throws \App\Exceptions\Common\ValidationException
      * @throws \App\Exceptions\Users\TokenNotValidException
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
@@ -304,19 +287,26 @@ class Registrar implements RegistrarContract
             throw new ValidationException($validator);
         }
 
-        $credentials = $this->request->only('email', 'password', 'token');
+        $credentials = $this->request->only('email', 'password', 'password_confirmation', 'token');
 
-        if (!($user = User::whereEmail($credentials['email'])->first())) {
-            throw new ModelNotFoundException(trans('passwords.user'));
+        $passwordBroker = app('auth.password.broker');
+        $response = $passwordBroker->reset(
+            $credentials, function (User $user, $password) {
+            $user->password = app('hash')->make($password);
+            $user->save();
+            app('auth.driver')->login($user);
+        });
+
+        switch ($response) {
+            case $passwordBroker::INVALID_USER:
+                throw new ModelNotFoundException(trans($response));
+                break;
+            case $passwordBroker::INVALID_TOKEN:
+                throw new TokenNotValidException(trans($response));
+                break;
         }
 
-        /** @var \Cartalyst\Sentinel\Reminders\EloquentReminder $reminder */
-        $reminder = $this->reminderRepository->exists($user);
-        if (!$reminder || $reminder->code !== $credentials['token']) {
-            throw new TokenNotValidException(trans('passwords.token'));
-        }
-
-        app('sentinel.reminders')->complete($user, $credentials['token'], $credentials['password']) && event(new ResetPassword($user));
+        event(new ResetPassword(app('auth.driver')->user()));
 
         return true;
     }
@@ -354,15 +344,5 @@ class Registrar implements RegistrarContract
         $linkedAccount->avatar = $oauthUserData->avatar;
 
         return $ownerAccount->linkedAccounts()->save($linkedAccount) ? $ownerAccount : false;
-    }
-
-    /**
-     * Get the failed login message.
-     *
-     * @return string
-     */
-    private function getFailedLoginMessage()
-    {
-        return 'These credentials do not match our records!';
     }
 }

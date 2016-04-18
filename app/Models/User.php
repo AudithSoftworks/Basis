@@ -1,56 +1,49 @@
 <?php namespace App\Models;
 
-use Cartalyst\Sentinel\Users\EloquentUser;
+use App\Traits\Users\CanActivate;
+use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * App\Models\User
  *
+ * @mixin \Eloquent
  * @property integer $id
  * @property string $name
  * @property string $email
  * @property string $password
- * @property string $permissions
- * @property string $last_login
  * @property \Carbon\Carbon $created_at
  * @property \Carbon\Carbon $updated_at
  * @property \Carbon\Carbon $deleted_at
  * @property-read \Illuminate\Database\Eloquent\Collection|UserOAuth[] $linkedAccounts
  * @property-read \Illuminate\Database\Eloquent\Collection|File[] $files
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$rolesModel[] $roles
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$persistencesModel[] $persistences
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$activationsModel[] $activations
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$remindersModel[] $reminders
- * @property-read \Illuminate\Database\Eloquent\Collection|\static::$throttlingModel[] $throttle
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereId($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereName($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereEmail($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User wherePassword($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User wherePermissions($value)
- * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereLastLogin($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereCreatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\User whereDeletedAt($value)
  */
-class User extends EloquentUser
+class User extends Authenticatable
 {
-    use SoftDeletes;
+    use CanActivate, CanResetPassword, SoftDeletes;
 
     /**
      * The attributes excluded from the model's JSON form.
      *
      * @var array
      */
-    protected $hidden = ['password'];
+    protected $hidden = ['password', 'remember_token'];
 
     /**
      * {@inheritDoc}
      */
     protected $fillable = [
-        'email',
-        'password',
         'name',
-        'permissions',
+        'email',
+        'password'
     ];
 
     /**

@@ -1,12 +1,12 @@
 <?php namespace App\Events\Users;
 
 use App\Events\Event as EventAbstract;
-use Cartalyst\Sentinel\Users\UserInterface;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class LoggedIn extends EventAbstract
 {
     /**
-     * @var array|\Cartalyst\Sentinel\Users\UserInterface
+     * @var array|\Illuminate\Contracts\Auth\Authenticatable
      */
     public $user;
 
@@ -16,10 +16,10 @@ class LoggedIn extends EventAbstract
     public $oauthProviderNameIfApplicable;
 
     /**
-     * @param \Cartalyst\Sentinel\Users\UserInterface $user
-     * @param string|null                             $oauthProviderName
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     * @param string|null                                $oauthProviderName
      */
-    public function __construct(UserInterface $user, $oauthProviderName = null)
+    public function __construct(Authenticatable $user, $oauthProviderName = null)
     {
         $this->user = $user;
         $this->oauthProviderNameIfApplicable = $oauthProviderName;

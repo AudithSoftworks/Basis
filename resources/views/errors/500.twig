@@ -5,28 +5,24 @@
 {% use "layout/body/main" %}
 {% use "layout/body/footer" %}
 
-{% block document_head_title %}<title>Update Account - Audith Basis</title>{% endblock %}
+{% block document_head_title %}<title>Error - Audith Basis</title>{% endblock %}
 
-{% block document_head_javascripts %}
-	<script type="text/javascript" src="{{ elixir('javascripts/auth.js') }}"></script>
-{% endblock %}
+{% block document_head_javascripts %}{% endblock %}
 
 {% block document_head_stylesheets %}
-	<link rel="stylesheet" href="{{ elixir('stylesheets/auth.css') }}">
+    <link rel="stylesheet" href="{{ elixir('stylesheets/auth.css') }}">
 {% endblock %}
 
 {% block document_body_header %}
-	<header class="container-fluid">
-		<h1 class="text-center">Audith Basis</h1>
-	</header>
+    <header class="container">
+        <h1 class="col-md-12">Audith <em>Basis</em></h1>
+    </header>
 {% endblock %}
 
 {% block document_body_main %}
-	<main class="container-fluid">
-		<h2><b>Error</b>!</h2>
-
-		<ul class="col-md-12">
-			<li class="col-md-6 col-md-offset-6 text-right"><a href="{{ route('logout', [], false) }}">{{ trans('auth.buttons.logout') }}</a></li>
-		</ul>
-	</main>
+    <main>
+        <section class="col-md-12">
+            <h3 class="font-green col-md-12"><b>Error</b>!</h3>
+        </section>
+    </main>
 {% endblock %}

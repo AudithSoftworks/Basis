@@ -4,10 +4,13 @@ use App\Contracts\Registrar;
 use App\Exceptions\Users\TokenNotValidException;
 use App\Http\Controllers\Controller;
 use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Foundation\Auth\ResetsPasswords;
 use Illuminate\Http\Request;
 
 class PasswordController extends Controller
 {
+    use ResetsPasswords;
+
     /**
      * Create a new password controller instance.
      */

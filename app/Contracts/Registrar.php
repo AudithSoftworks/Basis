@@ -60,7 +60,7 @@ interface Registrar
     public function loginViaOAuth(SocialiteUser $oauthUserData, $provider);
 
     /**
-     * @return boolean
+     * @return void
      */
     public function logout();
 

@@ -1,19 +1,19 @@
 <?php namespace App\Events\Users;
 
 use App\Events\Event as EventAbstract;
-use Cartalyst\Sentinel\Users\UserInterface;
+use Illuminate\Contracts\Auth\Authenticatable;
 
 class LoggedOut extends EventAbstract
 {
     /**
-     * @var array|\Cartalyst\Sentinel\Users\UserInterface
+     * @var array|\Illuminate\Contracts\Auth\Authenticatable
      */
     public $user;
 
     /**
-     * @param \Cartalyst\Sentinel\Users\UserInterface|null $user
+     * @param \Illuminate\Contracts\Auth\Authenticatable|null $user
      */
-    public function __construct(UserInterface $user)
+    public function __construct(Authenticatable $user)
     {
         $this->user = $user;
 
