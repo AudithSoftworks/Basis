@@ -1,5 +1,5 @@
-mysql56:
-  image: mysql:5.6
+mariadb10:
+  image: mariadb:10.1
   environment:
     - MYSQL_DATABASE=basis
     - MYSQL_ALLOW_EMPTY_PASSWORD=true
@@ -13,7 +13,7 @@ phpFpm:
     - .:/home/basis
   working_dir: /home/basis
   links:
-    - mysql56
+    - mariadb10
     - postgres94
     - redis
   environment:
@@ -32,7 +32,7 @@ phpCli:
     - .:/home/basis
   working_dir: /home/basis
   links:
-    - mysql56
+    - mariadb10
     - postgres94
     - redis
     - nginx
