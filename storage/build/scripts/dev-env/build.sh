@@ -41,6 +41,8 @@ docker exec basis_phpCli_1 /bin/bash -c "
     cp -r ./public/bower_components/google-fonts/ofl/pontanosans ./public/fonts/pontano_sans;
     cp -r ./public/bower_components/google-fonts/ofl/montserrat ./public/fonts/montserrat;
 
+    mkdir -p ./public/build/images; cp -r ./public/bower_components/jquery.uniform/dist/images/default/* ./public/build/images;
+
     chmod -R +x /home/basis/storage/build/tools;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/simple-line-icons/stylesheet.css public/fonts/simple-line-icons/*.ttf;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf;
