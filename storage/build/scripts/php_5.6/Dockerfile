@@ -55,6 +55,28 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin -
 # Install Compass dependencies
 RUN gem install compass sass sass-globbing autoprefixer-rails fontcustom
 
+# Install php-redis php-mongo php-xdebug
+RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
+    && cd /tmp/phpredis \
+    && phpize \
+    && ./configure \
+    && make \
+    && make install \
+    && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini
+
+RUN rm -rf /tmp/pear \
+    && echo no | pecl install -o -f mongo \
+    && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
+
+RUN pecl install -of xdebug \
+    && rm -rf /tmp/pear \
+    && echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.idekey = basisPhp" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini
+
 # Install Node
 RUN set -ex \
     && for key in \
@@ -69,32 +91,24 @@ RUN set -ex \
     ; do \
         gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
     done
+
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 5.10.1
-RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
-    && curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-    && gpg --verify SHASUMS256.txt.asc \
-    && grep " node-v$NODE_VERSION-linux-x64.tar.gz\$" SHASUMS256.txt.asc | sha256sum -c - \
-    && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
-    && rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc \
+ENV NODE_VERSION 6.2.2
+
+RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
+    && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+    && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
+    && grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
+    && apt-get install xz-utils \
+    && tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /usr/local --strip-components=1 \
+    && rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
     && npm install -g npm@latest \
-    && npm cache clear
+    && npm cache clear \
+    && rm -rf /tmp/npm-*
 
 # Install Node global dependencies
 RUN npm install -g bower gulp grunt-cli ttf2eot jshint
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
-
-RUN pecl install -of redis xdebug \
-    && rm -rf /tmp/pear \
-    && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini \
-    && echo "zend_extension=/usr/local/lib/php/extensions/no-debug-non-zts-20131226/xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.idekey = basisPhp" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo no | pecl install -o -f mongo \
-    && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
 
 EXPOSE 54321

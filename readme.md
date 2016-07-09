@@ -12,7 +12,3 @@
 [![Dependency Status](https://www.versioneye.com/user/projects/559127ee396561002000000a/badge.svg?style=flat)](https://www.versioneye.com/user/projects/559127ee396561002000000a)
 [![Dependency Status](https://www.versioneye.com/user/projects/559127ef3965610029000177/badge.svg?style=flat)](https://www.versioneye.com/user/projects/559127ef3965610029000177)
 [![Dependency Status](https://www.versioneye.com/user/projects/559128153965610020000024/badge.svg?style=flat)](https://www.versioneye.com/user/projects/559128153965610020000024)
-
-### License
-
-Audith.Basis is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
