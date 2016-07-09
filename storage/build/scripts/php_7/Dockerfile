@@ -52,40 +52,6 @@ ENV LC_ALL en_US.UTF-8
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer
 
-# Install Compass dependencies
-RUN gem install compass sass sass-globbing autoprefixer-rails fontcustom
-
-# Install Node
-RUN set -ex \
-    && for key in \
-        9554F04D7259F04124DE6B476D5A82AC7E37093B \
-        94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
-        0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
-        FD3A5288F042B6850C66B31F09FE44734EB7990E \
-        71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
-        DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
-        B9AE9905FFD7803F25714661B63B535A4C206CA9 \
-        C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
-    ; do \
-        gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
-    done
-ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 5.10.1
-RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.gz" \
-    && curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
-    && gpg --verify SHASUMS256.txt.asc \
-    && grep " node-v$NODE_VERSION-linux-x64.tar.gz\$" SHASUMS256.txt.asc | sha256sum -c - \
-    && tar -xzf "node-v$NODE_VERSION-linux-x64.tar.gz" -C /usr/local --strip-components=1 \
-    && rm "node-v$NODE_VERSION-linux-x64.tar.gz" SHASUMS256.txt.asc \
-    && npm install -g npm@latest \
-    && npm cache clear \
-    && rm -rf /tmp/npm-*
-
-# Install Node global dependencies
-RUN npm install -g bower gulp grunt-cli ttf2eot jshint
-
-ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
-
 # Install PECL php-xdebug and php-mongodb extensions
 RUN pecl install -of xdebug mongodb \
     && rm -rf /tmp/pear \
@@ -106,5 +72,42 @@ RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
     && make \
     && make install \
     && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini
+
+# Install Node
+RUN set -ex \
+    && for key in \
+        9554F04D7259F04124DE6B476D5A82AC7E37093B \
+        94AE36675C464D64BAFA68DD7434390BDBE9B9C5 \
+        0034A06D9D9B0064CE8ADF6BF1747F4AD2306D93 \
+        FD3A5288F042B6850C66B31F09FE44734EB7990E \
+        71DCFD284A79C3B38668286BC97EC7A07EDE3FC1 \
+        DD8F2338BAE7501E3DD5AC78C273792F7D83545D \
+        B9AE9905FFD7803F25714661B63B535A4C206CA9 \
+        C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
+    ; do \
+        gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+    done
+
+ENV NPM_CONFIG_LOGLEVEL info
+ENV NODE_VERSION 6.2.2
+
+RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
+    && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
+    && gpg --batch --decrypt --output SHASUMS256.txt SHASUMS256.txt.asc \
+    && grep " node-v$NODE_VERSION-linux-x64.tar.xz\$" SHASUMS256.txt | sha256sum -c - \
+    && apt-get install xz-utils \
+    && tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /usr/local --strip-components=1 \
+    && rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
+    && npm install -g npm@latest \
+    && npm cache clear \
+    && rm -rf /tmp/npm-*
+
+# Install Node global dependencies
+RUN npm install -g bower gulp grunt-cli ttf2eot jshint
+
+# Install Compass dependencies
+RUN gem install compass sass sass-globbing autoprefixer-rails fontcustom
+
+ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
 
 EXPOSE 54321
