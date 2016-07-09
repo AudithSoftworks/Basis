@@ -38,17 +38,17 @@ install:
   - case $PHP_VERSION in '5.5') export DOCKER_COMPOSE_FILE='./docker-compose-php55.yml' ;; '5.6') export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 'hhvm') export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
     && docker-compose -f $DOCKER_COMPOSE_FILE up -d
 
-  # Create database for MySQL and PgSQL
+  # Create database for MariaDb and PgSQL
   - sleep 15;
     docker-compose ps;
-    mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mysql56_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
+    mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mariadb10_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
     if [[ $PHP_VERSION != 'hhvm' ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
 
   # Fix for /etc/hosts file
   - docker exec basis_phpCli_1 echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginx_1) basis.audith.org | sudo tee -a /etc/hosts;
 
   # dotEnv file for initial test setup
-  - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mysql56/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
+  - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mariadb10/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
 
 before_script:
   # Build project dependencies
@@ -89,7 +89,7 @@ before_script:
     ";
 
 script:
-  # Testing against MySQL
+  # Testing against MariaDb
   - docker exec basis_phpCli_1 /bin/bash -c "cd /home/basis; ./vendor/bin/phpunit --debug --verbose";
 
   # Switching to PgSQL 9.4
