@@ -37,8 +37,6 @@ elixir(function (mix) {
     };
 
     var jsAliases = {
-        'pace': ['public/bower_components/pace/pace.js'],
-        'jquery': ['public/bower_components/jquery/dist/jquery.js'],
         'bootstrap': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap.min.js'],
         'bootstrap_affix': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/affix.js'],
         'bootstrap_alert': ['public/bower_components/bootstrap-sass-official/assets/javascripts/bootstrap/alert.js'],
@@ -63,8 +61,9 @@ elixir(function (mix) {
         'easy_pie_chart': ['public/bower_components/jquery.easy-pie-chart/dist/easypiechart.js'],
         'excanvas': ['public/bower_components/excanvas/excanvas.js'],
         'fastclick': ['public/bower_components/fastclick/lib/fastclick.js'],
-        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.6.0/fine-uploader/fine-uploader.js'],
+        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.10.0/fine-uploader/fine-uploader.js'],
         'humane_js': ['public/bower_components/humane-js/humane.js'],
+        'jquery': ['public/bower_components/jquery/dist/jquery.js'],
         'jquery_backstretch': ['public/bower_components/jquery-backstretch-2/jquery.backstretch.js'],
         'jquery_blockui': ['public/bower_components/jquery.blockUI/jquery.blockUI.js'],
         'jquery_easy_pie_chart': ['public/bower_components/jquery.easy-pie-chart/dist/jquery.easypiechart.js'],
@@ -75,13 +74,14 @@ elixir(function (mix) {
             'public/bower_components/jquery-flot/jquery.flot.resize.js'
         ],
         'jquery_ui': ['public/bower_components/jquery-ui/jquery-ui.js'],
-        'jquery_uniform': ['public/bower_components/jquery.uniform/jquery.uniform.js'],
+        'jquery_uniform': ['public/bower_components/jquery.uniform/src/js/jquery.uniform.js'],
         'jquery_slimscroll': ['public/bower_components/jquery.slimscroll/jquery.slimscroll.js'],
         'jquery_validation': [
             'public/bower_components/jquery.validation/dist/jquery.validate.js',
             'public/bower_components/jquery.validation/dist/additional-methods.js'
         ],
         'js_cookie': ['public/bower_components/js-cookie/src/js.cookie.js'],
+        'pace': ['public/bower_components/pace/pace.js'],
         'requirejs': ['public/bower_components/requirejs/require.js'],
         'respond': [
             'public/bower_components/respond/dest/matchmedia.polyfill.js',
@@ -102,7 +102,7 @@ elixir(function (mix) {
     var cssAliases = {
         'bootstrap_switch': ['public/bower_components/bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.min.css'],
         'bower_jvectormap_2': ['public/bower_components/bower-jvectormap-2/jquery-jvectormap-2.0.0.css'],
-        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.6.0/fine-uploader/fine-uploader-gallery.css'],
+        'fine_uploader': ['public/bower_components/fine-uploader/_dist/5.10.0/fine-uploader/fine-uploader-gallery.css'],
         'humane_js': [
             'public/bower_components/humane-js/themes/bigbox.css',
             'public/bower_components/humane-js/themes/boldlight.css',
