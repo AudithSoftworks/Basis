@@ -1,7 +1,6 @@
 <?php namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
-use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 
 class RouteServiceProvider extends ServiceProvider
@@ -82,8 +81,9 @@ class RouteServiceProvider extends ServiceProvider
             // Non-localized, generic routes (such as those for admin panel etc).
             //-----------------------------------------------------------------------
 
-            $router->get('/oauth/to/{provider}', ['uses' => 'Auth\LoginController@handleOAuthRedirect', 'as' => 'oauth.to']);
-            $router->get('/oauth/from/{provider}', ['uses' => 'Auth\LoginController@handleOAuthReturn', 'as' => 'oauth.from']);
+            $router->get('oauth/to/{provider}', ['uses' => 'Auth\LoginController@handleOAuthRedirect', 'as' => 'oauth.to']);
+            $router->get('oauth/from/{provider}', ['uses' => 'Auth\LoginController@handleOAuthReturn', 'as' => 'oauth.from']);
+            $router->get('admin', 'AdminController@index');
 
             //-----------------------------------------------------------------------------------------------------
             // Register localized routes with locale-prefices (in case of default locale, no prefix is attached).
@@ -127,6 +127,7 @@ class RouteServiceProvider extends ServiceProvider
         $router->post('activation', 'Auth\ActivateController@activate');
 
         $router->resource('files', 'FilesController', ['only' => ['index', 'create', 'store', 'show', 'destroy']]);
+
 
         $router->get('', ['uses' => 'HomeController@index', 'as' => empty($prefix) ?: $prefix . '.home']);
     }
