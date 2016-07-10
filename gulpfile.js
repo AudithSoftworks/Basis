@@ -94,8 +94,14 @@ elixir(function (mix) {
 
     var jsMaps = {
         '/*': ['jquery', 'bootstrap', 'js_cookie', 'bootstrap_hover_dropdown', 'jquery_slimscroll', 'jquery_blockui', 'bootstrap_switch'],
-        '/auth': ['jquery_validation', 'select2', 'jquery_backstretch', ['resources/assets/javascripts/app.js'], ['resources/assets/javascripts/auth/auth.js']],
-        '/file': ['bootstrap', 'bootstrap_progressbar', 'fine_uploader']
+        '/auth': ['jquery_validation', 'select2', 'jquery_backstretch', ['resources/assets/javascripts/app.js'], ['resources/assets/javascripts/auth.js']],
+        '/file': ['bootstrap', 'bootstrap_progressbar', 'fine_uploader'],
+
+        'admin/*': [
+            'jquery', 'bootstrap', 'js_cookie', 'jquery_slimscroll', 'jquery_blockui', 'bootstrap_switch',
+            ['resources/assets/javascripts/app.js'], ['resources/assets/javascripts/admin.js'],
+            ['resources/assets/javascripts/admin/layout.js'], ['resources/assets/javascripts/admin/quick-sidebar.js']],
+        'admin/user': []
     };
 
     var cssAliases = {
@@ -116,14 +122,18 @@ elixir(function (mix) {
     var cssMaps = {
         '/*': ['pace', 'humane_js'],
         '/auth': ['switchery', ['resources/assets/stylesheets/auth.css'], 'bootstrap_switch'],
-        '/file': ['switchery', ['resources/assets/stylesheets/auth.css'], 'fine_uploader']
+        '/file': ['switchery', ['resources/assets/stylesheets/auth.css'], 'fine_uploader'],
+        'admin/*': ['pace', ['resources/assets/stylesheets/admin.css']],
+        'admin/user': []
     };
 
     mix.scripts(resolveAssetMapToActualFilePaths('/auth', 'js'), 'public/javascripts/auth.js', './');
     mix.scripts(resolveAssetMapToActualFilePaths('/file', 'js'), 'public/javascripts/file.js', './');
+    mix.scripts(resolveAssetMapToActualFilePaths('admin/user', 'js'), 'public/javascripts/admin.js', './');
 
     mix.styles(resolveAssetMapToActualFilePaths('/auth', 'css'), 'public/stylesheets/auth.css', './');
     mix.styles(resolveAssetMapToActualFilePaths('/file', 'css'), 'public/stylesheets/file.css', './');
+    mix.styles(resolveAssetMapToActualFilePaths('admin/user', 'css'), 'public/stylesheets/admin.css', './');
 
     /*---------------
      | Versioning
