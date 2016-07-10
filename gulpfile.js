@@ -74,7 +74,6 @@ elixir(function (mix) {
             'public/bower_components/jquery-flot/jquery.flot.resize.js'
         ],
         'jquery_ui': ['public/bower_components/jquery-ui/jquery-ui.js'],
-        'jquery_uniform': ['public/bower_components/jquery.uniform/src/js/jquery.uniform.js'],
         'jquery_slimscroll': ['public/bower_components/jquery.slimscroll/jquery.slimscroll.js'],
         'jquery_validation': [
             'public/bower_components/jquery.validation/dist/jquery.validate.js',
@@ -94,7 +93,7 @@ elixir(function (mix) {
     };
 
     var jsMaps = {
-        '/*': ['jquery', 'bootstrap', 'js_cookie', 'bootstrap_hover_dropdown', 'jquery_slimscroll', 'jquery_blockui', 'jquery_uniform', 'bootstrap_switch'],
+        '/*': ['jquery', 'bootstrap', 'js_cookie', 'bootstrap_hover_dropdown', 'jquery_slimscroll', 'jquery_blockui', 'bootstrap_switch'],
         '/auth': ['jquery_validation', 'select2', 'jquery_backstretch', ['resources/assets/javascripts/app.js'], ['resources/assets/javascripts/auth/auth.js']],
         '/file': ['bootstrap', 'bootstrap_progressbar', 'fine_uploader']
     };

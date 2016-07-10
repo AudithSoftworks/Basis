@@ -206,24 +206,6 @@ var App = function () {
     };
 
     /**
-     * Handles custom checkboxes & radios using jQuery Uniform plugin
-     */
-    var handleUniform = function () {
-        if (!$().uniform) {
-            return;
-        }
-        var test = $("input[type=checkbox]:not(.toggle, .md-check, .md-radiobtn, .make-switch, .icheck), input[type=radio]:not(.toggle, .md-check, .md-radiobtn, .star, .make-switch, .icheck)");
-        if (test.size() > 0) {
-            test.each(function () {
-                if ($(this).parents(".checker").size() === 0) {
-                    $(this).show();
-                    $(this).uniform();
-                }
-            });
-        }
-    };
-
-    /**
      * Handles material design checkboxes
      */
     var handleMaterialDesign = function () {
@@ -360,7 +342,7 @@ var App = function () {
      */
     var handleTabs = function () {
         // Activate tab if tab id provided in the URL
-        if (location.hash) {
+        if (encodeURI(location.hash)) {
             var tabId = encodeURI(location.hash.substr(1));
             $('a[href="#' + tabId + '"]').parents('.tab-pane:hidden').each(function () {
                 var tabid = $(this).attr("id");
@@ -416,22 +398,27 @@ var App = function () {
 
         // Portlet tooltips
         $('.portlet > .portlet-title .fullscreen').tooltip({
+            trigger: 'hover',
             container: 'body',
             title: 'Fullscreen'
         });
         $('.portlet > .portlet-title > .tools > .reload').tooltip({
+            trigger: 'hover',
             container: 'body',
             title: 'Reload'
         });
         $('.portlet > .portlet-title > .tools > .remove').tooltip({
+            trigger: 'hover',
             container: 'body',
             title: 'Remove'
         });
         $('.portlet > .portlet-title > .tools > .config').tooltip({
+            trigger: 'hover',
             container: 'body',
             title: 'Settings'
         });
         $('.portlet > .portlet-title > .tools > .collapse, .portlet > .portlet-title > .tools > .expand').tooltip({
+            trigger: 'hover',
             container: 'body',
             title: 'Collapse/Expand'
         });
@@ -651,7 +638,6 @@ var App = function () {
 
             // UI Component handlers
             handleMaterialDesign(); // handles material design
-            handleUniform(); // handles custom radio & checkboxes
             handleiCheck(); // handles custom icheck radio and checkboxes
             handleBootstrapSwitch(); // handles bootstrap switch plugin
             handleScrollers(); // handles slim scrolling contents
@@ -678,7 +664,6 @@ var App = function () {
          * Main function to initiate core javascript after AJAX complete
          */
         initAjax: function () {
-            handleUniform(); // handles custom radio & checkboxes
             handleiCheck(); // handles custom icheck radio and checkboxes
             handleBootstrapSwitch(); // handles bootstrap switch plugin
             handleDropdownHover(); // handles dropdown hover
@@ -747,6 +732,10 @@ var App = function () {
         },
 
         initSlimScroll: function (el) {
+            if (!$().slimScroll) {
+                return;
+            }
+
             $(el).each(function () {
                 if ($(this).attr("data-initialized")) {
                     return; // exit
@@ -778,6 +767,10 @@ var App = function () {
         },
 
         destroySlimScroll: function (el) {
+            if (!$().slimScroll) {
+                return;
+            }
+
             $(el).each(function () {
                 if ($(this).attr("data-initialized") === "1") { // Destroy existing instance before updating the height
                     $(this).removeAttr("data-initialized");
@@ -962,31 +955,6 @@ var App = function () {
             }
 
             return id;
-        },
-
-        /**
-         * Initializes uniform elements.
-         * @param els
-         */
-        initUniform: function (els) {
-            if (els) {
-                $(els).each(function () {
-                    if ($(this).parents(".checker").size() === 0) {
-                        $(this).show();
-                        $(this).uniform();
-                    }
-                });
-            } else {
-                handleUniform();
-            }
-        },
-
-        /**
-         * Wrapper function to update/sync jquery uniform checkbox & radios.
-         * @param els
-         */
-        updateUniform: function (els) {
-            $.uniform.update(els); // Update the uniform checkbox & radios UI after the actual input control state changed
         },
 
         /**

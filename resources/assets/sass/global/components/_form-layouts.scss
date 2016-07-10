@@ -103,7 +103,7 @@
         }
 
         .portlet & {
-            @include border-radius(0 0 $general-border-radius $general-border-radius);
+            border-radius: 0 0 $general-border-radius $general-border-radius;
         }
 
         @include clearfix();
@@ -367,6 +367,24 @@
 
         .form-group:nth-child(even) {
             background-color: #fcfcfc;
+        }
+    }
+}
+
+/*
+|---------------------------------------
+| Horizontal form small input issue
+|---------------------------------------
+*/
+
+.form-horizontal {
+    .form-group {
+        .input-sm {
+            margin-top: 3px;
+        }
+
+        .form-control-static {
+            margin-top: 1px;
         }
     }
 }

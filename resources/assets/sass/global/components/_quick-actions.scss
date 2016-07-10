@@ -6,12 +6,12 @@
 
 .mt-actions {
     .mt-action {
-        margin: 0px;
+        margin: 0;
         padding: 15px 0 15px 0;
         border-bottom: 1px solid lighten(#e9ebee, 5%);
 
         &:last-child {
-            border-bottom: 0px;
+            border-bottom: 0;
         }
 
         .mt-action-img {
@@ -62,7 +62,7 @@
 
                         .mt-action-desc {
                             margin-bottom: 0;
-                            color: #a6a8a8;
+                            color: darken(#a6a8a8, 5%);
                         }
                     }
                 }
@@ -91,7 +91,7 @@
                     vertical-align: top;
                     display: table-cell;
                     text-align: center;
-                    width: 120px;
+                    width: 160px;
                     white-space: nowrap;
                     padding-top: 10px;
 

@@ -119,22 +119,22 @@
 
 .has-error .md-radio,
 .has-error.md-radio {
-    @include radio-variant($state-danger-text, $state-danger-text, $state-danger-bg);
+    @include radio-variant($state-danger-text, $state-danger-text, $state-danger-text);
 }
 
 .has-success .md-radio,
 .has-success.md-radio {
-    @include radio-variant($state-success-text, $state-success-text, $state-success-bg);
+    @include radio-variant($state-success-text, $state-success-text, $state-success-text);
 }
 
 .has-warning .md-radio,
 .has-warning.md-radio {
-    @include radio-variant($state-warning-text, $state-warning-text, $state-warning-bg);
+    @include radio-variant($state-warning-text, $state-warning-text, $state-warning-text);
 }
 
 .has-info .md-radio,
 .has-info.md-radio {
-    @include radio-variant($state-info-text, $state-info-text, $state-info-bg);
+    @include radio-variant($state-info-text, $state-info-text, $state-info-text);
 }
 
 .form-md-radios {

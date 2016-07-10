@@ -651,11 +651,8 @@
 
                         &:after {
                             right: 100%;
-                            top: 50%;
-                            border: solid transparent;
-                            border-color: rgba(47, 53, 59, 0);
+                            border: 8px solid rgba(47, 53, 59, 0);
                             border-right-color: #2f353b;
-                            border-width: 8px;
                             content: " ";
                             height: 0;
                             width: 0;
@@ -891,18 +888,6 @@
 
             }
         }
-    }
-}
-
-/*
-|----------------------------------------------
-| Mobile mode
-|----------------------------------------------
-*/
-
-@media (max-width: $screen-sm-max) { /* 991px */
-    .mt-element-list {
-
     }
 }
 

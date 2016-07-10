@@ -32,12 +32,15 @@
                 <input class="form-control form-control-solid placeholder-no-fix" type="email" autocomplete="off" placeholder="{{ trans('auth.labels.email') }}" name="email"/>
             </fieldset>
             <fieldset class="form-group col-md-12">
-                <label class="control-label visible-ie8 visible-ie9">{{ trans('auth.labels.password') }}</label>
+                <label class="control-label visible-ie8 visiblauthe-ie9">{{ trans('auth.labels.password') }}</label>
                 <input class="form-control form-control-solid placeholder-no-fix" type="password" autocomplete="off" placeholder="{{ trans('auth.labels.password') }}" name="password"/>
             </fieldset>
             <fieldset class="form-actions col-md-12">
                 <button type="submit" class="btn green uppercase">{{ trans('auth.buttons.login') }}</button>
-                <label class="rememberme check"><input type="checkbox" name="remember" value="1"> {{ trans('auth.remember_me') }}</label>
+                <label class="rememberme check mt-checkbox mt-checkbox-outline">
+                    <input type="checkbox" name="remember" value="1"> {{ trans('auth.remember_me') }}
+                    <span></span>
+                </label>
                 <a href="{{ action('Users\\PasswordController@requestPasswordResetLink', [], false) }}" id="forget-password" class="forget-password">{{ trans('auth.buttons.password') }}</a>
             </fieldset>
             <fieldset class="login-options col-md-12">

@@ -44,14 +44,15 @@
                 <input class="form-control placeholder-no-fix" type="password" autocomplete="off" placeholder="{{ trans('auth.labels.password_confirmation') }}" name="password_confirmation">
             </fieldset>
             <fieldset class="form-group margin-top-20 margin-bottom-20 col-md-12">
-                <label class="check">
+                <label class="check mt-checkbox mt-checkbox-outline">
                     <input type="checkbox" name="tnc"> {{ trans('auth.i_agree') | raw }}
+                    <span></span>
                 </label>
                 <span id="register_tnc_error"></span>
             </fieldset>
             <fieldset class="form-actions col-md-12">
-                <a class="btn btn-default" href="{{ route('login', [], false) }}">{{ trans('auth.buttons.login') }}</a>
-                <button type="submit" class="btn btn-success uppercase pull-right">{{ trans('auth.buttons.signup') }}</button>
+                <a class="btn green btn-outline" href="{{ route('login', [], false) }}">{{ trans('auth.buttons.login') }}</a>
+                <button type="submit" class="btn btn-info uppercase pull-right">{{ trans('auth.buttons.signup') }}</button>
             </fieldset>
         </form>
     </main>

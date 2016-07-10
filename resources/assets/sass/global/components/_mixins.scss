@@ -15,17 +15,6 @@
     }
 }
 
-// Opacity
-@mixin opacity($value, $important: '') {
-    opacity: $value #{$important};
-    filter: alpha(opacity=#{$value * 100}) #{$important};
-}
-
-// Border radius.
-@mixin border-radius($radius, $important: '') {
-    border-radius: unquote("#{$radius} #{$important}");
-}
-
 /*
 |------------------------------
 | Placeholder text
@@ -46,16 +35,6 @@
     &::-webkit-input-placeholder {
         color: $color;
     }
-}
-
-/*
-|-------------------------------------------
-| Drop shadows (By default set to: none)
-|-------------------------------------------
-*/
-
-@mixin box-shadow($shadow) {
-    box-shadow: none;
 }
 
 /*
@@ -106,4 +85,137 @@
 
 @mixin background-opacity($color, $opacity: 0.3) {
     background: rgba($color, $opacity);
+}
+
+@mixin vertical-align($position: absolute) {
+    position: #{$position};
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+@mixin burger-icon($line-color, $line-color-hover, $line-width, $line-height, $base-top: -5px, $above-top: 5px, $below-top: -5px) {
+    > span {
+        outline: none !important;
+
+        &:hover {
+            background: $line-color-hover;
+
+            &:before, &:after {
+                background: $line-color-hover;
+            }
+        }
+    }
+
+    > span,
+    > span:before,
+    > span:after {
+        display: inline-block;
+        width: $line-width;
+        height: $line-height;
+        background: $line-color;
+        position: relative;
+        top: $base-top;
+        transition: all ease .3s;
+    }
+
+    > span:before,
+    > span:after {
+        position: absolute;
+        left: 0;
+        content: '';
+    }
+
+    > span:before {
+        top: $above-top;
+    }
+
+    > span:after {
+        top: $below-top;
+    }
+
+    &.th-toggle-exit {
+        > span {
+            background-color: transparent !important;
+        }
+
+        > span:after {
+            transform: translateY(-$base-top) rotateZ(45deg);
+        }
+
+        > span:before {
+            transform: translateY($base-top) rotateZ(-45deg);
+        }
+    }
+}
+
+@mixin burger-icon-color-change($line-color, $line-color-hover) {
+    > span,
+    > span:before,
+    > span:after {
+        background: $line-color;
+    }
+
+    > span {
+        &:hover {
+            background: $line-color-hover;
+            &:before,
+            &:after {
+                background: $line-color-hover;
+            }
+        }
+    }
+
+    &.th-toggle-exit {
+        > span {
+            background-color: transparent !important;
+        }
+    }
+}
+
+@mixin close-icon($icon-size, $line-size, $color, $color-hover) {
+    position: relative;
+    display: inline-block;
+    width: $icon-size;
+    height: $icon-size;
+    overflow: hidden;
+    outline: none !important;
+
+    &:hover {
+        cursor: pointer;
+
+        &::before, &::after {
+            background: $color-hover;
+        }
+    }
+
+    &::before, &::after {
+        content: '';
+        position: absolute;
+        height: $line-size;
+        width: 100%;
+        top: 50%;
+        left: 0;
+        margin-top: $line-size / 2;
+        background: $color;
+    }
+
+    &::before {
+        transform: rotate(45deg);
+    }
+
+    &::after {
+        transform: rotate(-45deg);
+    }
+}
+
+@mixin close-icon-color-change($color, $color-hover) {
+    &:hover {
+        &::before, &::after {
+            background: $color-hover;
+        }
+    }
+
+    &::before, &::after {
+        background: $color;
+    }
 }

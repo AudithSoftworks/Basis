@@ -214,8 +214,8 @@
 }
 
 .table .btn {
-    margin-top: 0px;
-    margin-left: 0px;
+    margin-top: 0;
+    margin-left: 0;
     margin-right: 5px;
 }
 
@@ -253,7 +253,7 @@
 }
 
 .table-advance tr td {
-    border-left-width: 0px;
+    border-left-width: 0;
 }
 
 .table-advance tr td:first-child {
@@ -358,9 +358,13 @@
     &.table-hover > tbody > tr {
         > td:hover,
         > th:hover,
-        &:hover > td,
-        &:hover > th {
+        &:hover > td {
             background: lighten(#94a0b2, 34%);
         }
     }
+}
+
+.table-hover > tbody > tr:hover,
+.table-hover > tbody > tr:hover > td {
+    background: lighten(#94a0b2, 32%) !important;
 }

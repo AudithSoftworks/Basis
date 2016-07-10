@@ -24,7 +24,7 @@ docker exec basis_phpCli_1 /bin/bash -c "
 
     cd /home/basis/public/bower_components/fine-uploader && npm install && grunt package;
 
-    cd /home/basis && git clone --depth=1 --branch=1.14.0 https://github.com/jzaefferer/jquery-validation.git /home/basis/public/bower_components/jquery.validation;
+    cd /home/basis && git clone --depth=1 --branch=1.15.0 https://github.com/jzaefferer/jquery-validation.git /home/basis/public/bower_components/jquery.validation;
     cd /home/basis/public/bower_components/jquery.validation && rm -rf .git && npm install && grunt;
 
     cd /home/basis && git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2;
@@ -40,8 +40,6 @@ docker exec basis_phpCli_1 /bin/bash -c "
     cp -r ./public/bower_components/google-fonts/ofl/marcellus ./public/fonts/marcellus;
     cp -r ./public/bower_components/google-fonts/ofl/pontanosans ./public/fonts/pontano_sans;
     cp -r ./public/bower_components/google-fonts/ofl/montserrat ./public/fonts/montserrat;
-
-    mkdir -p ./public/build/images; cp -r ./public/bower_components/jquery.uniform/dist/images/default/* ./public/build/images;
 
     chmod -R +x /home/basis/storage/build/tools;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/simple-line-icons/stylesheet.css public/fonts/simple-line-icons/*.ttf;

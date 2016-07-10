@@ -438,8 +438,7 @@
 
     .step-line {
         .mt-step-col {
-            padding-top: 30px;
-            padding-bottom: 30px;
+            padding: 30px 0;
             text-align: center;
         }
 
@@ -466,28 +465,32 @@
         }
 
         .mt-step-title {
+            position: relative;
             font-size: 20px;
             font-weight: 400;
 
             &:after {
                 content: '';
-                height: 3px;
-                width: 50%;
                 position: absolute;
-                background-color: #e5e5e5;
-                top: 53px;
+                top: -32px;
                 left: 50%;
                 z-index: 4;
-            }
-            &:before {
-                content: '';
                 height: 3px;
                 width: 50%;
-                position: absolute;
                 background-color: #e5e5e5;
-                top: 53px;
+                transform: translateY(-100%);
+            }
+
+            &:before {
+                content: '';
+                position: absolute;
+                top: -32px;
                 right: 50%;
                 z-index: 4;
+                height: 3px;
+                width: 50%;
+                background-color: #e5e5e5;
+                transform: translateY(-100%);
             }
         }
 

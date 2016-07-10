@@ -21,13 +21,12 @@
 
 .toast .toast-close-button {
     display: inline-block;
-    margin-top: 0px;
-    margin-right: 0px;
+    margin-top: 0;
+    margin-right: 0;
     text-indent: -100000px;
     width: 11px;
     height: 16px;
-    background-repeat: no-repeat !important;
-    background-image: url("#{$general-img-path}portlet-remove-icon-white.png") !important;
+    background: url("#{$global-img-path}portlet-remove-icon-white.png") no-repeat !important;
 }
 
 .toast-top-center {

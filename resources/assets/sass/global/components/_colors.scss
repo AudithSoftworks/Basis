@@ -40,6 +40,37 @@
     .border-right-#{$name} {
         border-right-color: map-get($colors, base) !important;
     }
+
+    // Pseudo classes
+    .bg-before-#{$name}:before,
+    .bg-after-#{$name}:after {
+        background: map-get($colors, base) !important;
+    }
+
+    .border-before-#{$name}:before,
+    .border-after-#{$name}:after {
+        border-color: map-get($colors, base) !important;
+    }
+
+    .border-top-before-#{$name}:before,
+    .border-top-after-#{$name}:after {
+        border-top-color: map-get($colors, base) !important;
+    }
+
+    .border-bottom-before-#{$name}:before,
+    .border-bottom-after-#{$name}:after {
+        border-bottom-color: map-get($colors, base) !important;
+    }
+
+    .border-left-before-#{$name}:before,
+    .border-left-after-#{$name}:after {
+        border-left-color: map-get($colors, base) !important;
+    }
+
+    .border-right-before-#{$name}:before,
+    .border-right-after-#{$name}:after {
+        border-right-color: map-get($colors, base) !important;
+    }
 }
 
 /*

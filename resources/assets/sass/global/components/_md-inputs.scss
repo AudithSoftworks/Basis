@@ -62,7 +62,7 @@
         padding-top: 5px;
         font-size: $input-md-label-font-size;
         color: $input-md-label-color;
-        @include opacity($input-md-label-opacity);
+        opacity: $input-md-label-opacity;
     }
 
     .form-control {
@@ -124,16 +124,15 @@
             margin-bottom: 0;
             font-size: $input-md-label-font-size;
             color: $input-md-label-color;
-            @include opacity($input-md-label-opacity);
+            opacity: $input-md-label-opacity;
         }
 
         ~ .help-block-error {
-            @include opacity(1);
+            opacity: 1;
         }
 
         &.edited:not([readonly]),
-        &:focus:not([readonly]),
-        &.focus:not([readonly]) {
+        &:focus:not([readonly]) {
             ~ label,
             ~ .form-control-focus {
                 color: $input-md-label-color;
@@ -147,16 +146,26 @@
             }
 
             ~ label {
-                @include opacity(1);
+                opacity: 1;
             }
 
             ~ .help-block {
                 color: $input-md-focus-border;
-                @include opacity(1);
+                opacity: 1;
             }
 
             ~ .help-block-error {
-                @include opacity(0);
+                opacity: 0;
+            }
+        }
+
+        &.edited:not([readonly]):not(:focus) {
+            ~ .help-block {
+                opacity: 0;
+            }
+
+            ~ .help-block-error {
+                opacity: 0;
             }
         }
 
@@ -261,7 +270,7 @@
     .help-block {
         position: absolute;
         margin: 2px 0 0 0;
-        @include opacity(0);
+        opacity: 0;
         font-size: 13px;
     }
 
@@ -328,7 +337,7 @@
         }
 
         .input-group-addon {
-            @include border-radius(0);
+            border-radius: 0;
             background: none;
             border: 0;
             border-bottom: 1px solid $input-border;
@@ -407,9 +416,8 @@
 
 .form-inline {
     .form-md-line-input {
-        margin: 0;
+        margin: 0 20px 0 0;
         padding-top: 0;
-        margin-right: 20px;
 
         > .input-icon {
             padding: 0;

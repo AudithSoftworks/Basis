@@ -50,6 +50,10 @@
     .btn.#{$name}-stripe {
         border-left: 4px solid map-get($colors, base) !important;
     }
+
+    .btn.#{$name}.btn-no-border:not(.active) {
+        border-color: transparent;
+    }
 }
 
 /*
@@ -60,6 +64,7 @@
 
 .btn-circle {
     border-radius: 25px !important;
+    overflow: hidden;
 }
 
 .btn-circle-right {
@@ -137,7 +142,7 @@
         font-weight: 600;
         text-transform: uppercase;
         transition: box-shadow 0.28s cubic-bezier(0.4, 0, 0.2, 1);
-        @include border-radius($general-border-radius);
+        border-radius: $general-border-radius;
         border-width: 0 !important;
         overflow: hidden;
         position: relative;
