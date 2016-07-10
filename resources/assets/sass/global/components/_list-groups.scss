@@ -31,12 +31,3 @@
 .list-group {
     @include list-group-item-variant(danger, $state-danger-bg, $state-danger-text);
 }
-
-@if $theme-type == "material-design" {
-    .list-group1 {
-        margin-left: 5px;
-        margin-right: 5px;
-        @extend .md-shadow-z-1;
-        border: 0;
-    }
-}

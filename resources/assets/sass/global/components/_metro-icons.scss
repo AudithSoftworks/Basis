@@ -11,9 +11,7 @@
     margin-top: 3px;
     line-height: 14px;
     vertical-align: top;
-    background-image: url('#{$general-img-path}syncfusion-icons.png');
-    background-position: 0 0;
-    background-repeat: no-repeat;
+    background: url('#{$global-img-path}syncfusion-icons.png') no-repeat 0 0;
 }
 
 [class^="m-icon-big-"] {
@@ -22,9 +20,7 @@
     height: 30px;
     margin: 6px;
     vertical-align: middle;
-    background-image: url('#{$general-img-path}syncfusion-icons.png');
-    background-position: 0 0px;
-    background-repeat: no-repeat;
+    background: url('#{$global-img-path}syncfusion-icons.png') no-repeat 0 0;
 }
 
 /*
@@ -38,7 +34,7 @@
 }
 
 .btn.m-icon-big.m-icon-only {
-    padding: 9px 8px 8px 0px;
+    padding: 9px 8px 8px 0;
 }
 
 .btn.m-icon-big [class^="m-icon-big-"] {
@@ -46,7 +42,7 @@
 }
 
 .btn.m-icon-ony > i {
-    margin-left: 0px;
+    margin-left: 0;
 }
 
 /*
@@ -69,7 +65,7 @@
 
 /* white icon */
 .m-icon-white {
-    background-image: url('#{$general-img-path}syncfusion-icons-white.png');
+    background-image: url('#{$global-img-path}syncfusion-icons-white.png');
 }
 
 /*  Misc */

@@ -7,10 +7,6 @@
 |------------------------------
 */
 
-@if $theme-style == "square" {
-    //@import 'components/_reset-rounds';
-}
-
 @import 'components/reset-general';
 
 /*
@@ -64,6 +60,8 @@
 @import 'components/animate';
 @import 'components/headings';
 @import 'components/timeline';
+@import 'components/timeline-2';
+@import 'components/timeline-3';
 @import 'components/tasks-widget';
 @import 'components/_comments';
 @import 'components/_quick-actions';
@@ -87,3 +85,9 @@
 */
 
 @import 'components/colors';
+
+
+// System components
+
+@import 'components/cookie-consent';
+@import 'components/sidebar';

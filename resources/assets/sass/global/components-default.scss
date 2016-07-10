@@ -5,6 +5,7 @@
 */
 
 $theme-style: 'square'; 
-$theme-type:  'default'; 
+$theme-type:  'default';
 
+@import 'components/reset-rounds';
 @import 'components';

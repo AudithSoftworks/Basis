@@ -23,8 +23,8 @@
         }
     }
 
-    &.fullscreen {
-        z-index: 11000;
+    &.note-frame.fullscreen {
+        z-index: 10050;
         width: 100% !important;
     }
 

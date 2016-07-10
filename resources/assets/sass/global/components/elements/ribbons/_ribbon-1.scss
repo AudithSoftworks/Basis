@@ -7,7 +7,8 @@
 
     .ribbon-content {
         margin: 0;
-        padding-top: 2.5em;
+        padding: 25px;
+        clear: both;
 
         &.no-padding {
             padding-top: 0;
@@ -15,11 +16,12 @@
     }
 
     .ribbon {
-        position: absolute;
-        top: 15px;
-        left: -2px;
         padding: 0.5em 1em;
         z-index: 5;
+        float: left;
+        margin: 10px 0 0 -2px;
+        clear: left;
+        position: relative;
 
         /*
         |------------------------------
@@ -28,21 +30,28 @@
         */
 
         &.ribbon-right {
-            left: auto;
-            right: -2px;
+            float: right;
+            clear: right;
+            margin: 10px -2px 0 0;
         }
+
         &.ribbon-vertical-left {
-            top: -2px;
-            left: 15px;
+            clear: none;
+            margin: -2px 0 0 10px;
             padding-top: 1em;
             padding-bottom: 1em;
+            width: 41px;
+            text-align: center;
         }
+
         &.ribbon-vertical-right {
-            top: -2px;
-            left: auto;
-            right: 15px;
+            clear: none;
+            float: right;
+            margin: -2px 10px 0 0;
             padding-top: 1em;
             padding-bottom: 1em;
+            width: 41px;
+            text-align: center;
         }
 
         /*
@@ -65,17 +74,17 @@
             border-bottom-right-radius: 5px !important;
 
             &.ribbon-right {
-                border-top-right-radius: 0px !important;
-                border-bottom-right-radius: 0px !important;
+                border-top-right-radius: 0 !important;
+                border-bottom-right-radius: 0 !important;
                 border-top-left-radius: 5px !important;
                 border-bottom-left-radius: 5px !important;
             }
 
             &.ribbon-vertical-right,
             &.ribbon-vertical-left {
-                border-top-right-radius: 0px !important;
+                border-top-right-radius: 0 !important;
                 border-bottom-right-radius: 5px !important;
-                border-top-left-radius: 0px !important;
+                border-top-left-radius: 0 !important;
                 border-bottom-left-radius: 5px !important;
             }
         }
@@ -122,8 +131,7 @@
 
         &.ribbon-border-dash {
             &:after {
-                border: 1px solid;
-                border-style: dashed;
+                border: 1px dashed;
                 content: '';
                 position: absolute;
                 top: 5px;
@@ -167,10 +175,12 @@
 
         &.ribbon-clip {
             left: -10px;
+            margin-left: 0;
 
             &.ribbon-right {
                 left: auto;
                 right: -10px;
+                margin-right: 0;
             }
         }
 

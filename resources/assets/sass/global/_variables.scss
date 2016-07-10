@@ -23,6 +23,7 @@ $font-family-default: "Helvetica Neue", Helvetica, Arial, sans-serif !default;
 
 $general-heading-color: #3f444a;
 $general-text-color: darken(#677581, 5%);
+$general-transition: all 0.3s;
 
 /* Global text color on <body> */
 $text-color: #333333 !default;
@@ -39,11 +40,10 @@ $link-color: #5b9bd1 !default;
 /* Link hover color. */
 $link-hover-color: darken($link-color, 15%) !default;
 $primary-link-color: #65a0d0 !default;
-$general-img-path: '/media_assets/images/' !default;
 
 $general-border-radius: 4px !default;
 @if $theme-type == "material-design" {
-    $general-border-radius: 2px !default;
+    $general-border-radius: 2px !global;
 }
 
 $dropdown-shadow: 5px 5px rgba(#666, 0.1);
@@ -98,6 +98,11 @@ $screen-xs-max: ($screen-sm-min - 1) !default; // 767px
 $screen-sm-max: ($screen-md-min - 1) !default; // 991px
 $screen-md-max: ($screen-lg-min - 1) !default; // 1199px
 
-$jquery-uniform-img-path: "#{$general-img-path}global/vendor/jquery.uniform/themes/default/" !default;
+/* Image paths */
+$global-img-path: '/media_assets/images/' !default;
+$page-img-path: '/media_assets/images/' !default;
+$page-media-path: '/media_assets/other/' !default;
+
+$jquery-uniform-img-path: "#{$global-img-path}global/vendor/jquery.uniform/themes/default/" !default;
 
 @import "bootstrap-override";

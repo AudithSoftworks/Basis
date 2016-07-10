@@ -18,7 +18,7 @@
 
 @if $theme-type == "material-design" {
     .alert {
-        @include border-radius($general-border-radius);
+        border-radius: $general-border-radius;
         border-width: 0;
         @extend .md-shadow-z-1;
     }

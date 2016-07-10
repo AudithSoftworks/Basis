@@ -1,4 +1,9 @@
-/* Fix: content shifting to the right on modal open */
+/*
+|--------------------------------------------------------
+| Fix: content shifting to the right on modal open
+|--------------------------------------------------------
+*/
+
 .modal-open.page-overflow .page-container,
 .modal-open.page-overflow .page-container .navbar-fixed-top,
 .modal-open.page-overflow .page-container .navbar-fixed-bottom,
@@ -24,7 +29,7 @@
 
 @if $theme-type == "material-design" {
     .modal {
-        @extend .md-shadow-z-3;
+        @extend .md-shadow-z-3 !optional;
         border-radius: $general-border-radius;
         border: 0 !important;
 

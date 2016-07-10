@@ -177,7 +177,7 @@ var Login = function () {
             },
 
             submitHandler: function (form) {
-                form.submit();
+                form[0].submit();
             }
         });
 

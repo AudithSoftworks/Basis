@@ -141,22 +141,22 @@
 
 .has-error .md-checkbox,
 .has-error.md-checkbox {
-    @include checkbox-variant($state-danger-text, $state-danger-text, $state-danger-bg);
+    @include checkbox-variant($state-danger-text, $state-danger-text, $state-danger-text);
 }
 
 .has-success .md-checkbox,
 .has-success.md-checkbox {
-    @include checkbox-variant($state-success-text, $state-success-text, $state-success-bg);
+    @include checkbox-variant($state-success-text, $state-success-text, $state-success-text);
 }
 
 .has-warning .md-checkbox,
 .has-warning.md-checkbox {
-    @include checkbox-variant($state-warning-text, $state-warning-text, $state-warning-bg);
+    @include checkbox-variant($state-warning-text, $state-warning-text, $state-warning-text);
 }
 
 .has-info .md-checkbox,
 .has-info.md-checkbox {
-    @include checkbox-variant($state-info-text, $state-info-text, $state-info-bg);
+    @include checkbox-variant($state-info-text, $state-info-text, $state-info-text);
 }
 
 .form-md-checkboxes {

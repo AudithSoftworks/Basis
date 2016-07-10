@@ -310,6 +310,7 @@ $tabbable-line-font-color: #333333 !default;
 
         > li {
             margin: 0;
+            border-bottom: 4px solid transparent;
 
             > a {
                 background: none !important;

@@ -7,6 +7,10 @@
     &.progress-sm {
         height: 12px;
     }
+
+    .page-md & {
+        text-indent: -99999px;
+    }
 }
 
 /*

@@ -94,3 +94,12 @@
 .select2-results__option--highlighted .select2-result-repository__watchers {
     color: #c1d7e9;
 }
+
+.select2-selection__choice {
+    background-color: #eeeeee !important;
+    border: 1px solid #eeeeee !important;
+
+    .select2-selection__choice__remove {
+        font-weight: normal !important;
+    }
+}

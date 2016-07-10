@@ -41,7 +41,7 @@ $color-blue: #009dc7 !default;
     border: 1px solid #eeeeee;
     font-family: $font-family-default;
 
-    @include border-radius($general-border-radius);
+    border-radius: $general-border-radius;
 
     li.divider {
         background: #f1f3f6;
@@ -178,7 +178,7 @@ $color-blue: #009dc7 !default;
 
     &.dropup {
         > .dropdown-menu {
-            margin-top: 0px;
+            margin-top: 0;
             margin-bottom: 10px;
 
             &:after,
@@ -359,14 +359,14 @@ $color-blue: #009dc7 !default;
     .btn-group {
         > .dropdown-menu {
             @extend .md-shadow-z-2-i;
-            @include opacity(0);
+            opacity: 0;
             margin-top: 0px;
         }
 
         &.dropup {
             > .dropdown-menu {
-                margin-top: 0px;
-                margin-bottom: 0px;
+                margin-top: 0;
+                margin-bottom: 0;
             }
         }
     }
@@ -374,7 +374,7 @@ $color-blue: #009dc7 !default;
     .btn-group.open {
         > .dropdown-menu {
             @include ease-out(1500ms, opacity, 0.1ms);
-            @include opacity(1);
+            opacity: 1;
         }
     }
 }
@@ -399,8 +399,7 @@ $color-blue: #009dc7 !default;
     list-style: none;
     position: absolute;
     background: #242b31;
-    @include border-radius(2px);
-    -webkit-background-clip: padding-box;
+    border-radius: 2px;
     background-clip: padding-box;
     @include cubic-transition($delay: 0, $duration: 300ms, $property: (all));
 
