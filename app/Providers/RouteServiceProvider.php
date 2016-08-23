@@ -99,7 +99,5 @@ class RouteServiceProvider extends ServiceProvider
         $router->resource('files', 'FilesController', ['only' => ['index', 'create', 'store', 'show', 'destroy']]);
 
         $router->get('', 'HomeController@index');
-
-        $router->get('admin', 'AdminController@index');
     }
 }
