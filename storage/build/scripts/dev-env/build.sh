@@ -22,7 +22,7 @@ test -f .env || cat .env.example | sed s/DB_HOST=.*/DB_HOST=mariadb10/g | sed s/
 docker exec basis_phpCli_1 /bin/bash -c "
     cd /home/basis && npm update && bower --config.interactive=false --allow-root update;
 
-    cd /home/basis/public/bower_components/fine-uploader && npm install && grunt package;
+    cd /home/basis/public/bower_components/fine-uploader && npm install && make build;
 
     cd /home/basis && git clone --depth=1 --branch=1.15.0 https://github.com/jzaefferer/jquery-validation.git /home/basis/public/bower_components/jquery.validation;
     cd /home/basis/public/bower_components/jquery.validation && rm -rf .git && npm install && grunt;
