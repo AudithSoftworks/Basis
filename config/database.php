@@ -11,7 +11,7 @@ return [
     | array format for simplicity. Here you can tweak the fetch style.
     |
     */
-    'fetch' => PDO::FETCH_CLASS,
+    'fetch' => PDO::FETCH_OBJ,
 
     /*
     |--------------------------------------------------------------------------
@@ -23,7 +23,7 @@ return [
     | you may use many connections at once using the Database library.
     |
     */
-    'default' => env('DB', 'mysql'),
+    'default' => env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -102,8 +102,9 @@ return [
     'redis' => [
         'cluster' => false,
         'default' => [
-            'host' => env('REDIS_HOST', '127.0.0.1'),
-            'port' => 6379,
+            'host' => env('REDIS_HOST', 'localhost'),
+            'password' => env('REDIS_PASSWORD', null),
+            'port' => env('REDIS_PORT', 6379),
             'database' => 0,
         ],
     ],

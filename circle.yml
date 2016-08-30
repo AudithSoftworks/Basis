@@ -1,16 +1,12 @@
 machine:
   pre:
-    - curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > docker-compose; sudo mv docker-compose /usr/bin/docker-compose; sudo chmod 0755 /usr/bin/docker-compose
+    - curl -L https://github.com/docker/compose/releases/download/1.8.0/docker-compose-`uname -s`-`uname -m` > docker-compose; sudo mv docker-compose /usr/bin/docker-compose; sudo chmod 0755 /usr/bin/docker-compose;
   services:
     - docker
 
 general:
   artifacts:
     - "./storage/coverage"
-
-notify:
-  webhooks:
-    - url: https://webhooks.gitter.im/e/251b9f310b8c9e8855f9
 
 dependencies:
   cache_directories:
@@ -24,33 +20,26 @@ dependencies:
     - chmod -R 0777 ./storage/logs
 
     ########################################################################
-    # Parallelism: Node-0 => PHP 5.6, Node-1 => PHP 7, Node-2 => HHVM
+    # Parallelism: Node-0 => PHP 5.6, Node-1 => PHP 7
     ########################################################################
 
     # Docker build
-    - if [[ $CIRCLE_BRANCH == 'upgrades' ]]; then docker build -qf storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .; fi;
-    - if [[ $CIRCLE_BRANCH == 'upgrades' && `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 0 ]]; then docker build -qf storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .; fi;
-      if [[ $CIRCLE_BRANCH == 'upgrades' && `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 1 ]]; then docker build -qf storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .; fi;
-      if [[ $CIRCLE_BRANCH == 'upgrades' && `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 2 ]]; then docker build -qf storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .; fi;
-    - if [[ $CIRCLE_BRANCH == 'upgrades' && `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 0 ]]; then docker build -qf storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .; fi;
-      if [[ $CIRCLE_BRANCH == 'upgrades' && `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 1 ]]; then docker build -qf storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .; fi;
+    - if [[ $CIRCLE_BRANCH == 'docker-build' ]]; then docker build -qf storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .; fi;
+    - if [[ $CIRCLE_BRANCH == 'docker-build' && `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 0 ]]; then docker build -qf storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .; fi;
+      if [[ $CIRCLE_BRANCH == 'docker-build' && `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 1 ]]; then docker build -qf storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .; fi;
+    - if [[ $CIRCLE_BRANCH == 'docker-build' && `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 0 ]]; then docker build -qf storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .; fi;
+      if [[ $CIRCLE_BRANCH == 'docker-build' && `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` == 1 ]]; then docker build -qf storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .; fi;
     - docker images
 
     # Docker Compose
-    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-php7.yml' ;; 2) export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
-      && docker-compose -f $DOCKER_COMPOSE_FILE up -d;
-
-    # Create database for MariaDb and PgSQL
-    - sleep 5;
-      docker-compose ps;
-      mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mariadb10_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
-      if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 2 ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
+    - case `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` in 0) export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; 1) export DOCKER_COMPOSE_FILE='./docker-compose-php7.yml' ;; esac
+      && docker-compose -f $DOCKER_COMPOSE_FILE up -d && docker-compose -f $DOCKER_COMPOSE_FILE ps
 
     # Fix for /etc/hosts file
-    - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginx_1) basis.audith.org | tee -a /etc/hosts";
+    - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginx_1) basis.audith.org | tee -a /etc/hosts"
 
     # dotEnv file for initial test setup
-    - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mariadb10/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env;
+    - cat .env.example | sed s/DB_HOST=.*/DB_HOST=mariadb/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env
 
     # Build project dependencies
     - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c "
@@ -93,11 +82,12 @@ test:
     - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
         parallel: true
 
-    # Switching to PgSQL 9.4
-    - cat .env | sed s/DB_HOST=.*/DB_HOST=postgres94/g | sed s/DB=.*/DB=pgsql/g | tee .env
+    # Switching to PgSQL
+    - cat .env | sed s/DB_CONNECTION=.*/DB_CONNECTION=pgsql/g | sed s/DB_HOST=.*/DB_HOST=postgres/g | sed s/DB_USERNAME=.*/DB_USERNAME=postgres/g | tee .env:
+        parallel: true
 
-    # Testing against PgSQL 9.4
-    - if [[ `expr $CIRCLE_NODE_INDEX % $CIRCLE_NODE_TOTAL` != 2 ]]; then sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose'; fi:
+    # Testing against PgSQL
+    - sudo lxc-attach -n "$(docker inspect --format '{{.Id}}' basis_phpCli_1)" -- bash -c 'cd /home/basis; ./vendor/bin/phpunit --debug --verbose':
         parallel: true
 
   post:
