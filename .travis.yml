@@ -10,23 +10,20 @@ services:
 env:
   - PHP_VERSION=5.6
   - PHP_VERSION=7.0
-  - PHP_VERSION=hhvm
 
 matrix:
   fast_finish: true
-#  allow_failures:
-#    - env: PHP_VERSION=7.0
 
 # sudo: false
 
 cache:
   directories:
-    - ./vendor
     - ./node_modules
     - ./public/bower_components
+    - ./vendor
 
 before_install:
-  - curl -L https://github.com/docker/compose/releases/download/1.5.2/docker-compose-`uname -s`-`uname -m` > docker-compose; chmod +x docker-compose; true
+  - curl -L https://github.com/docker/compose/releases/download/1.8.0/docker-compose-`uname -s`-`uname -m` > docker-compose; chmod +x docker-compose; true
   - sudo mv docker-compose /usr/local/bin/
   - pwd && docker -v && docker info && docker-compose -v
 
@@ -41,20 +38,19 @@ install:
   - if [[ $BRANCH == 'upgrades' ]]; then docker build -qf storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .; fi;
   - if [[ $BRANCH == 'upgrades' && $PHP_VERSION == '5.6' ]]; then docker build -qf storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .; fi;
     if [[ $BRANCH == 'upgrades' && $PHP_VERSION == '7.0' ]]; then docker build -qf storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .; fi;
-    if [[ $BRANCH == 'upgrades' && $PHP_VERSION == 'hhvm' ]]; then docker build -qf storage/build/scripts/hhvm/Dockerfile -t audithsoftworks/basis:hhvm .; fi;
   - if [[ $BRANCH == 'upgrades' && $PHP_VERSION == '5.6' ]]; then docker build -qf storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .; fi;
     if [[ $BRANCH == 'upgrades' && $PHP_VERSION == '7.0' ]]; then docker build -qf storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .; fi;
   - docker images
 
   # Docker Compose
-  - case $PHP_VERSION in '5.6') export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; '7.0') export DOCKER_COMPOSE_FILE='./docker-compose-php7.yml' ;; 'hhvm') export DOCKER_COMPOSE_FILE='./docker-compose-hhvm.yml' ;; esac
+  - case $PHP_VERSION in '5.6') export DOCKER_COMPOSE_FILE='./docker-compose-php56.yml' ;; '7.0') export DOCKER_COMPOSE_FILE='./docker-compose-php7.yml' ;; esac
     && docker-compose -f $DOCKER_COMPOSE_FILE up -d
 
   # Create database for MariaDb and PgSQL
   - sleep 15;
     docker-compose ps;
     mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mariadb10_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
-    if [[ $PHP_VERSION != 'hhvm' ]]; then psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres94_1) -U postgres -c "CREATE DATABASE basis;"; fi;
+    psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres_1) -U postgres -c "CREATE DATABASE basis;";
 
   # Fix for /etc/hosts file
   - docker exec basis_phpCli_1 echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginx_1) basis.audith.org | sudo tee -a /etc/hosts;
@@ -104,11 +100,11 @@ script:
   # Testing against MariaDb
   - docker exec basis_phpCli_1 /bin/bash -c "cd /home/basis; ./vendor/bin/phpunit --debug --verbose";
 
-  # Switching to PgSQL 9.4
-  - cat .env | sed s/DB_HOST=.*/DB_HOST=postgres94/g | sed s/DB=.*/DB=pgsql/g | tee .env
+  # Switching to PgSQL
+  - cat .env | sed s/DB=.*/DB=pgsql/g | sed s/DB_HOST=.*/DB_HOST=postgres/g | sed s/DB_USERNAME=.*/DB_USERNAME=postgres| tee .env
 
-  # Testing against PgSQL 9.4
-  - if [[ $PHP_VERSION != 'hhvm' ]]; then docker exec basis_phpCli_1 /bin/bash -c "cd /home/basis; ./vendor/bin/phpunit --debug --verbose"; fi;
+  # Testing against PgSQL
+  - docker exec basis_phpCli_1 /bin/bash -c "cd /home/basis; ./vendor/bin/phpunit --debug --verbose";
 
 notifications:
   hipchat: f504f9e2e6696c17589a7b49f4ce05@Audith.Basis

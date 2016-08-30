@@ -3,8 +3,11 @@ mariadb10:
   environment:
     - MYSQL_DATABASE=basis
     - MYSQL_ALLOW_EMPTY_PASSWORD=true
-postgres94:
-  image: postgres:9.4
+postgres:
+  image: postgres:9.6
+  environment:
+    - POSTGRES_DB=basis
+    - POSTGRES_PASSWORD=
 redis:
   image: redis
 phpFpm:
@@ -14,7 +17,7 @@ phpFpm:
   working_dir: /home/basis
   links:
     - mariadb10
-    - postgres94
+    - postgres
     - redis
   environment:
     XDEBUG_CONFIG: remote_host=172.17.0.1
@@ -33,7 +36,7 @@ phpCli:
   working_dir: /home/basis
   links:
     - mariadb10
-    - postgres94
+    - postgres
     - redis
     - nginx
   environment:
