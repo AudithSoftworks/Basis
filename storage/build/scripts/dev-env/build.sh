@@ -8,16 +8,12 @@
 
 export VERSION_SUFFIX='php7'; # php56|php7
 
-#docker-compose -f docker-compose-${VERSION_SUFFIX}.yml pull;
+docker-compose -f docker-compose-${VERSION_SUFFIX}.yml pull;
 docker-compose -f docker-compose-${VERSION_SUFFIX}.yml up -d;
 docker-compose -f docker-compose-${VERSION_SUFFIX}.yml ps;
 docker exec basis_phpCli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginx_1) basis.audith.org | tee -a /etc/hosts";
 
-sleep 10;
-mysql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_mariadb10_1) -u root -e "CREATE DATABASE IF NOT EXISTS basis;";
-psql -h $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_postgres_1) -U postgres -c "CREATE DATABASE basis;";
-
-test -f .env || cat .env.example | sed s/DB_HOST=.*/DB_HOST=mariadb10/g | sed s/DB_USERNAME=.*/DB=mysql/g | sed s/DB_PASSWORD=.*//g | tee .env;
+test -f .env || cat .env.example | sed s/DB_HOST=.*/DB_HOST=mariadb/g | tee .env;
 docker exec basis_phpCli_1 /bin/bash -c "
     cd /home/basis && npm update && bower --config.interactive=false --allow-root update;
 

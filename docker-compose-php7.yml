@@ -1,10 +1,10 @@
-mariadb10:
+mariadb:
   image: mariadb:10.1
   environment:
     - MYSQL_DATABASE=basis
     - MYSQL_ALLOW_EMPTY_PASSWORD=true
 postgres:
-  image: postgres:9.6
+  image: postgres:latest
   environment:
     - POSTGRES_DB=basis
     - POSTGRES_PASSWORD=
@@ -16,7 +16,7 @@ phpFpm:
     - .:/home/basis
   working_dir: /home/basis
   links:
-    - mariadb10
+    - mariadb
     - postgres
     - redis
   environment:
@@ -35,7 +35,7 @@ phpCli:
     - .:/home/basis
   working_dir: /home/basis
   links:
-    - mariadb10
+    - mariadb
     - postgres
     - redis
     - nginx
