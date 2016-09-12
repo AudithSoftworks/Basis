@@ -6,15 +6,18 @@
 #docker build -f storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .;
 #docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
 
-export VERSION_SUFFIX='php7'; # php56|php7
+#docker-compose build
 
-docker-compose -f docker-compose-${VERSION_SUFFIX}.yml pull;
-docker-compose -f docker-compose-${VERSION_SUFFIX}.yml up -d;
-docker-compose -f docker-compose-${VERSION_SUFFIX}.yml ps;
-docker exec basis_phpCli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.IPAddress }}' basis_nginx_1) basis.audith.org | tee -a /etc/hosts";
+export PHP_VERSION='5'; # 5|7
+
+#docker-compose pull;
+
+docker-compose up -d php${PHP_VERSION}-cli;
+docker-compose ps;
+docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | tee -a /etc/hosts";
 
 test -f .env || cat .env.example | sed s/DB_HOST=.*/DB_HOST=mariadb/g | tee .env;
-docker exec basis_phpCli_1 /bin/bash -c "
+docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     cd /home/basis && npm update && bower --config.interactive=false --allow-root update;
 
     cd /home/basis/public/bower_components/fine-uploader && npm install && make build;
@@ -54,7 +57,6 @@ docker exec basis_phpCli_1 /bin/bash -c "
     chown -R 1000:1000 ./
 ";
 
-#docker-compose -f docker-compose-${VERSION_SUFFIX}.yml down;
-#sleep 10;
+#docker-compose down;
 #docker rm $(docker ps -a | grep "Exited" | awk "{print \$1}")
 #docker rmi $(docker images | grep "<none>" | awk "{print \$3}");

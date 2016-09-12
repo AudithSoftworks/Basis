@@ -89,7 +89,7 @@ RUN set -ex \
     done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.2.2
+ENV NODE_VERSION 6.5.0
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
     && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -106,7 +106,7 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
 RUN npm install -g bower gulp grunt-cli ttf2eot jshint
 
 # Install Compass dependencies
-RUN gem install compass sass sass-globbing autoprefixer-rails fontcustom
+RUN gem install --no-rdoc --no-ri sass:3.4.22 sass-globbing autoprefixer-rails compass
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
 
