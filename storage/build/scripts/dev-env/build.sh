@@ -8,7 +8,7 @@
 
 #docker-compose build
 
-export PHP_VERSION='5'; # 5|7
+if [ -z ${PHP_VERSION+x} ]; then export PHP_VERSION='5'; fi # If PHP_VERSION env-var isn't set, set it (useful for CI tools). [5|7]
 
 #docker-compose pull;
 
