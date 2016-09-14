@@ -36,7 +36,7 @@ trait Activates
             $activation->where('code', $code);
         }
 
-        return $activation->first() ?: false;
+        return $activation->first() ? true : false;
     }
 
     /**
@@ -60,7 +60,7 @@ trait Activates
     {
         $activation = UserActivation::where('user_id', $user->id)->where('completed', true)->first();
 
-        return $activation ?: false;
+        return $activation ? true : false;
     }
 
     /**

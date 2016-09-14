@@ -53,6 +53,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
 
     ./artisan key:generate;
     ./artisan migrate;
+    ./artisan passport:install;
 
     chown -R 1000:1000 ./
 ";

@@ -10,6 +10,7 @@ public/javascripts/*
 public/swagger*
 resources/assets/stylesheets/*
 !resources/assets/sass/global/vendor
+storage/*.key
 storage/app/*
 storage/build/tools/*
 !storage/build/tools/sfnt2woff

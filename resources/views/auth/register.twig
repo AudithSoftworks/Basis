@@ -23,8 +23,8 @@
 
 {% block document_body_main %}
     <main>
-        <form class="register-form col-md-12" action="{{ action('UsersController@store', [], false) }}" method="post">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <form class="register-form col-md-12" action="{{ action('Auth\\RegisterController@register', [], false) }}" method="post">
+            {{ csrf_field() }}
 
             <h3 class="form-title font-green col-md-12">{{ trans('auth.headings.register') }}</h3>
             <fieldset class="form-group col-md-12">
@@ -51,13 +51,9 @@
                 <span id="register_tnc_error"></span>
             </fieldset>
             <fieldset class="form-actions col-md-12">
-                <a class="btn green btn-outline" href="{{ route('login', [], false) }}">{{ trans('auth.buttons.login') }}</a>
+                <a class="btn green btn-outline" href="{{ action('Auth\\LoginController@showLoginForm', [], false) }}">{{ trans('auth.buttons.login') }}</a>
                 <button type="submit" class="btn btn-info uppercase pull-right">{{ trans('auth.buttons.signup') }}</button>
             </fieldset>
         </form>
     </main>
-{% endblock %}
-
-{% block document_body_footer %}
-    <footer>2015 © Audith Softworks.</footer>
 {% endblock %}

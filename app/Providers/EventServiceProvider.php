@@ -2,7 +2,6 @@
 
 use App\Events as Events;
 use App\Listeners as Listeners;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -25,22 +24,18 @@ class EventServiceProvider extends ServiceProvider
         Events\Users\RequestedActivationLink::class => [
             Listeners\Users\SendActivationLinkViaEmail::class
         ],
-        Events\Users\RequestedResetPasswordLink::class => [
-            Listeners\Users\SendResetPasswordLinkViaEmail::class
-        ],
+        Events\Users\RequestedResetPasswordLink::class => [],
         Events\Users\Updated::class => [],
     ];
 
     /**
      * Register any other events for your application.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher $events
-     *
      * @return void
      */
-    public function boot(DispatcherContract $events)
+    public function boot()
     {
-        parent::boot($events);
+        parent::boot();
 
         //
     }

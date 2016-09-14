@@ -9,8 +9,10 @@ return [
     | framework when an event needs to be broadcast. You may set this to
     | any of the connections defined in the "connections" array below.
     |
+    | Supported: "pusher", "redis", "log", "null"
+    |
     */
-    'default' => env('BROADCAST_DRIVER', 'pusher'),
+    'default' => env('BROADCAST_DRIVER', 'null'),
 
     /*
     |--------------------------------------------------------------------------
@@ -28,6 +30,9 @@ return [
             'key' => env('PUSHER_KEY'),
             'secret' => env('PUSHER_SECRET'),
             'app_id' => env('PUSHER_APP_ID'),
+            'options' => [
+                //
+            ],
         ],
         'redis' => [
             'driver' => 'redis',
@@ -35,6 +40,9 @@ return [
         ],
         'log' => [
             'driver' => 'log',
+        ],
+        'null' => [
+            'driver' => 'null',
         ],
     ],
 ];

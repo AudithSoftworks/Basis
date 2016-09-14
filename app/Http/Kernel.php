@@ -23,14 +23,17 @@ class Kernel extends HttpKernel
     protected $middlewareGroups = [
         'web' => [
             Middleware\EncryptCookies::class,
+            Middleware\Localization::class,
+            Middleware\VerifyCsrfToken::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Illuminate\Session\Middleware\StartSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            Middleware\Localization::class,
-            Middleware\VerifyCsrfToken::class
+
         ],
         'api' => [
-            'throttle:60,1'
+            'throttle:60,1',
+            'bindings'
         ],
     ];
 
@@ -44,6 +47,8 @@ class Kernel extends HttpKernel
         'auth' => Middleware\Authenticate::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'guest' => Middleware\RedirectIfAuthenticated::class,
-        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class
+        'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
+        'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        'can' => \Illuminate\Auth\Middleware\Authorize::class,
     ];
 }

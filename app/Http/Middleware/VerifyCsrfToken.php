@@ -6,6 +6,15 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as BaseVerifier;
 class VerifyCsrfToken extends BaseVerifier
 {
     /**
+     * The URIs that should be excluded from CSRF verification.
+     *
+     * @var array
+     */
+    protected $except = [
+        //
+    ];
+
+    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request $request
@@ -16,7 +25,7 @@ class VerifyCsrfToken extends BaseVerifier
     public function handle($request, Closure $next)
     {
         # Skip API related requests
-        if ($request->wantsJson()) {
+        if ($request->expectsJson()) {
             return $next($request);
         }
 

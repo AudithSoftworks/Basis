@@ -32,11 +32,11 @@ class FilesController extends Controller
         return view('file.create');
     }
 
-
     /**
      * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\JsonResponse
+     * @throws \App\Exceptions\Common\ValidationException
      */
     public function store(Request $request)
     {

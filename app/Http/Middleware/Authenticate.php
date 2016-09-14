@@ -34,10 +34,10 @@ class Authenticate
     public function handle(Request $request, \Closure $next)
     {
         if (app('auth.driver')->guest()) {
-            if ($request->ajax() || $request->wantsJson()) {
+            if ($request->expectsJson()) {
                 throw new UnauthorizedHttpException('Unauthorized');
             } else {
-                return redirect()->guest(route('login'));
+                return redirect()->guest(route(app('translator')->getLocale() . '.login'));
             }
         }
 

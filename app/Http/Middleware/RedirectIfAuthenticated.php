@@ -1,7 +1,6 @@
 <?php namespace App\Http\Middleware;
 
 use App\Exceptions\Users\UserAlreadyLoggedInException;
-use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 
 class RedirectIfAuthenticated
@@ -12,17 +11,17 @@ class RedirectIfAuthenticated
      * @param  \Illuminate\Http\Request $request
      * @param  \Closure                 $next
      *
-     * @return \Closure
+     * @return \Closure|\Illuminate\Http\RedirectResponse
      * @throws \App\Exceptions\Users\UserAlreadyLoggedInException
      */
     public function handle(Request $request, \Closure $next)
     {
-        if (!app('auth.driver')->guest()) {
-            if ($request->ajax() || $request->wantsJson()) {
+        if (app('auth.driver')->check()) {
+            if ($request->expectsJson()) {
                 throw new UserAlreadyLoggedInException;
             }
 
-            abort(500, 'You already have logged in');
+            return redirect('/');
         }
 
         return $next($request);

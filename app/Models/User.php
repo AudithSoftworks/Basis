@@ -4,6 +4,8 @@ use App\Traits\Users\CanActivate;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Passport\HasApiTokens;
 
 /**
  * App\Models\User
@@ -28,7 +30,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
  */
 class User extends Authenticatable
 {
-    use CanActivate, CanResetPassword, SoftDeletes;
+    use Notifiable, HasApiTokens, CanActivate, CanResetPassword, SoftDeletes;
 
     /**
      * The attributes excluded from the model's JSON form.
@@ -38,13 +40,11 @@ class User extends Authenticatable
     protected $hidden = ['password', 'remember_token'];
 
     /**
-     * {@inheritDoc}
+     * The attributes that are mass assignable.
+     *
+     * @var array
      */
-    protected $fillable = [
-        'name',
-        'email',
-        'password'
-    ];
+    protected $fillable = ['name', 'email', 'password'];
 
     /**
      * Soft-deletes enabled.
