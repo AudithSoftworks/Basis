@@ -9,6 +9,7 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -y && apt-get install -y apt-utils && apt-get upgrade -y
 RUN apt-get install -y \
         bzip2 \
+        daemon \
         fontforge \
         git \
         libfreetype6-dev \
@@ -26,6 +27,7 @@ RUN apt-get install -y \
         ruby \
         ruby-dev \
         telnet \
+        unzip \
         wget \
     && apt-get clean \
     && apt-get autoremove -y
