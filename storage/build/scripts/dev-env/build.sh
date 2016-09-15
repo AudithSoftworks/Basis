@@ -18,12 +18,14 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect -f
 
 test -f .env || cat .env.example | sed s/DB_HOST=.*/DB_HOST=mariadb/g | tee .env;
 docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
-    cd /home/basis && npm update --loglevel=warn && bower --config.interactive=false --allow-root --loglevel=warn update;
+    npm config set loglevel warn;
 
-    cd /home/basis/public/bower_components/fine-uploader && npm install --loglevel=warn && make build;
+    cd /home/basis && npm update && bower --config.interactive=false --allow-root --loglevel=warn update;
+
+    cd /home/basis/public/bower_components/fine-uploader && npm install && make build;
 
     cd /home/basis && git clone --depth=1 --branch=1.15.0 https://github.com/jzaefferer/jquery-validation.git /home/basis/public/bower_components/jquery.validation;
-    cd /home/basis/public/bower_components/jquery.validation && rm -rf .git && npm install --loglevel=warn && grunt;
+    cd /home/basis/public/bower_components/jquery.validation && rm -rf .git && npm install && grunt;
 
     cd /home/basis && git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2;
     cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
