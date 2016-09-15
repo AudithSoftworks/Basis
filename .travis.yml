@@ -2,23 +2,40 @@ branches:
   only:
     - master
 
-language: php
-php:
-  - '7.0'
-
+dist: trusty
 sudo: required
-
 services:
   - docker
 
-env:
-  - PHP_VERSION=5
-  - PHP_VERSION=7
+language: php
 
 matrix:
   fast_finish: true
-
-# sudo: false
+  include:
+    - php: '5.6'
+      env:
+        - PHP_VERSION=5
+        - DB_CONNECTION=mysql
+        - DB_HOST=mariadb
+        - DB_USERNAME=root
+    - php: '5.6'
+      env:
+        - PHP_VERSION=5
+        - DB_CONNECTION=pgsql
+        - DB_HOST=postgres
+        - DB_USERNAME=postgres
+    - php: '7'
+      env:
+        - PHP_VERSION=7
+        - DB_CONNECTION=mysql
+        - DB_HOST=mariadb
+        - DB_USERNAME=root
+    - php: '7'
+      env:
+        - PHP_VERSION=7
+        - DB_CONNECTION=pgsql
+        - DB_HOST=postgres
+        - DB_USERNAME=postgres
 
 cache:
   directories:
@@ -47,25 +64,21 @@ install:
 
   # docker-compose pull
   - if [[ $BRANCH != 'docker-build' ]]; then docker-compose pull; fi;
+  - docker-compose up -d php${PHP_VERSION}-cli;
+  - docker-compose ps;
+  - echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts;
+  - docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | tee -a /etc/hosts";
 
 before_script:
-  # Run build script
-  - chmod +x ./storage/build/scripts/dev-env/build.sh;
-  - ./storage/build/scripts/dev-env/build.sh;
+  - chmod +x ./storage/build/scripts/ci/build.sh;
 
 script:
-  # Testing against MariaDb
-  - docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "cd /home/basis; ./vendor/bin/phpunit --debug --verbose";
-
-  # Switching to PgSQL
-  - cat .env | sed s/DB_CONNECTION=.*/DB_CONNECTION=pgsql/g | sed s/DB_HOST=.*/DB_HOST=postgres/g | sed s/DB_USERNAME=.*/DB_USERNAME=postgres/g | tee .env
-
-  # Testing against PgSQL
-  - docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "cd /home/basis; ./vendor/bin/phpunit --debug --verbose";
+  - ./storage/build/scripts/ci/build.sh;
 
 after_script:
+  - docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "pkill sc";
   - wget https://scrutinizer-ci.com/ocular.phar
-  - if [[ $PHP_VERSION == 5 ]]; then php ocular.phar code-coverage:upload --format=php-clover ./storage/coverage/coverage.xml; fi
+  - if [[ $PHP_VERSION == 7 && $DB_CONNECTION == 'mysql' ]]; then php ocular.phar code-coverage:upload --format=php-clover ./storage/coverage/coverage.xml; fi
 
 notifications:
   hipchat: f504f9e2e6696c17589a7b49f4ce05@Audith.Basis

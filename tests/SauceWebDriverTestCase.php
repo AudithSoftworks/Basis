@@ -1,11 +1,8 @@
 <?php namespace App\Tests;
 
-use Illuminate\Foundation\Testing\ApplicationTrait;
-use Illuminate\Foundation\Testing\CrawlerTrait;
-
-class SauceWebDriverTestCase extends Sauce\Sausage\WebDriverTestCase
+class SauceWebDriverTestCase extends \Sauce\Sausage\WebDriverTestCase
 {
-    use ApplicationTrait;
+    public static $sauceHost;
 
     /**
      * Creates the application.

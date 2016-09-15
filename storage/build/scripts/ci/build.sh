@@ -1,31 +1,26 @@
 #!/usr/bin/env bash
 
-#docker build -f storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .
-#docker build -f storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .;
-#docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .;
-#docker build -f storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .;
-#docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
-
-#docker-compose build
-
-if [ -z ${PHP_VERSION+x} ]; then export PHP_VERSION='5'; fi; # 5|7
-
-#docker-compose pull;
-
-docker-compose up -d php${PHP_VERSION}-cli;
-docker-compose ps;
-docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | tee -a /etc/hosts";
-
-test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
+test -f .env || sed \
+    -e "s/DB_CONNECTION=.*/DB_CONNECTION=${DB_CONNECTION}/g" \
+    -e "s/DB_HOST=.*/DB_HOST=${DB_HOST}/g" \
+    -e "s/DB_USERNAME=.*/DB_USERNAME=${DB_USERNAME}/g" \
+    -e "s/SAUCE_USERNAME=.*/SAUCE_USERNAME=${SAUCE_USERNAME}/g" \
+    -e "s/SAUCE_ACCESS_KEY=.*/SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}/g" .env.example \
+    | tee .env > /dev/null 2>&1;
 
 docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     export NPM_CONFIG_LOGLEVEL=warn;
+    export SAUCE_BUILD=travis-job-${TRAVIS_JOB_NUMBER};
+    export SAUCE_USERNAME=${SAUCE_USERNAME};
+    export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
 
-    wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.0-linux.tar.gz;
-    tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.0-linux.tar.gz;
-    rm ./storage/build/tools/sc-4.4.0-linux.tar.gz;
+    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then
+        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.0-linux.tar.gz;
+        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.0-linux.tar.gz;
+        rm ./storage/build/tools/sc-4.4.0-linux.tar.gz;
 
-    daemon -U -- /home/basis/storage/build/tools/sc-4.4.0-linux/bin/sc --tunnel-domains=basis.audith.org;
+        daemon -U -- /home/basis/storage/build/tools/sc-4.4.0-linux/bin/sc --tunnel-domains=basis.audith.org;
+    fi;
 
     cd /home/basis && npm update && bower --config.interactive=false --allow-root --loglevel=warn update;
 
@@ -66,9 +61,8 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
 
     chown -R 1000:1000 ./;
 
-    ./vendor/bin/phpunit --debug --verbose;
+    ./vendor/bin/phpunit --debug --verbose tests/JsonApi/;
+    ./vendor/bin/phpunit --debug --verbose tests/Misc/;
+    ./vendor/bin/phpunit --debug --verbose tests/Models/;
+    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then ./vendor/bin/phpunit --debug --verbose tests/WebUi/; fi;
 ";
-
-#docker-compose down;
-#docker rm $(docker ps -a | grep "Exited" | awk "{print \$1}");
-#docker rmi $(docker images | grep "<none>" | awk "{print \$3}");
