@@ -2,6 +2,7 @@
 
 use App\Exceptions\Users\UserNotActivatedException;
 use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Response as IlluminateResponse;
@@ -44,9 +45,7 @@ class Handler extends ExceptionHandler
      * @param \Illuminate\Http\Request $request
      * @param \Exception               $e
      *
-     * @return \Illuminate\Http\Response
-     *
-     * @todo Separate API exception handling from Web one (possibly separating Laravel and Lumen apps).
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function render($request, \Exception $e)
     {
@@ -54,7 +53,7 @@ class Handler extends ExceptionHandler
             $e = new NotFoundHttpException($e->getMessage(), $e);
         }
 
-        if ($request->ajax() || $request->wantsJson()) {
+        if ($request->expectsJson()) {
             $exceptionClass = get_class($e);
             $responseBody = ['exception' => $exceptionClass, 'message' => $e->getMessage()];
 
@@ -106,5 +105,22 @@ class Handler extends ExceptionHandler
         }
 
         return parent::render($request, $e);
+    }
+
+    /**
+     * Convert an authentication exception into an unauthenticated response.
+     *
+     * @param  \Illuminate\Http\Request                 $request
+     * @param  \Illuminate\Auth\AuthenticationException $exception
+     *
+     * @return \Illuminate\Http\Response
+     */
+    protected function unauthenticated($request, AuthenticationException $exception)
+    {
+        if ($request->expectsJson()) {
+            return response()->json(['error' => 'Unauthenticated.'], 401);
+        }
+
+        return redirect()->guest('login');
     }
 }

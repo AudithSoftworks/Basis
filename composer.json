@@ -25,8 +25,9 @@
         "ext-mbstring": "*",
         "ext-mcrypt": "*",
         "ext-openssl": "*",
-        "barryvdh/laravel-ide-helper": "^2.1",
-        "laravel/framework": "5.2.*",
+        "barryvdh/laravel-ide-helper": "^2.2",
+        "laravel/framework": "5.3.*",
+        "laravel/passport": "^1.0",
         "laravel/socialite": "~2",
         "predis/predis": "~1",
         "rcrowe/twigbridge": "~0.9"
@@ -34,11 +35,12 @@
     "require-dev": {
         "doctrine/dbal": "~2.5",
         "fzaninotto/faker": "~1.5",
+        "mockery/mockery": "0.9.*",
         "phpspec/phpspec": "~3.0",
-        "phpunit/phpunit": "~5",
+        "phpunit/phpunit": "~5.0",
         "sauce/sausage": ">=0.17",
-        "symfony/dom-crawler": "~3.0",
-        "symfony/css-selector": "~3.0"
+        "symfony/css-selector": "3.1.*",
+        "symfony/dom-crawler": "3.1.*"
     },
     "autoload": {
         "classmap": [
@@ -54,19 +56,19 @@
         }
     },
     "scripts": {
+        "post-root-package-install": [
+            "php -r \"file_exists('.env') || copy('.env.example', '.env');\""
+        ],
+        "post-create-project-cmd": [
+            "php artisan key:generate"
+        ],
         "post-install-cmd": [
-            "php artisan clear-compiled",
+            "Illuminate\\Foundation\\ComposerScripts::postInstall",
             "php artisan optimize"
         ],
         "post-update-cmd": [
-            "php artisan clear-compiled",
-            "php artisan ide-helper:generate",
-            "php artisan ide-helper:meta",
+            "Illuminate\\Foundation\\ComposerScripts::postUpdate",
             "php artisan optimize"
-        ],
-        "post-create-project-cmd": [
-            "php -r \"copy('.env.example', '.env');\"",
-            "php artisan key:generate"
         ]
     },
     "config": {

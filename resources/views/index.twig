@@ -28,14 +28,10 @@
 
             <h3 class="form-title font-green col-md-12">{{ trans_choice('auth.headings.welcome', userType, {'name' : name})|raw }}</h3>
             <fieldset class="col-md-12">
-                <a class="btn green uppercase" href="{% if name == trans('auth.guest') %}{{ action('Users\\AuthController@getLogin', [], false) }}{% else %}{{ action('Users\\AuthController@getLogout', [], false) }}{% endif %}">
+                <a class="btn green uppercase" href="{% if name == trans('auth.guest') %}{{ action('Auth\\LoginController@showLoginForm', [], false) }}{% else %}{{ action('Auth\\LoginController@logout', [], false) }}{% endif %}">
                     {% if name == trans('auth.guest') %}{{ trans('auth.buttons.login') }}{% else %}{{ trans('auth.buttons.logout') }}{% endif %}
                 </a>
             </fieldset>
         </form>
     </main>
-{% endblock %}
-
-{% block document_body_footer %}
-    <footer>2015 © Audith Softworks.</footer>
 {% endblock %}

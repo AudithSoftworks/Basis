@@ -23,21 +23,17 @@
 
 {% block document_body_main %}
     <main>
-        <form class="forget-form col-md-12" action="{{ action('Users\\PasswordController@sendPasswordResetLink', [], false) }}" method="post">
-            <input type="hidden" name="_token" value="{{ csrf_token() }}">
+        <form class="forget-form col-md-12" action="{{ action('Auth\\PasswordController@sendPasswordResetLink', [], false) }}" method="post">
+            {{ csrf_field() }}
 
             <h3 class="form-title font-green col-md-12">{{ trans('auth.headings.password') }}</h3>
             <fieldset class="form-group col-md-12">
                 <input class="form-control placeholder-no-fix" type="email" autocomplete="off" placeholder="{{ trans('auth.labels.email') }}" name="email">
             </fieldset>
             <fieldset class="form-actions col-md-12">
-                <a class="btn btn-default" href="{{ route('login', [], false) }}">{{ trans('auth.buttons.login') }}</a>
+                <a class="btn btn-default" href="{{ action('Auth\\LoginController@showLoginForm', [], false) }}">{{ trans('auth.buttons.login') }}</a>
                 <button type="submit" class="btn btn-success uppercase pull-right">{{ trans('auth.buttons.password') }}</button>
             </fieldset>
         </form>
     </main>
-{% endblock %}
-
-{% block document_body_footer %}
-    <footer>2015 © Audith Softworks.</footer>
 {% endblock %}

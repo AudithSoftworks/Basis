@@ -1,13 +1,13 @@
 <?php namespace App\Providers;
 
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider as ServiceProvider;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 
 class RouteServiceProvider extends ServiceProvider
 {
     /**
      * This namespace is applied to the controller routes in your routes file.
-     *
      * In addition, it is set as the URL generator's root namespace.
      *
      * @var string
@@ -17,87 +17,117 @@ class RouteServiceProvider extends ServiceProvider
     /**
      * Define your route model bindings, pattern filters, etc.
      *
-     * @param  \Illuminate\Routing\Router $router
-     *
      * @return void
      */
-    public function boot(Router $router)
+    public function boot()
     {
-        $router->patterns([
+        app('router')->patterns([
             'provider' => 'twitter|google|facebook',
             'token' => '[a-zA-Z0-9-]+'
         ]);
 
-        parent::boot($router);
+        parent::boot();
     }
 
     /**
      * Define the routes for the application.
-     *
-     * @param \Illuminate\Routing\Router $router
      */
-    public function map(Router $router)
+    public function map()
     {
-        $defaultLocale = config('app.locale');
-        $namespace = $this->namespace;
-        $middleware = 'web';
+        $this->mapApiRoutes();
+        $this->mapWebRoutes();
+    }
 
-        //-----------------------------------------------------------------------
-        // Non-localized, generic routes (such as those for admin panel etc).
-        //-----------------------------------------------------------------------
+    /**
+     * Define the "api" routes for the application.
+     * These routes are typically stateless.
+     *
+     * @return void
+     */
+    protected function mapApiRoutes()
+    {
+        app('router')->group([
+            'middleware' => 'api',
+            'namespace' => $this->namespace,
+            'prefix' => 'api/v1',
+        ], function (Router $router) {
+            $router->post('login', 'Auth\LoginController@login');
+            $router->post('logout', 'Auth\LoginController@logout')->middleware('auth:api');
+            $router->post('register', 'Auth\RegisterController@register');
 
-        $router->group(compact('namespace', 'middleware'), function (Router $router) {
-            $router->get('/oauth/{provider}', 'Users\AuthController@getOAuth');
-        });
+            $router->post('password/email', 'Auth\PasswordController@sendPasswordResetLink');
+            $router->post('password/reset', 'Auth\PasswordController@resetPassword');
 
-        //-----------------------------------------------------------------------------------------------------
-        // Register localized routes with locale-prefices (in case of default locale, no prefix is attached).
-        //-----------------------------------------------------------------------------------------------------
-
-        foreach (config('app.locales') as $prefix => $localeName) {
-            app('translator')->setLocale($prefix);
-            // Skip default locale for now.
-            if ($prefix === $defaultLocale) {
-                continue;
-            }
-
-            // Set localized routers.
-            $router->group(compact('namespace', 'middleware', 'prefix'), function (Router $router) use ($prefix) {
-                $this->localizedRoutes($router, $prefix);
-            });
-        }
-
-        //------------------------------------------------
-        // Default locale: No prefices are necessary.
-        //------------------------------------------------
-
-        app('translator')->setLocale($defaultLocale);
-        $router->group(compact('namespace', 'middleware'), function (Router $router) use ($defaultLocale) {
-            $this->localizedRoutes($router, $defaultLocale);
+            $router->get('activation', 'Auth\ActivateController@requestActivationCode')->middleware('auth:api');
+            $router->get('activation/{token}', 'Auth\ActivateController@activate')->middleware('auth:api');
+            $router->post('activation', 'Auth\ActivateController@activate')->middleware('auth:api');
         });
     }
 
-    protected function localizedRoutes(Router $router, $prefix)
+    /**
+     * Define the "web" routes for the application.
+     * These routes all receive session state, CSRF protection, etc.
+     *
+     * @return void
+     */
+    protected function mapWebRoutes()
     {
-        $router->get('login/{provider?}', ['uses' => 'Users\AuthController@getLogin', 'as' => $prefix . '.login']);
-        $router->post('login/{provider?}', 'Users\AuthController@postLogin');
-        $router->get('logout', ['uses' => 'Users\AuthController@getLogout', 'as' => $prefix . '.logout']);
-        $router->get('register', ['uses' => 'UsersController@create', 'as' => $prefix . '.register']);
-        $router->post('register', 'UsersController@store');
+        app('router')->group([
+            'middleware' => 'web',
+            'namespace' => $this->namespace,
+        ], function (Router $router) {
+            $defaultLocale = config('app.locale');
 
-        $router->resource('users', 'UsersController');
+            //-----------------------------------------------------------------------
+            // Non-localized, generic routes (such as those for admin panel etc).
+            //-----------------------------------------------------------------------
 
-        $router->get('password/email', 'Users\PasswordController@requestPasswordResetLink');
-        $router->post('password/email', 'Users\PasswordController@sendPasswordResetLink');
-        $router->get('password/reset/{token}', 'Users\PasswordController@showPasswordResetForm');
-        $router->post('password/reset', 'Users\PasswordController@resetPassword');
+            $router->get('/oauth/to/{provider}', ['uses' => 'Auth\LoginController@handleOAuthRedirect', 'as' => 'oauth.to']);
+            $router->get('/oauth/from/{provider}', ['uses' => 'Auth\LoginController@handleOAuthReturn', 'as' => 'oauth.from']);
 
-        $router->get('activation', 'Users\ActivationController@requestActivationCode');
-        $router->get('activation/{token}', 'Users\ActivationController@activate');
-        $router->post('activation', 'Users\ActivationController@activate');
+            //-----------------------------------------------------------------------------------------------------
+            // Register localized routes with locale-prefices (in case of default locale, no prefix is attached).
+            //-----------------------------------------------------------------------------------------------------
+
+            foreach (config('app.locales') as $prefix => $localeName) {
+                app('translator')->setLocale($prefix);
+                // Localized routes.
+                $router->group(compact('namespace', 'middleware', 'prefix'), function (Router $router) use ($prefix) {
+                    $this->localizeWebRoutes($router, $prefix);
+                });
+            }
+
+            /*------------------------------------
+             | Default, non-localized home
+             *-----------------------------------*/
+
+            $router->get('', 'HomeController@index');
+        });
+    }
+
+    /**
+     * @param \Illuminate\Routing\Router $router
+     * @param string                     $prefix
+     */
+    protected function localizeWebRoutes(Router $router, $prefix = '')
+    {
+        $router->get('login', ['uses' => 'Auth\LoginController@showLoginForm', 'as' => empty($prefix) ?: $prefix . '.login']);
+        $router->post('login', 'Auth\LoginController@loginViaWeb');
+        $router->get('logout', ['uses' => 'Auth\LoginController@logout', 'as' => empty($prefix) ?: $prefix . '.logout']);
+        $router->get('register', ['uses' => 'Auth\RegisterController@showRegistrationForm', 'as' => empty($prefix) ?: $prefix . '.register']);
+        $router->post('register', 'Auth\RegisterController@register');
+
+        $router->get('password/email', ['uses' => 'Auth\PasswordController@requestPasswordResetLink', 'as' => empty($prefix) ?: $prefix . '.password.email']);
+        $router->post('password/email', 'Auth\PasswordController@sendPasswordResetLink');
+        $router->get('password/reset/{token}', ['uses' => 'Auth\PasswordController@showPasswordResetForm', 'as' => empty($prefix) ?: $prefix . '.password.reset']);
+        $router->post('password/reset', 'Auth\PasswordController@resetPassword');
+
+        $router->get('activation', ['uses' => 'Auth\ActivateController@requestActivationCode', 'as' => empty($prefix) ?: $prefix . '.activation.request']);
+        $router->get('activation/{token}', ['uses' => 'Auth\ActivateController@activate', 'as' => empty($prefix) ?: $prefix . '.activation.complete']);
+        $router->post('activation', 'Auth\ActivateController@activate');
 
         $router->resource('files', 'FilesController', ['only' => ['index', 'create', 'store', 'show', 'destroy']]);
 
-        $router->get('', 'HomeController@index');
+        $router->get('', ['uses' => 'HomeController@index', 'as' => empty($prefix) ?: $prefix . '.home']);
     }
 }

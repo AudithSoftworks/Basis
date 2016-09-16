@@ -1,4 +1,4 @@
-<?php namespace App\Tests\WebUi;
+<?php namespace App\Tests\Misc;
 
 use App\Tests\IlluminateTestCase;
 
