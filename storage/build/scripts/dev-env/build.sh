@@ -29,7 +29,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.0-linux.tar.gz;
     rm ./storage/build/tools/sc-4.4.0-linux.tar.gz;
 
-    daemon -U -- /home/basis/storage/build/tools/sc-4.4.0-linux/bin/sc --tunnel-domains=basis.audith.org;
+    daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.0-linux/bin/sc --tunnel-domains=basis.audith.org;
 
     cd /home/basis && npm update && bower --config.interactive=false --allow-root update;
 
@@ -71,6 +71,9 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     chown -R 1000:1000 ./;
 
     ./vendor/bin/phpunit --debug --verbose;
+
+    ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
+    if [ -z ${SAUCE_ACCESS_KEY+x} ]; then echo 'SAUCE_* env vars are missing!'; else ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases'; fi;
 ";
 
 #docker-compose down;
