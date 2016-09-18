@@ -81,6 +81,10 @@ elixir(function (mix) {
         ],
         'js_cookie': ['public/bower_components/js-cookie/src/js.cookie.js'],
         'pace': ['public/bower_components/pace/pace.js'],
+        'react': [
+            'public/bower_components/react/react.js',
+            'public/bower_components/react/react-dom.js'
+        ],
         'requirejs': ['public/bower_components/requirejs/require.js'],
         'respond': [
             'public/bower_components/respond/dest/matchmedia.polyfill.js',
