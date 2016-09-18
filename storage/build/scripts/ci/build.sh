@@ -61,8 +61,6 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
 
     chown -R 1000:1000 ./;
 
-    ./vendor/bin/phpunit --debug --verbose tests/JsonApi/;
-    ./vendor/bin/phpunit --debug --verbose tests/Misc/;
-    ./vendor/bin/phpunit --debug --verbose tests/Models/;
-    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then ./vendor/bin/phpunit --debug --verbose tests/WebUi/; fi;
+    ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
+    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases'; fi;
 ";

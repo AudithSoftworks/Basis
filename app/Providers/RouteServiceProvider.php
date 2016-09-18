@@ -75,8 +75,6 @@ class RouteServiceProvider extends ServiceProvider
             'middleware' => 'web',
             'namespace' => $this->namespace,
         ], function (Router $router) {
-            $defaultLocale = config('app.locale');
-
             //-----------------------------------------------------------------------
             // Non-localized, generic routes (such as those for admin panel etc).
             //-----------------------------------------------------------------------

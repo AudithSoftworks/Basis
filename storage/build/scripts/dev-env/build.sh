@@ -20,8 +20,8 @@ docker exec basis_php${PHP_VERSION}-cli_1 \
 test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 
 ###############################################################################################################
-# Before running the next command, make sure you have also exported SAUCE_USERNAME and SAUCE_ACCESS_KEY
-# env variables to the environment for which the next 'docker exec' is being run.
+# IMPORTANT NOTE: Before running the next command, make sure you have also exported SAUCE_USERNAME
+# and SAUCE_ACCESS_KEY env variables to the environment for which the next 'docker exec' is being run.
 ###############################################################################################################
 
 docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "

@@ -17,7 +17,7 @@ Audith Basis is an enhanced version of Laravel framework, a feature list for whi
 ### Features
 
 * [Back-end] _Completely localized routes_ - access your endpoints and URLs in your own language, with Unicode support.
-* [Front-end/UI] _Back-end control panel_ - comes with built-in control panel, featuring sample pages for your to expand upon.
+* [Front-end/UI] _Back-end control panel_ - comes with built-in control panel, featuring sample pages for you to expand upon.
 * [Front-end/UI] _Custom web-fonts, web typography support_ - build and use your own web-fonts with included toolset, from any TTF/OTF fontsets.
 * [DevOps/CI/CD] _Docker support_ - fully Dockerized package with pre-built PHP 5.6 and 7.0 containers.
 
@@ -31,7 +31,7 @@ I have included a build script in ```./storage/scripts/dev-env/build.sh``` insid
 2. Start your desired Docker-Compose configuration (any of: PHP 5.6 or 7.0).
 3. Update your ```/etc/hosts``` file to point to the primary container in your Docker configuration - generally ```php_XXX``` is the primary container, which is linked to ```php_XXX-fpm``` and other machines.
 4. Create ```.env``` file, containing your environmental variables.
-5. Switch into the primary container environment, to start building your environment:
+5. Switch into the primary container environment, to start building your environment (Note: before doing so, please read the important note in ```build.sh``` file!):
     1. Install NPM and Bower dependencies.
     2. Install ```fine-uploader``` package and build it (used in UI, for file uploads).
     3. Install ```jquery-validation``` package and build it (used in UI, for form validation).
@@ -43,5 +43,6 @@ I have included a build script in ```./storage/scripts/dev-env/build.sh``` insid
     9. Install Composer dependencies.
     10. Using Laravel Artisan, generate an encryption key and run migrations, install Laravel Passport keys.
     11. Since Docker runs with root privileges, ```chown``` all newly created files to your host machine UUID:GUID (assuming it is 1000:1000, modify if necessary).
+    12. And finally, run all the tests.
     
 Additionally, I've included few commands to shut down Docker-Compose configuration and cleanup your host machine from unnecessary Docker assets.
