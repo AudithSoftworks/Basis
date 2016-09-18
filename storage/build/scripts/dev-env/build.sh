@@ -14,20 +14,24 @@ if [ -z ${PHP_VERSION+x} ]; then export PHP_VERSION='5'; fi; # 5|7
 
 docker-compose up -d php${PHP_VERSION}-cli;
 docker-compose ps;
-docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | tee -a /etc/hosts";
+docker exec basis_php${PHP_VERSION}-cli_1 \
+    /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | tee -a /etc/hosts";
 
 test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 
-docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
-    export NPM_CONFIG_LOGLEVEL=warn;
+###############################################################################################################
+# Before running the next command, make sure you have also exported SAUCE_USERNAME and SAUCE_ACCESS_KEY
+# env variables to the environment for which the next 'docker exec' is being run.
+###############################################################################################################
 
+docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.0-linux.tar.gz;
     tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.0-linux.tar.gz;
     rm ./storage/build/tools/sc-4.4.0-linux.tar.gz;
 
     daemon -U -- /home/basis/storage/build/tools/sc-4.4.0-linux/bin/sc --tunnel-domains=basis.audith.org;
 
-    cd /home/basis && npm update && bower --config.interactive=false --allow-root --loglevel=warn update;
+    cd /home/basis && npm update && bower --config.interactive=false --allow-root update;
 
     cd /home/basis/public/bower_components/fine-uploader && npm install && make build;
 

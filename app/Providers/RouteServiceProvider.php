@@ -128,7 +128,6 @@ class RouteServiceProvider extends ServiceProvider
 
         $router->resource('files', 'FilesController', ['only' => ['index', 'create', 'store', 'show', 'destroy']]);
 
-
         $router->get('', ['uses' => 'HomeController@index', 'as' => empty($prefix) ?: $prefix . '.home']);
     }
 }

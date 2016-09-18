@@ -34,10 +34,17 @@ class AuthenticationTest extends SauceWebDriverTestCase
         $this->setBrowserUrl('');
     }
 
+    public function testAuthenticateMiddleware()
+    {
+        $this->url(self::$startUrl . '/oauth/clients'); // An 'auth'-enabled path.
+        $this->assertEquals('http://basis.audith.org/en/login', $this->url()); // We get redirected.
+        $this->assertContains('Login - Audith Basis', $this->title());
+    }
+
     public function testRegister()
     {
-        $this->url(self::$startUrl);
-        $this->assertEquals('http://basis.audith.org/en', $this->url());
+        $this->url(self::$startUrl); // Trying to hit root path '/'
+        $this->assertEquals(self::$startUrl . '/en', $this->url()); // We get redirected to '/en' localized path.
         $this->assertContains('Audith Basis', $this->title());
     }
 }
