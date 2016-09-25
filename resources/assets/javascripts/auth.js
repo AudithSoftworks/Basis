@@ -1,3 +1,5 @@
+require('../sass/auth.scss');
+
 var Login = function () {
     var $loginForm = jQuery('.login-form');
     var $passwordReminderForm = jQuery('.forget-form');

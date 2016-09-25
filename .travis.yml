@@ -41,7 +41,6 @@ matrix:
 cache:
   directories:
     - ./node_modules
-    - ./public/bower_components
     - ./vendor
 
 before_install:

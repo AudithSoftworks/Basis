@@ -19,6 +19,7 @@ Audith Basis is an enhanced version of Laravel framework, a feature list for whi
 * [Back-end] _Completely localized routes_ - access your endpoints and URLs in your own language, with Unicode support.
 * [Front-end/UI] _Back-end control panel_ - comes with built-in control panel, featuring sample pages for you to expand upon.
 * [Front-end/UI] _Custom web-fonts, web typography support_ - build and use your own web-fonts with included toolset, from any TTF/OTF fontsets.
+* [Front-end/UI] _Webpack support_ - build all web assets with Webpack.
 * [DevOps/CI/CD] _Docker support_ - fully Dockerized package with pre-built PHP 5.6 and 7.0 containers.
 
 ### Installation
@@ -32,17 +33,15 @@ I have included a build script in ```./storage/scripts/dev-env/build.sh``` insid
 3. Update your ```/etc/hosts``` file to point to the primary container in your Docker configuration - generally ```php_XXX``` is the primary container, which is linked to ```php_XXX-fpm``` and other machines.
 4. Create ```.env``` file, containing your environmental variables.
 5. Switch into the primary container environment, to start building your environment (Note: before doing so, please read the important note in ```build.sh``` file!):
-    1. Install NPM and Bower dependencies.
-    2. Install ```fine-uploader``` package and build it (used in UI, for file uploads).
-    3. Install ```jquery-validation``` package and build it (used in UI, for form validation).
-    4. Install ```woff-2``` and it's submodules; and build them (used to build custom web-fonts).
-    5. Install ```css3-font-converter``` package and build it (used to build custom web-fonts).
-    6. Copy required font files from ```google-fonts``` local Bower location and build your web-fonts.
-    7. Compile SASS files using pre-installed Compass.
-    8. Run Gulp to build static web assets.
-    9. Install Composer dependencies.
-    10. Using Laravel Artisan, generate an encryption key and run migrations, install Laravel Passport keys.
-    11. Since Docker runs with root privileges, ```chown``` all newly created files to your host machine UUID:GUID (assuming it is 1000:1000, modify if necessary).
-    12. And finally, run all the tests.
+    1. Install Sauce Connect and start it as a daemon.
+    2. Install NPM dependencies.
+    3. Install ```woff-2``` and it's submodules; and build them (used to build custom web-fonts).
+    4. Install ```css3-font-converter``` package and build it (used to build custom web-fonts).
+    5. Clone/update ```google-fonts``` to local storage, copy required font files and build your web-fonts.
+    6. Run Webpack to build web assets.
+    7. Install Composer dependencies.
+    8. Using Laravel Artisan, generate an encryption key and run migrations, install Laravel Passport keys.
+    9. Since Docker runs with root privileges, ```chown``` all newly created files to your host machine UUID:GUID (assuming it is 1000:1000, modify if necessary).
+    10. And finally, run all the tests.
     
 Additionally, I've included few commands to shut down Docker-Compose configuration and cleanup your host machine from unnecessary Docker assets.

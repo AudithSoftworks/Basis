@@ -76,6 +76,7 @@ services:
     environment:
       XDEBUG_CONFIG: "remote_host=172.17.0.1"
       REDIS_PORT: 6379
+      WORKDIR: "/home/basis"
     stdin_open: true
   php7-cli:
       build:
@@ -92,4 +93,5 @@ services:
       environment:
         XDEBUG_CONFIG: "remote_host=172.17.0.1"
         REDIS_PORT: 6379
+        WORKDIR: "/home/basis"
       stdin_open: true

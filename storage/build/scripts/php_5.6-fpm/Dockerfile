@@ -48,7 +48,7 @@ RUN pecl install -o -f redis xdebug \
     && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
 
 # Locale
-RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
+RUN locale-gen en_US.UTF-8 && locale-gen az_AZ.UTF-8 && locale-gen tr_TR.UTF-8 && dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8

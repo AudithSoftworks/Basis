@@ -1,8 +1,12 @@
-/*
-|------------------------------------------------------
-| Mixins (Based on Twitter Bootstrap's _mixings.scss)
-|------------------------------------------------------
-*/
+/*------------------------------------
+ | @font-face mixin
+ *-----------------------------------*/
+
+@import '~font-face-mixin/fontface';
+
+/*---------------------------------------------------------
+ | Mixins (Based on Twitter Bootstrap's _mixings.scss)
+ *--------------------------------------------------------*/
 
 @mixin clearfix() {
     &:before,
@@ -15,11 +19,9 @@
     }
 }
 
-/*
-|------------------------------
-| Placeholder text
-|------------------------------
-*/
+/*------------------------------------
+ | Placeholder text
+ *-----------------------------------*/
 
 @mixin placeholder($color: $input-color-placeholder) {
     // @see https://github.com/twbs/bootstrap/pull/11526
@@ -37,11 +39,9 @@
     }
 }
 
-/*
-|------------------------------
-| Labels
-|------------------------------
-*/
+/*------------------------------------
+ | Labels
+ *-----------------------------------*/
 
 @mixin label-variant($color) {
     background-color: $color;
@@ -69,11 +69,9 @@
     animation: $animation-name $duration ease 0s infinite;
 }
 
-/*
-|------------------------------
-| Cubic Bezier Transition
-|------------------------------
-*/
+/*------------------------------------
+ | Cubic Bezier Transition
+ *-----------------------------------*/
 
 @mixin cubic-transition($delay, $duration, $property) {
     transition: {

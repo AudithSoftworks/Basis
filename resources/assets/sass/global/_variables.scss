@@ -4,8 +4,9 @@
 |-----------------------------------------
 */
 @import "colors";
-@import "bootstrap-sass-official/assets/stylesheets/bootstrap/variables";
-@import "bootstrap-sass-official/assets/stylesheets/bootstrap/mixins";
+@import "~bootstrap-sass/assets/stylesheets/bootstrap/variables";
+@import "~bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+@import "components/mixins";
 
 $direction: 'ltr' !default;
 $theme-style: 'square' !default;
@@ -17,6 +18,7 @@ $theme-type: 'default' !default;
 |--------------------------------------------------------------------------------
 */
 
+$font-public-path: "/fonts/" !default;
 $font-family-primary: "Open Sans", sans-serif !default;
 $font-family-nav: Roboto, sans-serif !default;
 $font-family-default: "Helvetica Neue", Helvetica, Arial, sans-serif !default;

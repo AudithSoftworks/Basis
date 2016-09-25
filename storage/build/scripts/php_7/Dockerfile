@@ -6,8 +6,10 @@ WORKDIR /home/basis
 ENV DEBIAN_FRONTEND noninteractive
 
 # Install dependencies
-RUN apt-get update -y && apt-get install -y apt-utils && apt-get upgrade -y
-RUN apt-get install -y \
+RUN apt-get update -y \
+    && apt-get install -y apt-utils \
+    && apt-get upgrade -y \
+    && apt-get install -y \
         bzip2 \
         daemon \
         fontforge \
@@ -24,8 +26,6 @@ RUN apt-get install -y \
         locales \
         locales-all \
         openjdk-7-jre \
-        ruby \
-        ruby-dev \
         telnet \
         unzip \
         wget \
@@ -46,7 +46,7 @@ RUN docker-php-ext-install \
         zip
 
 # Locale
-RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
+RUN locale-gen en_US.UTF-8 && locale-gen az_AZ.UTF-8 && locale-gen tr_TR.UTF-8 && dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
@@ -105,11 +105,9 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
     && rm -rf /tmp/npm-*
 
 # Install Node global dependencies
-RUN npm install -g bower gulp grunt-cli grunt ttf2eot jshint
-
-# Install Compass dependencies
-RUN gem install --no-rdoc --no-ri sass:3.4.22 sass-globbing autoprefixer-rails compass
+RUN npm install -g ttf2eot jshint webpack
 
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
 
+EXPOSE 9229
 EXPOSE 54321
