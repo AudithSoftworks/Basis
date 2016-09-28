@@ -1,12 +1,19 @@
 ## Audith Basis on Laravel 5.3
 
 [![Build Status](https://travis-ci.org/AudithSoftworks/Basis.svg?branch=master)](https://travis-ci.org/AudithSoftworks/Basis)
-[![Latest Stable Version](https://poser.pugx.org/audithsoftworks/basis/v/stable.svg)](https://packagist.org/packages/audithsoftworks/basis)
-[![License](https://poser.pugx.org/audithsoftworks/basis/license.svg)](https://packagist.org/packages/audithsoftworks/basis)
-[![Dependency Status](https://www.versioneye.com/user/projects/57c57d33939fc600471d4c2b/badge.svg?style=flat-square)](https://www.versioneye.com/user/projects/57c57d33939fc600471d4c2b)
+[![Build Status](https://saucelabs.com/buildstatus/shehi)](https://saucelabs.com/beta/builds/e3026690874a48e2ade1bb7a9606df53)
+[![Latest Stable Version](https://img.shields.io/packagist/v/audithsoftworks/basis.svg?maxAge=2592000?style=plastic)](https://packagist.org/packages/audithsoftworks/basis)
+![License](https://img.shields.io/github/license/AudithSoftworks/Basis.svg?maxAge=2592000?style=plastic)
+[![Contributors](https://img.shields.io/github/contributors/AudithSoftworks/Basis.svg?maxAge=2592000?style=plastic)](https://github.com/AudithSoftworks/Basis)
 
+[![](https://img.shields.io/docker/automated/audithsoftworks/basis.svg?maxAge=2592000?style=plastic)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images")
 [![](https://images.microbadger.com/badges/version/audithsoftworks/basis.svg)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images")
 [![](https://images.microbadger.com/badges/image/audithsoftworks/basis.svg)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images layers")
+[![](https://img.shields.io/docker/pulls/audithsoftworks/basis.svg)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images")
+
+[![bitHound Overall Score](https://www.bithound.io/github/AudithSoftworks/Basis/badges/score.svg)](https://www.bithound.io/github/AudithSoftworks/Basis)
+[![bitHound Dependencies](https://www.bithound.io/github/AudithSoftworks/Basis/badges/dependencies.svg)](https://www.bithound.io/github/AudithSoftworks/Basis/master/dependencies/npm)
+[![bitHound Dev Dependencies](https://www.bithound.io/github/AudithSoftworks/Basis/badges/devDependencies.svg)](https://www.bithound.io/github/AudithSoftworks/Basis/master/dependencies/npm)
 
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3/mini.png)](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3)
 [![Code Quality](https://scrutinizer-ci.com/g/AudithSoftworks/Basis/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AudithSoftworks/Basis)

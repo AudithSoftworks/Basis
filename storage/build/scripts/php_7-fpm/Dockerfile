@@ -18,9 +18,7 @@ RUN apt-get install -y \
         locales \
         locales-all \
         telnet \
-        wget \
-    && apt-get clean \
-    && apt-get autoremove -y
+        wget
 RUN docker-php-ext-install \
         bcmath \
         exif \
@@ -63,5 +61,10 @@ RUN locale-gen en_US.UTF-8 && locale-gen az_AZ.UTF-8 && locale-gen tr_TR.UTF-8 &
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+
+# Clean-up
+RUN apt-get clean \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 EXPOSE 54321

@@ -8,13 +8,13 @@
         "font-face-mixin": "^1.1.0",
         "node-sass": "^3.10.0",
         "path": "^0.12.7",
-        "postcss-loader": "^0.13.0",
+        "postcss-loader": "^1.0.0",
         "precss": "^1.4.0",
         "sass-loader": "^4.0.2",
         "style-loader": "^0.13.1",
         "webpack": "2.1.0-beta.25",
         "webpack-manifest-plugin": "^1.0.1",
-        "webpack-merge": "^0.14.1",
+        "webpack-merge": "~0.15.0",
         "webpack-validator": "^2.2.7"
     },
     "dependencies": {
@@ -27,17 +27,19 @@
         "font-awesome": "^4.6.3",
         "jquery": "^3.1.0",
         "jquery-slimscroll": "^1.3.8",
+        "jquery-ui": "^1.12.1",
         "jquery-validation": "^1.15.1",
         "js-cookie": "^2.1.3",
         "pace-progress": "^1.0.2",
         "react": "^15.3.2",
         "select2": "^4.0.3",
         "select2-bootstrap-theme": "0.1.0-beta.9",
-        "simple-line-icons-webfont": "^4.0.3"
+        "simple-line-icons-webfont": "^4.0.3",
+        "skycons": "^1.0.0"
     },
     "scripts": {
-        "build": "webpack --colors --display-cached --display-cached-assets --display-error-details --display-modules --display-chunks --display-reasons --debug && exit 0",
-        "watch": "webpack --watch --colors --display-cached --display-cached-assets --display-error-details --display-modules --display-chunks --display-reasons --debug && exit 0",
-        "help": "webpack -h && exit 0;"
+        "build": "webpack --colors || true",
+        "webpack": "webpack --colors --display-cached --display-cached-assets --display-error-details --display-modules --display-chunks --debug || true",
+        "watch": "webpack --watch --colors || true"
     }
 }

@@ -6,16 +6,15 @@
 #docker build -f storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .;
 #docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
 
-#docker-compose build
+docker-compose build
+#docker-compose pull;
 
 if [ -z ${PHP_VERSION+x} ]; then export PHP_VERSION='7'; fi; # 5|7
-
-#docker-compose pull;
 
 docker-compose up -d php${PHP_VERSION}-cli;
 docker-compose ps;
 docker exec basis_php${PHP_VERSION}-cli_1 \
-    /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | tee -a /etc/hosts";
+    /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
 
 test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 
@@ -24,7 +23,7 @@ test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 # and SAUCE_ACCESS_KEY env variables to the environment for which the next 'docker exec' is being run.
 ###############################################################################################################
 
-docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
+docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
         wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.0-linux.tar.gz;
         tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.0-linux.tar.gz;
@@ -51,6 +50,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
         cd ./node_modules/.google-fonts && git pull origin master;
     else
         git clone --depth=1 https://github.com/google/fonts.git ./node_modules/.google-fonts;
+        rm -rf ./node_modules/.google-fonts/.git
     fi;
 
     cd \$WORKDIR;
@@ -78,7 +78,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     ./artisan migrate;
     ./artisan passport:install;
 
-    chown -R 1000:1000 ./;
+    sudo chown -R basis:basis ./;
 
     ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
     if [ -z ${SAUCE_ACCESS_KEY+x} ]; then

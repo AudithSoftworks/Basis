@@ -44,7 +44,7 @@ cache:
     - ./vendor
 
 before_install:
-  - curl -L https://github.com/docker/compose/releases/download/1.8.0/docker-compose-`uname -s`-`uname -m` > docker-compose; chmod +x docker-compose; true
+  - curl -L https://github.com/docker/compose/releases/download/1.8.1/docker-compose-`uname -s`-`uname -m` > docker-compose; chmod +x docker-compose; true
   - sudo mv docker-compose /usr/local/bin/
   - pwd && docker -v && docker info && docker-compose -v
 
@@ -55,19 +55,20 @@ install:
 #  - export BRANCH=$(if [ "$TRAVIS_PULL_REQUEST" == "false" ]; then echo $TRAVIS_BRANCH; else echo `curl -s $PR | jq -r .head.ref`; fi)
 #  - echo "TRAVIS_BRANCH=$TRAVIS_BRANCH, PR=$PR, BRANCH=$BRANCH"
 
-  # Docker build
-  - if [[ $TRAVIS_TAG == 'docker-build' ]]; then docker build -qf storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .; fi;
+  - if [[ $TRAVIS_TAG == 'docker-build' ]]; then docker build -qf storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .; else docker pull audithsoftworks/basis:nginx; fi;
   - if [[ $TRAVIS_TAG == 'docker-build' && $PHP_VERSION == '5' ]]; then docker build -qf storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .; fi;
     if [[ $TRAVIS_TAG == 'docker-build' && $PHP_VERSION == '7' ]]; then docker build -qf storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .; fi;
   - if [[ $TRAVIS_TAG == 'docker-build' && $PHP_VERSION == '5' ]]; then docker build -qf storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .; fi;
     if [[ $TRAVIS_TAG == 'docker-build' && $PHP_VERSION == '7' ]]; then docker build -qf storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .; fi;
-
-  # docker-compose pull
-  - if [[ $TRAVIS_TAG != 'docker-build' ]]; then docker-compose pull; fi;
+  - if [[ $TRAVIS_TAG != 'docker-build' && $PHP_VERSION == '5' ]]; then docker pull audithsoftworks/basis:php_5.6; fi;
+    if [[ $TRAVIS_TAG != 'docker-build' && $PHP_VERSION == '7' ]]; then docker pull audithsoftworks/basis:php_7; fi;
+  - if [[ $TRAVIS_TAG != 'docker-build' && $PHP_VERSION == '5' ]]; then docker pull audithsoftworks/basis:php_5.6-fpm; fi;
+    if [[ $TRAVIS_TAG != 'docker-build' && $PHP_VERSION == '7' ]]; then docker pull audithsoftworks/basis:php_7-fpm; fi;
   - docker-compose up -d php${PHP_VERSION}-cli;
+  - docker images;
   - docker-compose ps;
   - echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts;
-  - docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | tee -a /etc/hosts";
+  - docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
 
 before_script:
   - chmod +x ./storage/build/scripts/ci/build.sh;

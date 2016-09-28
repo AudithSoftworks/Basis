@@ -1,3 +1,17 @@
+require('../sass/admin.scss');
+
+require('jquery');
+require('bootstrap-sass/assets/javascripts/bootstrap.js');
+require('jquery-validation');
+require('js-cookie');
+require('jquery-slimscroll');
+require('block-ui');
+require('bootstrap-switch');
+
+require('./app.js');
+require('./admin/layout.js');
+require('./admin/quick-sidebar.js');
+
 var Admin = function () {
     // Handle Theme Settings
     var handleTheme = function () {

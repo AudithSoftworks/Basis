@@ -107,4 +107,17 @@ $page-media-path: '/media_assets/other/' !default;
 
 $jquery-uniform-img-path: "#{$global-img-path}global/vendor/jquery.uniform/themes/default/" !default;
 
+/*------------------------------------
+ | Metronic grid system
+ *-----------------------------------*/
+
+$m-layout-breakpoints: (
+    xs: 480px, // Small screen / phone
+    sm: 768px, // Medium screen / tablet
+    md: 992px, // Large screen / desktop
+    lg: 1260px // Extra large screen / wide desktop
+) !default;
+$m-grid-columns: 12 !default;
+$m-grid-columns-gutter: 20px !default;
+
 @import "bootstrap-override";

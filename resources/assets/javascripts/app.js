@@ -1,8 +1,4 @@
-/*
- |------------------------------------------------------------------
- | Core script to handle the entire theme and core functions
- |------------------------------------------------------------------
- */
+require('pace-progress/pace.js');
 
 var App = function () {
     var isRTL = false;
@@ -163,9 +159,9 @@ var App = function () {
                     error: function (/* xhr, ajaxOptions, thrownError */) {
                         App.unblockUI(el);
                         var msg = 'Error on reloading the content. Please check your connection and try again.';
-                        if (error == "toastr" && toastr) {
+                        if (error === "toastr" && toastr) {
                             toastr.error(msg);
-                        } else if (error == "notific8" && $.notific8) {
+                        } else if (error === "notific8" && $.notific8) {
                             $.notific8('zindex', 11500);
                             $.notific8(msg, {
                                 theme: 'ruby',
@@ -235,7 +231,7 @@ var App = function () {
             $('body').on('click', 'a.btn, button.btn, input.btn, label.btn', function (e) {
                 element = $(this);
 
-                if (element.find(".md-click-circle").length == 0) {
+                if (element.find(".md-click-circle").length === 0) {
                     element.prepend("<span class='md-click-circle'></span>");
                 }
 
@@ -260,7 +256,7 @@ var App = function () {
 
         // Floating labels
         var handleInput = function (el) {
-            if (el.val() != "") {
+            if (el.val() !== "") {
                 el.addClass('edited');
             } else {
                 el.removeClass('edited');
@@ -469,7 +465,7 @@ var App = function () {
      * Handle textarea autosize.
      */
     var handleTextareaAutosize = function () {
-        if (typeof autosize == "function") {
+        if (typeof autosize === "function") {
             autosize(document.querySelector('textarea.autosizeme'));
         }
     };
@@ -592,13 +588,13 @@ var App = function () {
             var offset = parseInt(parent.attr('data-offset') ? parent.attr('data-offset') : 0);
 
             items.each(function () {
-                if ($(this).attr('data-height') == "height") {
+                if ($(this).attr('data-height') === 'height') {
                     $(this).css('height', '');
                 } else {
                     $(this).css('min-height', '');
                 }
 
-                var height_ = (mode == 'base-height' ? $(this).outerHeight() : $(this).outerHeight(true));
+                var height_ = (mode === 'base-height' ? $(this).outerHeight() : $(this).outerHeight(true));
                 if (height_ > height) {
                     height = height_;
                 }
@@ -607,7 +603,7 @@ var App = function () {
             height = height + offset;
 
             items.each(function () {
-                if ($(this).attr('data-height') == "height") {
+                if ($(this).attr('data-height') === 'height') {
                     $(this).css('height', height);
                 } else {
                     $(this).css('min-height', height);
@@ -937,7 +933,7 @@ var App = function () {
                     }
                 }
             } else {
-                if (options.place == "append") {
+                if (options.place === "append") {
                     $(options.container).append(html);
                 } else {
                     $(options.container).prepend(html);
