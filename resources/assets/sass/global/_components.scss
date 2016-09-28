@@ -25,6 +25,7 @@
 
 @import 'components/typography';
 @import 'components/utils';
+@import 'components/grid';
 @import 'components/font-icons';
 @import 'components/alerts';
 @import 'components/badges';
@@ -36,6 +37,7 @@
 @import 'components/dropdowns';
 @import 'components/feeds';
 @import 'components/form-layouts';
+@import 'components/form-repeater';
 @import 'components/inputs';
 @import 'components/icon-buttons';
 @import 'components/input-icons';
@@ -65,6 +67,14 @@
 @import 'components/tasks-widget';
 @import 'components/_comments';
 @import 'components/_quick-actions';
+
+@import 'components/_app-widgets';
+
+@import 'components/_ui-sweetalert';
+@import 'components/_clipboard';
+
+@import 'components/_bootstrap-multiselect';
+
 
 /*
 |------------------------------

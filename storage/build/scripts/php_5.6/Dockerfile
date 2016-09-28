@@ -11,6 +11,7 @@ RUN apt-get update -y \
     && apt-get upgrade -y \
     && apt-get install -y \
         bzip2 \
+        cron \
         daemon \
         fontforge \
         git \
@@ -25,12 +26,12 @@ RUN apt-get update -y \
         libxslt1-dev \
         locales \
         locales-all \
+        nano \
         openjdk-7-jre \
+        sudo \
         telnet \
         unzip \
-        wget \
-    && apt-get clean \
-    && apt-get autoremove -y
+        wget
 RUN docker-php-ext-install \
         bcmath \
         exif \
@@ -76,6 +77,9 @@ RUN pecl install -of xdebug \
     && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini
 
+# Port for XDebug
+EXPOSE 54321
+
 # Install Node
 RUN set -ex \
     && for key in \
@@ -92,7 +96,7 @@ RUN set -ex \
     done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.6.0
+ENV NODE_VERSION 6.9.1
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
     && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -101,14 +105,29 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
     && apt-get install xz-utils \
     && tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /usr/local --strip-components=1 \
     && rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
+    && ln -s /usr/local/bin/node /usr/local/bin/nodejs \
     && npm install -g npm@latest \
     && npm cache clear \
     && rm -rf /tmp/npm-*
 
 # Install Node global dependencies
-RUN npm install -g ttf2eot jshint webpack
+RUN npm install -g ttf2eot jshint
 
-ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
-
+# Port for node --inspect
 EXPOSE 9229
-EXPOSE 54321
+
+# Clean-up
+RUN apt-get clean \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Add a non-root user to prevent files being created with root permissions on host machine.
+ARG PUID=1000
+ARG PGID=1000
+RUN groupadd -g $PGID basis && useradd -u $PUID -g basis -M basis
+RUN usermod -aG sudo basis
+RUN cat /etc/sudoers | sed -e "s/%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g" -e "s/%admin.*/%admin ALL=(ALL) NOPASSWD: ALL/g" | tee /etc/sudoers
+
+# Add Web-font related tools to PATH
+USER basis
+ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2

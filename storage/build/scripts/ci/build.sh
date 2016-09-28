@@ -40,6 +40,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
         cd ./node_modules/.google-fonts && git pull origin master;
     else
         git clone --depth=1 https://github.com/google/fonts.git ./node_modules/.google-fonts;
+        rm -rf ./node_modules/.google-fonts/.git
     fi;
 
     cd \$WORKDIR;
@@ -67,7 +68,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     ./artisan migrate;
     ./artisan passport:install;
 
-    chown -R 1000:1000 ./;
+    sudo chown -R basis:basis ./;
 
     ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
     if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases'; fi;

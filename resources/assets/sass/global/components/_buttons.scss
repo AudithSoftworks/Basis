@@ -137,7 +137,7 @@
     $uppercase-padding-sm: 7px 18px 7px 18px !default;
     $uppercase-padding-xs: 3px 8px 3px 8px !default;
 
-    .btn:not(.md-skip) {
+    .btn:not(.md-skip):not(.bs-select-all):not(.bs-deselect-all) {
         font-size: 12px;
         font-weight: 600;
         text-transform: uppercase;

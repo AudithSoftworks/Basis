@@ -99,6 +99,7 @@ class RouteServiceProvider extends ServiceProvider
              | Default, non-localized home
              *-----------------------------------*/
 
+            $router->get('home', 'HomeController@index');
             $router->get('', 'HomeController@index');
         });
     }
