@@ -4,8 +4,9 @@
 |-----------------------------------------
 */
 @import "colors";
-@import "bootstrap-sass-official/assets/stylesheets/bootstrap/variables";
-@import "bootstrap-sass-official/assets/stylesheets/bootstrap/mixins";
+@import "~bootstrap-sass/assets/stylesheets/bootstrap/variables";
+@import "~bootstrap-sass/assets/stylesheets/bootstrap/mixins";
+@import "components/mixins";
 
 $direction: 'ltr' !default;
 $theme-style: 'square' !default;
@@ -17,6 +18,7 @@ $theme-type: 'default' !default;
 |--------------------------------------------------------------------------------
 */
 
+$font-public-path: "/fonts/" !default;
 $font-family-primary: "Open Sans", sans-serif !default;
 $font-family-nav: Roboto, sans-serif !default;
 $font-family-default: "Helvetica Neue", Helvetica, Arial, sans-serif !default;
@@ -90,7 +92,7 @@ $screen-md-min: 992px !default;
 /* Large screen / wide desktop */
 $screen-lg-min: 1200px !default;
 
-/* Large scree / wider desktop */
+/* Large screen / wider desktop */
 $screen-lg-med: 1260px !default;
 
 /* So media queries don't overlap when required, provide a maximum */
@@ -104,5 +106,18 @@ $page-img-path: '/media_assets/images/' !default;
 $page-media-path: '/media_assets/other/' !default;
 
 $jquery-uniform-img-path: "#{$global-img-path}global/vendor/jquery.uniform/themes/default/" !default;
+
+/*------------------------------------
+ | Metronic grid system
+ *-----------------------------------*/
+
+$m-layout-breakpoints: (
+    xs: 480px, // Small screen / phone
+    sm: 768px, // Medium screen / tablet
+    md: 992px, // Large screen / desktop
+    lg: 1260px // Extra large screen / wide desktop
+) !default;
+$m-grid-columns: 12 !default;
+$m-grid-columns-gutter: 20px !default;
 
 @import "bootstrap-override";

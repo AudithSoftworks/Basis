@@ -2,11 +2,7 @@ $simple-line-font-path: "simple-line-icons/" !default;
 $simple-line-font-family: "Simple-Line-Icons" !default;
 $simple-line-icon-prefix: "icon-" !default;
 
-@include font-face(
-        $simple-line-font-family,
-        font-files('#{$simple-line-font-path}Simple-Line-Icons.woff2', '#{$simple-line-font-path}Simple-Line-Icons.woff', '#{$simple-line-font-path}Simple-Line-Icons.ttf'),
-        '#{$simple-line-font-path}Simple-Line-Icons.eot', 400, normal
-);
+@include font-face($simple-line-font-family, $font-public-path + $simple-line-font-path + 'Simple-Line-Icons', 400, normal, eot woff2 woff ttf);
 
 /* Use the following CSS code if you want to use data attributes for inserting your icons */
 [data-icon]:before {

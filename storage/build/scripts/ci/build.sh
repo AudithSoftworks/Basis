@@ -22,26 +22,36 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
         daemon -U -- /home/basis/storage/build/tools/sc-4.4.0-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
-    cd /home/basis && npm update && bower --config.interactive=false --allow-root --loglevel=warn update;
+    npm update;
 
-    cd /home/basis/public/bower_components/fine-uploader && npm install && make build;
+    cd \$WORKDIR;
+    if [[ ! -d ./storage/build/tools/woff2 ]]; then
+        git clone --depth=1 https://github.com/google/woff2.git ./storage/build/tools/woff2;
+        cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
+    fi;
 
-    cd /home/basis && git clone --depth=1 --branch=1.15.0 https://github.com/jzaefferer/jquery-validation.git /home/basis/public/bower_components/jquery.validation;
-    cd /home/basis/public/bower_components/jquery.validation && rm -rf .git && npm install && grunt;
+    cd \$WORKDIR;
+    if [[ ! -d ./storage/build/tools/css3_font_converter ]]; then
+        git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git ./storage/build/tools/css3_font_converter;
+    fi;
 
-    cd /home/basis && git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2;
-    cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
+    cd \$WORKDIR;
+    if [[ -d ./node_modules/.google-fonts ]]; then
+        cd ./node_modules/.google-fonts && git pull origin master;
+    else
+        git clone --depth=1 https://github.com/google/fonts.git ./node_modules/.google-fonts;
+        rm -rf ./node_modules/.google-fonts/.git
+    fi;
 
-    cd /home/basis && git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git /home/basis/storage/build/tools/css3_font_converter;
-
-    cp -r ./public/bower_components/bootstrap/fonts ./public/fonts/glyphicons;
-    cp -r ./public/bower_components/fontawesome/fonts ./public/fonts/font_awesome;
-    cp -r ./public/bower_components/simple-line-icons-webfont/fonts ./public/fonts/simple-line-icons;
-    cp -r ./public/bower_components/google-fonts/apache/opensans ./public/fonts/opensans;
-    cp -r ./public/bower_components/google-fonts/ofl/armata ./public/fonts/armata;
-    cp -r ./public/bower_components/google-fonts/ofl/marcellus ./public/fonts/marcellus;
-    cp -r ./public/bower_components/google-fonts/ofl/pontanosans ./public/fonts/pontano_sans;
-    cp -r ./public/bower_components/google-fonts/ofl/montserrat ./public/fonts/montserrat;
+    cd \$WORKDIR;
+    if [[ ! -d ./public/fonts/glyphicons ]]; then cp -r ./node_modules/bootstrap-sass/assets/fonts/bootstrap ./public/fonts/glyphicons; fi;
+    if [[ ! -d ./public/fonts/font_awesome ]]; then cp -r ./node_modules/font-awesome/fonts ./public/fonts/font_awesome; fi;
+    if [[ ! -d ./public/fonts/simple-line-icons ]]; then cp -r ./node_modules/simple-line-icons-webfont/fonts ./public/fonts/simple-line-icons; fi;
+    if [[ ! -d ./public/fonts/opensans ]]; then cp -r ./node_modules/.google-fonts/apache/opensans ./public/fonts/opensans; fi;
+    if [[ ! -d ./public/fonts/armata ]]; then cp -r ./node_modules/.google-fonts/ofl/armata ./public/fonts/armata; fi;
+    if [[ ! -d ./public/fonts/marcellus ]]; then cp -r ./node_modules/.google-fonts/ofl/marcellus ./public/fonts/marcellus; fi;
+    if [[ ! -d ./public/fonts/pontano_sans ]]; then cp -r ./node_modules/.google-fonts/ofl/pontanosans ./public/fonts/pontano_sans; fi;
+    if [[ ! -d ./public/fonts/montserrat ]]; then cp -r ./node_modules/.google-fonts/ofl/montserrat ./public/fonts/montserrat; fi;
 
     chmod -R +x /home/basis/storage/build/tools;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/simple-line-icons/stylesheet.css public/fonts/simple-line-icons/*.ttf;
@@ -51,18 +61,15 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
 
-    compass compile;
-    gulp;
+    npm run build;
     composer selfupdate && composer update --prefer-source --no-interaction;
 
     ./artisan key:generate;
     ./artisan migrate;
     ./artisan passport:install;
 
-    chown -R 1000:1000 ./;
+    sudo chown -R basis:basis ./;
 
-    ./vendor/bin/phpunit --debug --verbose tests/JsonApi/;
-    ./vendor/bin/phpunit --debug --verbose tests/Misc/;
-    ./vendor/bin/phpunit --debug --verbose tests/Models/;
-    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then ./vendor/bin/phpunit --debug --verbose tests/WebUi/; fi;
+    ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
+    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases'; fi;
 ";

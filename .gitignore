@@ -3,12 +3,9 @@
 node_modules
 vendor
 bootstrap/cache/*
-public/bower_components
 public/build
 public/fonts/*
-public/javascripts/*
 public/swagger*
-resources/assets/stylesheets/*
 !resources/assets/sass/global/vendor
 storage/*.key
 storage/app/*
@@ -31,5 +28,4 @@ _ide_helper.php
 !.git*
 !.env.*
 !*.yml
-!.bowerrc
 old

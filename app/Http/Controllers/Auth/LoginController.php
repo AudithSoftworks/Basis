@@ -244,14 +244,16 @@ class LoginController extends Controller
      */
     public function logout(Request $request)
     {
-        $user = app('auth.driver')->user();
+        if (app('auth.driver')->check()) {
+            $user = app('auth.driver')->user();
 
-        app('auth.driver')->logout();
+            app('auth.driver')->logout();
+
+            app('events')->fire(new LoggedOut($user));
+        }
 
         $request->session()->flush();
         $request->session()->regenerate();
-
-        app('events')->fire(new LoggedOut($user));
 
         if ($request->expectsJson()) {
             return response()->json([]);

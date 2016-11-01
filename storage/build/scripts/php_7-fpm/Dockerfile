@@ -18,9 +18,7 @@ RUN apt-get install -y \
         locales \
         locales-all \
         telnet \
-        wget \
-    && apt-get clean \
-    && apt-get autoremove -y
+        wget
 RUN docker-php-ext-install \
         bcmath \
         exif \
@@ -59,9 +57,14 @@ RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
     && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini
 
 # Locale
-RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
+RUN locale-gen en_US.UTF-8 && locale-gen az_AZ.UTF-8 && locale-gen tr_TR.UTF-8 && dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+
+# Clean-up
+RUN apt-get clean \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 EXPOSE 54321

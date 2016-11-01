@@ -1,4 +1,4 @@
-<?php namespace App\Tests\WebUi;
+<?php namespace App\Tests\WebUi\SauceWebDriver;
 
 use App\Tests\SauceWebDriverTestCase;
 use Illuminate\Contracts\Console\Kernel;
@@ -22,7 +22,7 @@ class AuthenticationTest extends SauceWebDriverTestCase
         putenv('APP_ENV=testing');
 
         // Create an app instance for facades to work
-        $app = require __DIR__ . '/../../bootstrap/app.php';
+        $app = require __DIR__ . '/../../../bootstrap/app.php';
         $app->make(Kernel::class)->bootstrap();
 
         // Re-Migrate
@@ -34,10 +34,17 @@ class AuthenticationTest extends SauceWebDriverTestCase
         $this->setBrowserUrl('');
     }
 
-    public function testRegister()
+    public function testAuthenticateMiddleware()
     {
-        $this->url(self::$startUrl);
-        $this->assertEquals('http://basis.audith.org/en', $this->url());
+        $this->url(self::$startUrl . '/oauth/clients'); // An 'auth'-enabled path.
+        $this->assertEquals('http://basis.audith.org/en/login', $this->url()); // We get redirected.
+        $this->assertContains('Login - Audith Basis', $this->title());
+    }
+
+    public function testHome()
+    {
+        $this->url(self::$startUrl); // Trying to hit root path '/'
+        $this->assertEquals(self::$startUrl . '/en', $this->url()); // We get redirected to '/en' localized path.
         $this->assertContains('Audith Basis', $this->title());
     }
 }

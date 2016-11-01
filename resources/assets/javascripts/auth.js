@@ -1,3 +1,11 @@
+require('../sass/auth.scss');
+
+require('jquery');
+require('bootstrap-sass/assets/javascripts/bootstrap.js');
+require('jquery-validation');
+require('js-cookie');
+require('bootstrap-switch');
+
 var Login = function () {
     var $loginForm = jQuery('.login-form');
     var $passwordReminderForm = jQuery('.forget-form');
@@ -10,7 +18,7 @@ var Login = function () {
             focusInvalid: false, // do not focus the last invalid input
             ignore: "",
             rules: {
-                username: {
+                email: {
                     required: true
                 },
                 password: {
@@ -22,8 +30,8 @@ var Login = function () {
             },
 
             messages: {
-                username: {
-                    required: "Username is required."
+                email: {
+                    required: "Email is required."
                 },
                 password: {
                     required: "Password is required."
@@ -131,9 +139,6 @@ var Login = function () {
                 email: {
                     required: true,
                     email: true
-                },
-                username: {
-                    required: true
                 },
                 password: {
                     required: true
