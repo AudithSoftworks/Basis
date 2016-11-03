@@ -126,7 +126,7 @@ ARG PUID=1000
 ARG PGID=1000
 RUN groupadd -g $PGID basis && useradd -u $PUID -g basis -M basis
 RUN usermod -aG sudo basis
-RUN cat /etc/sudoers | sed -e "s/%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g" -e "s/%admin.*/%admin ALL=(ALL) NOPASSWD: ALL/g" | tee /etc/sudoers
+RUN sed -i -e "s/%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g" /etc/sudoers
 
 # Add Web-font related tools to PATH
 USER basis
