@@ -8,6 +8,7 @@ RUN apt-get install -y \
         git \
         libcurl4-gnutls-dev \
         libfreetype6-dev \
+        libjpeg-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
         libpng12-dev \
@@ -21,8 +22,8 @@ RUN apt-get install -y \
         wget
 RUN docker-php-ext-install \
         bcmath \
+        calendar \
         exif \
-        gd \
         gettext \
         mbstring \
         mcrypt \
@@ -33,6 +34,9 @@ RUN docker-php-ext-install \
         sockets \
         xsl \
         zip
+
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd
 
 # Install PECL php-xdebug and php-mongodb extensions
 RUN pecl install -of xdebug mongodb \
@@ -55,6 +59,9 @@ RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
     && make install \
     && rm -rf /tmp/phpredis \
     && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini
+
+# Timezone
+RUN echo "date.timezone = UTC" | tee /usr/local/etc/php/conf.d/date.ini
 
 # Locale
 RUN locale-gen en_US.UTF-8 && locale-gen az_AZ.UTF-8 && locale-gen tr_TR.UTF-8 && dpkg-reconfigure locales

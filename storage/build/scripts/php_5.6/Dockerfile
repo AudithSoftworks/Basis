@@ -16,6 +16,7 @@ RUN apt-get update -y \
         fontforge \
         git \
         libfreetype6-dev \
+        libjpeg-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
         libpng12-dev \
@@ -34,8 +35,8 @@ RUN apt-get update -y \
         wget
 RUN docker-php-ext-install \
         bcmath \
+        calendar \
         exif \
-        gd \
         gettext \
         mbstring \
         mcrypt \
@@ -45,6 +46,9 @@ RUN docker-php-ext-install \
         sockets \
         xsl \
         zip
+
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd
 
 # Locale
 RUN locale-gen en_US.UTF-8 && locale-gen az_AZ.UTF-8 && locale-gen tr_TR.UTF-8 && dpkg-reconfigure locales
@@ -80,6 +84,9 @@ RUN pecl install -of xdebug \
 # Port for XDebug
 EXPOSE 54321
 
+# Timezone
+RUN echo "date.timezone = UTC" | tee /usr/local/etc/php/conf.d/date.ini
+
 # Install Node
 RUN set -ex \
     && for key in \
@@ -92,11 +99,11 @@ RUN set -ex \
         B9AE9905FFD7803F25714661B63B535A4C206CA9 \
         C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
     ; do \
-        gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+        gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key"; \
     done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.9.1
+ENV NODE_VERSION 6.9.2
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
     && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
