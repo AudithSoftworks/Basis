@@ -11,6 +11,8 @@ docker-compose build
 
 if [ -z ${PHP_VERSION+x} ]; then export PHP_VERSION='7'; fi; # 5|7
 
+if [[ $(docker-compose ps | grep Exit) || $(docker-compose ps | grep Up) ]]; then docker-compose down; fi;
+
 docker-compose up -d php${PHP_VERSION}-cli;
 docker-compose ps;
 docker exec basis_php${PHP_VERSION}-cli_1 \
@@ -24,12 +26,17 @@ test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 ###############################################################################################################
 
 docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
-    if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
-        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.0-linux.tar.gz;
-        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.0-linux.tar.gz;
-        rm ./storage/build/tools/sc-4.4.0-linux.tar.gz;
+    crontab -l;
 
-        daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.0-linux/bin/sc --tunnel-domains=basis.audith.org;
+    export SAUCE_USERNAME=${SAUCE_USERNAME};
+    export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
+
+    if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
+        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.2-linux.tar.gz;
+        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.2-linux.tar.gz;
+        rm ./storage/build/tools/sc-4.4.2-linux.tar.gz;
+
+        daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.2-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
     npm update;
@@ -72,13 +79,14 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
 
     npm run build;
-    composer selfupdate && composer update --prefer-source --no-interaction;
+    sudo composer selfupdate;
+    composer update --prefer-source --no-interaction;
 
     ./artisan key:generate;
     ./artisan migrate;
     ./artisan passport:install;
 
-    sudo chown -R basis:basis ./;
+    sudo chown -R 1000:1000 ./;
 
     ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
     if [ -z ${SAUCE_ACCESS_KEY+x} ]; then
@@ -88,4 +96,4 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
 
 #docker-compose down;
 #docker rm $(docker ps -a | grep "Exited" | awk "{print \$1}");
-#docker rmi $(docker images | grep "<none>" | awk "{print \$3}");
+if [[ $(docker images | grep "<none>") ]]; then docker rmi $(docker images | grep "<none>" | awk "{print \$3}"); fi;

@@ -67,6 +67,7 @@ services:
     image: audithsoftworks/basis:php_5.6
     volumes:
       - .:/home/basis
+      - ./storage/build/configs/crontabs:/var/spool/cron/crontabs
     working_dir: /home/basis
     links:
       - mariadb
@@ -85,6 +86,7 @@ services:
     image: audithsoftworks/basis:php_7
     volumes:
       - .:/home/basis
+      - ./storage/build/configs/crontabs:/var/spool/cron/crontabs
     working_dir: /home/basis
     links:
       - mariadb

@@ -20,11 +20,7 @@
         </testsuite>
     </testsuites>
     <filter>
-        <blacklist>
-            <directory suffix=".php">./database</directory>
-            <directory suffix=".php">./vendor</directory>
-        </blacklist>
-        <whitelist>
+        <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./app</directory>
         </whitelist>
     </filter>

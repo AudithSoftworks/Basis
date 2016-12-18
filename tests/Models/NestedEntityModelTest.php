@@ -33,7 +33,7 @@ class NestedEntityModelTest extends IlluminateTestCase
      */
     public function testInsertForException($data)
     {
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
 
         $nestedEntitiesModel = new NestedEntity();
         $nestedEntitiesModel->{$data['method']}('Exception case', 100);
@@ -234,7 +234,7 @@ class NestedEntityModelTest extends IlluminateTestCase
      */
     public function testFetchForException($data)
     {
-        $this->setExpectedException('\InvalidArgumentException');
+        $this->expectException(\InvalidArgumentException::class);
 
         $nestedEntitiesModel = new NestedEntity();
         $nestedEntitiesModel->fetch($data['flag'], $data['id']);
@@ -336,7 +336,7 @@ class NestedEntityModelTest extends IlluminateTestCase
 
     public function testRemoveForException()
     {
-        $this->setExpectedException(\InvalidArgumentException::class);
+        $this->expectException(\InvalidArgumentException::class);
 
         $nestedEntitiesModel = new NestedEntity();
         $nestedEntitiesModel->remove(100);
@@ -346,6 +346,7 @@ class NestedEntityModelTest extends IlluminateTestCase
     {
         $nestedEntitiesModel = new NestedEntity();
         $_timeNow = Carbon::now();
+        sleep(1);
 
         //------------------------------------------
         // Case 1: Soft-delete of a leaf entity
