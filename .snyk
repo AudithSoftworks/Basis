@@ -1,0 +1,8 @@
+# Snyk (https://snyk.io) policy file, patches or ignores known vulnerabilities.
+version: v1.7.0
+ignore: {}
+# patches apply the minimum changes required to fix a vulnerability
+patch:
+  'npm:marked:20170112':
+    - laravel-elixir > gulp-notify > node-notifier > cli-usage > marked:
+        patched: '2017-02-10T14:49:45.484Z'
