@@ -1,9 +1,44 @@
 {
     "private": true,
     "devDependencies": {
-        "gulp": "^3.9.1"
+        "clean-webpack-plugin": "^0.1.15",
+        "css-loader": "^0.26.1",
+        "extract-text-webpack-plugin": "2.0.0-rc.3",
+        "file-loader": "^0.10.0",
+        "font-face-mixin": "^1.1.0",
+        "node-sass": "^4.0.0",
+        "path": "^0.12.7",
+        "postcss-loader": "^1.3.0",
+        "precss": "^1.4.0",
+        "sass-loader": "^5.0.1",
+        "style-loader": "^0.13.1",
+        "webpack": "^2.2.1",
+        "webpack-manifest-plugin": "^1.1.0",
+        "webpack-merge": "^2.6.1"
     },
     "dependencies": {
-        "laravel-elixir": "6.0.0-10"
+        "block-ui": "^2.70.1",
+        "bootstrap-hover-dropdown": "^2.2.1",
+        "bootstrap-sass": "^3.3.7",
+        "bootstrap-select": "^1.11.2",
+        "bootstrap-switch": "^3.3.2",
+        "fine-uploader": "^5.13.0",
+        "font-awesome": "^4.6.3",
+        "jquery": "^3.1.1",
+        "jquery-slimscroll": "^1.3.8",
+        "jquery-ui": "^1.12.1",
+        "jquery-validation": "^1.15.1",
+        "js-cookie": "^2.1.3",
+        "pace-progress": "^1.0.2",
+        "react": "^15.3.2",
+        "select2": "^4.0.3",
+        "select2-bootstrap-theme": "0.1.0-beta.9",
+        "simple-line-icons-webfont": "^4.0.3",
+        "skycons": "^1.0.0"
+    },
+    "scripts": {
+        "build": "webpack --colors || true",
+        "compile": "webpack --colors --display-cached --display-cached-assets --display-error-details --display-modules --display-chunks --debug || true",
+        "watch": "webpack --watch --colors || true"
     }
 }

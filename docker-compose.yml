@@ -28,19 +28,19 @@ services:
       XDEBUG_CONFIG: "remote_host=172.17.0.1"
       REDIS_PORT: 6379
   php7-fpm:
-      build:
-        context: ./storage/build/scripts/php_7-fpm
-      image: audithsoftworks/basis:php_7-fpm
-      volumes:
-        - .:/home/basis
-      working_dir: /home/basis
-      links:
-        - mariadb
-        - postgres
-        - redis
-      environment:
-        XDEBUG_CONFIG: "remote_host=172.17.0.1"
-        REDIS_PORT: 6379
+    build:
+      context: ./storage/build/scripts/php_7-fpm
+    image: audithsoftworks/basis:php_7-fpm
+    volumes:
+      - .:/home/basis
+    working_dir: /home/basis
+    links:
+      - mariadb
+      - postgres
+      - redis
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.17.0.1"
+      REDIS_PORT: 6379
   nginxForPhp5:
     build:
       context: ./storage/build/scripts/nginx
@@ -52,21 +52,22 @@ services:
     links:
       - php5-fpm:phpFpm
   nginxForPhp7:
-      build:
-        context: ./storage/build/scripts/nginx
-      image: audithsoftworks/basis:nginx
-      volumes:
-        - ./storage/build/configs/nginx.conf:/etc/nginx/conf.d/default.conf:ro
-        - .:/home/basis
-      working_dir: /home/basis
-      links:
-        - php7-fpm:phpFpm
+    build:
+      context: ./storage/build/scripts/nginx
+    image: audithsoftworks/basis:nginx
+    volumes:
+      - ./storage/build/configs/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - .:/home/basis
+    working_dir: /home/basis
+    links:
+      - php7-fpm:phpFpm
   php5-cli:
     build:
       context: ./storage/build/scripts/php_5.6
     image: audithsoftworks/basis:php_5.6
     volumes:
       - .:/home/basis
+      - ./storage/build/configs/crontabs:/var/spool/cron/crontabs
     working_dir: /home/basis
     links:
       - mariadb
@@ -76,20 +77,25 @@ services:
     environment:
       XDEBUG_CONFIG: "remote_host=172.17.0.1"
       REDIS_PORT: 6379
+      WORKDIR: "/home/basis"
     stdin_open: true
+    tty: true
   php7-cli:
-      build:
-        context: ./storage/build/scripts/php_7
-      image: audithsoftworks/basis:php_7
-      volumes:
-        - .:/home/basis
-      working_dir: /home/basis
-      links:
-        - mariadb
-        - postgres
-        - redis
-        - nginxForPhp7:nginx
-      environment:
-        XDEBUG_CONFIG: "remote_host=172.17.0.1"
-        REDIS_PORT: 6379
-      stdin_open: true
+    build:
+      context: ./storage/build/scripts/php_7
+    image: audithsoftworks/basis:php_7
+    volumes:
+      - .:/home/basis
+      - ./storage/build/configs/crontabs:/var/spool/cron/crontabs
+    working_dir: /home/basis
+    links:
+      - mariadb
+      - postgres
+      - redis
+      - nginxForPhp7:nginx
+    environment:
+      XDEBUG_CONFIG: "remote_host=172.17.0.1"
+      REDIS_PORT: 6379
+      WORKDIR: "/home/basis"
+    stdin_open: true
+    tty: true

@@ -6,47 +6,69 @@
 #docker build -f storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .;
 #docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
 
-#docker-compose build
-
-if [ -z ${PHP_VERSION+x} ]; then export PHP_VERSION='5'; fi; # 5|7
-
+docker-compose build
 #docker-compose pull;
+
+if [ -z ${PHP_VERSION+x} ]; then export PHP_VERSION='7'; fi; # 5|7
+
+if [[ $(docker-compose ps | grep Exit) || $(docker-compose ps | grep Up) ]]; then docker-compose down; fi;
 
 docker-compose up -d php${PHP_VERSION}-cli;
 docker-compose ps;
-docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | tee -a /etc/hosts";
+docker exec basis_php${PHP_VERSION}-cli_1 \
+    /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
 
 test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 
-docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
-    export NPM_CONFIG_LOGLEVEL=warn;
+###############################################################################################################
+# IMPORTANT NOTE: Before running the next command, make sure you have also exported SAUCE_USERNAME
+# and SAUCE_ACCESS_KEY env variables to the environment for which the next 'docker exec' is being run.
+###############################################################################################################
 
-    wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.0-linux.tar.gz;
-    tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.0-linux.tar.gz;
-    rm ./storage/build/tools/sc-4.4.0-linux.tar.gz;
+docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
+    crontab -l;
 
-    daemon -U -- /home/basis/storage/build/tools/sc-4.4.0-linux/bin/sc --tunnel-domains=basis.audith.org;
+    export SAUCE_USERNAME=${SAUCE_USERNAME};
+    export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
 
-    cd /home/basis && npm update && bower --config.interactive=false --allow-root --loglevel=warn update;
+    if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
+        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.3-linux.tar.gz;
+        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.3-linux.tar.gz;
+        rm ./storage/build/tools/sc-4.4.3-linux.tar.gz;
 
-    cd /home/basis/public/bower_components/fine-uploader && npm install && make build;
+        daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.3-linux/bin/sc --tunnel-domains=basis.audith.org;
+    fi;
 
-    cd /home/basis && git clone --depth=1 --branch=1.15.0 https://github.com/jzaefferer/jquery-validation.git /home/basis/public/bower_components/jquery.validation;
-    cd /home/basis/public/bower_components/jquery.validation && rm -rf .git && npm install && grunt;
+    npm update;
 
-    cd /home/basis && git clone --depth=1 https://github.com/google/woff2.git /home/basis/storage/build/tools/woff2;
-    cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
+    cd \$WORKDIR;
+    if [[ ! -d ./storage/build/tools/woff2 ]]; then
+        git clone --depth=1 https://github.com/google/woff2.git ./storage/build/tools/woff2;
+        cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
+    fi;
 
-    cd /home/basis && git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git /home/basis/storage/build/tools/css3_font_converter;
+    cd \$WORKDIR;
+    if [[ ! -d ./storage/build/tools/css3_font_converter ]]; then
+        git clone --depth=1 https://github.com/zoltan-dulac/css3FontConverter.git ./storage/build/tools/css3_font_converter;
+    fi;
 
-    cp -r ./public/bower_components/bootstrap/fonts ./public/fonts/glyphicons;
-    cp -r ./public/bower_components/fontawesome/fonts ./public/fonts/font_awesome;
-    cp -r ./public/bower_components/simple-line-icons-webfont/fonts ./public/fonts/simple-line-icons;
-    cp -r ./public/bower_components/google-fonts/apache/opensans ./public/fonts/opensans;
-    cp -r ./public/bower_components/google-fonts/ofl/armata ./public/fonts/armata;
-    cp -r ./public/bower_components/google-fonts/ofl/marcellus ./public/fonts/marcellus;
-    cp -r ./public/bower_components/google-fonts/ofl/pontanosans ./public/fonts/pontano_sans;
-    cp -r ./public/bower_components/google-fonts/ofl/montserrat ./public/fonts/montserrat;
+    cd \$WORKDIR;
+    if [[ -d ./node_modules/.google-fonts ]]; then
+        cd ./node_modules/.google-fonts && git pull origin master;
+    else
+        git clone --depth=1 https://github.com/google/fonts.git ./node_modules/.google-fonts;
+        rm -rf ./node_modules/.google-fonts/.git
+    fi;
+
+    cd \$WORKDIR;
+    if [[ ! -d ./public/fonts/glyphicons ]]; then cp -r ./node_modules/bootstrap-sass/assets/fonts/bootstrap ./public/fonts/glyphicons; fi;
+    if [[ ! -d ./public/fonts/font_awesome ]]; then cp -r ./node_modules/font-awesome/fonts ./public/fonts/font_awesome; fi;
+    if [[ ! -d ./public/fonts/simple-line-icons ]]; then cp -r ./node_modules/simple-line-icons-webfont/fonts ./public/fonts/simple-line-icons; fi;
+    if [[ ! -d ./public/fonts/opensans ]]; then cp -r ./node_modules/.google-fonts/apache/opensans ./public/fonts/opensans; fi;
+    if [[ ! -d ./public/fonts/armata ]]; then cp -r ./node_modules/.google-fonts/ofl/armata ./public/fonts/armata; fi;
+    if [[ ! -d ./public/fonts/marcellus ]]; then cp -r ./node_modules/.google-fonts/ofl/marcellus ./public/fonts/marcellus; fi;
+    if [[ ! -d ./public/fonts/pontano_sans ]]; then cp -r ./node_modules/.google-fonts/ofl/pontanosans ./public/fonts/pontano_sans; fi;
+    if [[ ! -d ./public/fonts/montserrat ]]; then cp -r ./node_modules/.google-fonts/ofl/montserrat ./public/fonts/montserrat; fi;
 
     chmod -R +x /home/basis/storage/build/tools;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/simple-line-icons/stylesheet.css public/fonts/simple-line-icons/*.ttf;
@@ -56,19 +78,24 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/armata/stylesheet.css public/fonts/armata/*.ttf;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
 
-    compass compile;
-    gulp;
-    composer selfupdate && composer update --prefer-source --no-interaction;
+    npm run build;
+    sudo composer selfupdate;
+    composer update --prefer-source --no-interaction;
 
     ./artisan key:generate;
     ./artisan migrate;
     ./artisan passport:install;
 
-    chown -R 1000:1000 ./;
+    sudo chown -R 1000:1000 ./;
+    sudo chmod -R 0777 ./storage/framework/views/twig;
+    sudo chmod -R 0777 ./storage/logs;
 
-    ./vendor/bin/phpunit --debug --verbose;
+    ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
+    if [ -z ${SAUCE_ACCESS_KEY+x} ]; then
+        echo 'SAUCE_* env vars are missing!'; else ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases';
+    fi;
 ";
 
 #docker-compose down;
 #docker rm $(docker ps -a | grep "Exited" | awk "{print \$1}");
-#docker rmi $(docker images | grep "<none>" | awk "{print \$3}");
+if [[ $(docker images | grep "<none>") ]]; then docker rmi $(docker images | grep "<none>" | awk "{print \$3}"); fi;

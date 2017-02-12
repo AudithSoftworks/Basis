@@ -2,16 +2,16 @@
 @import 'global/fonts/fontawesome';
 @import 'global/fonts/opensans';
 @import 'global/fonts/simple-line-icons';
-@import 'bootstrap-sass-official/assets/stylesheets/bootstrap';
-@import 'select2/src/scss/core';
-@import 'select2-bootstrap-theme/src/select2-bootstrap';
+@import '~bootstrap-sass/assets/stylesheets/bootstrap';
+@import '~select2/src/scss/core';
+@import '~select2-bootstrap-theme/src/select2-bootstrap';
 @import 'global/components/mixins';
 @import 'global/components-md';
 @import 'global/plugins-md';
 
 /*
 |------------------------------
-| Login page
+| Register page
 |------------------------------
 */
 

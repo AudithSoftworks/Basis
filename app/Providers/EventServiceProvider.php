@@ -25,7 +25,6 @@ class EventServiceProvider extends ServiceProvider
             Listeners\Users\SendActivationLinkViaEmail::class
         ],
         Events\Users\RequestedResetPasswordLink::class => [],
-        Events\Users\Updated::class => [],
     ];
 
     /**

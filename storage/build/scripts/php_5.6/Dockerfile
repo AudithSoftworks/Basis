@@ -6,13 +6,17 @@ WORKDIR /home/basis
 ENV DEBIAN_FRONTEND noninteractive
 
 # Install dependencies
-RUN apt-get update -y && apt-get install -y apt-utils && apt-get upgrade -y
-RUN apt-get install -y \
+RUN apt-get update -y \
+    && apt-get install -y apt-utils \
+    && apt-get upgrade -y \
+    && apt-get install -y \
         bzip2 \
+        cron \
         daemon \
         fontforge \
         git \
         libfreetype6-dev \
+        libjpeg-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
         libpng12-dev \
@@ -23,18 +27,16 @@ RUN apt-get install -y \
         libxslt1-dev \
         locales \
         locales-all \
+        nano \
         openjdk-7-jre \
-        ruby \
-        ruby-dev \
+        sudo \
         telnet \
         unzip \
-        wget \
-    && apt-get clean \
-    && apt-get autoremove -y
+        wget
 RUN docker-php-ext-install \
         bcmath \
+        calendar \
         exif \
-        gd \
         gettext \
         mbstring \
         mcrypt \
@@ -45,8 +47,11 @@ RUN docker-php-ext-install \
         xsl \
         zip
 
+RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
+    && docker-php-ext-install gd
+
 # Locale
-RUN locale-gen en_US.UTF-8 && dpkg-reconfigure locales
+RUN locale-gen en_US.UTF-8 && locale-gen az_AZ.UTF-8 && locale-gen tr_TR.UTF-8 && dpkg-reconfigure locales
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
@@ -76,6 +81,12 @@ RUN pecl install -of xdebug \
     && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini
 
+# Port for XDebug
+EXPOSE 54321
+
+# Timezone
+RUN echo "date.timezone = UTC" | tee /usr/local/etc/php/conf.d/date.ini
+
 # Install Node
 RUN set -ex \
     && for key in \
@@ -88,11 +99,11 @@ RUN set -ex \
         B9AE9905FFD7803F25714661B63B535A4C206CA9 \
         C4F0DFFF4E8C1A8236409D08E73BC641CC11F4C8 \
     ; do \
-        gpg --keyserver ha.pool.sks-keyservers.net --recv-keys "$key"; \
+        gpg --keyserver hkp://p80.pool.sks-keyservers.net:80 --recv-keys "$key"; \
     done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.5.0
+ENV NODE_VERSION 6.9.5
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
     && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -101,16 +112,29 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
     && apt-get install xz-utils \
     && tar -xJf "node-v$NODE_VERSION-linux-x64.tar.xz" -C /usr/local --strip-components=1 \
     && rm "node-v$NODE_VERSION-linux-x64.tar.xz" SHASUMS256.txt.asc SHASUMS256.txt \
+    && ln -s /usr/local/bin/node /usr/local/bin/nodejs \
     && npm install -g npm@latest \
     && npm cache clear \
     && rm -rf /tmp/npm-*
 
 # Install Node global dependencies
-RUN npm install -g bower gulp grunt-cli ttf2eot jshint
+RUN npm install -g ttf2eot jshint
 
-# Install Compass dependencies
-RUN gem install --no-rdoc --no-ri sass:3.4.22 sass-globbing autoprefixer-rails compass
+# Port for node --inspect
+EXPOSE 9229
 
+# Clean-up
+RUN apt-get clean \
+    && apt-get autoremove -y \
+    && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
+
+# Add a non-root user to prevent files being created with root permissions on host machine.
+ARG PUID=1000
+ARG PGID=1000
+RUN groupadd -g $PGID basis && useradd -u $PUID -g basis -M basis
+RUN usermod -aG sudo basis
+RUN sed -i -e "s/%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g" /etc/sudoers
+
+# Add Web-font related tools to PATH
+USER basis
 ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
-
-EXPOSE 54321

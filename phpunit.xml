@@ -9,16 +9,18 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Application Test Suite">
-            <directory suffix="Test.php">./tests</directory>
+        <testsuite name="Illuminate TestCases">
+            <directory suffix="Test.php">./tests/JsonApi</directory>
+            <directory suffix="Test.php">./tests/Misc</directory>
+            <directory suffix="Test.php">./tests/Models</directory>
+            <directory suffix="Test.php">./tests/WebUi/Illuminate</directory>
+        </testsuite>
+        <testsuite name="SauceWebDriver TestCases">
+            <directory suffix="Test.php">./tests/WebUi/SauceWebDriver</directory>
         </testsuite>
     </testsuites>
     <filter>
-        <blacklist>
-            <directory suffix=".php">./database</directory>
-            <directory suffix=".php">./vendor</directory>
-        </blacklist>
-        <whitelist>
+        <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./app</directory>
         </whitelist>
     </filter>

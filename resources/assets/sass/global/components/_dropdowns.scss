@@ -41,6 +41,10 @@ $color-blue: #009dc7 !default;
     border: 1px solid #eeeeee;
     font-family: $font-family-default;
 
+    .dropdown-hoverable:hover & {
+        display: block;
+    }
+
     border-radius: $general-border-radius;
 
     li.divider {
@@ -98,7 +102,7 @@ $color-blue: #009dc7 !default;
 
         &:before,
         &:after {
-            display: none;
+            display: none !important;
         }
     }
 
