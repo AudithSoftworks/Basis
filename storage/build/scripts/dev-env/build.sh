@@ -32,11 +32,11 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
 
     if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
-        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.2-linux.tar.gz;
-        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.2-linux.tar.gz;
-        rm ./storage/build/tools/sc-4.4.2-linux.tar.gz;
+        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.3-linux.tar.gz;
+        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.3-linux.tar.gz;
+        rm ./storage/build/tools/sc-4.4.3-linux.tar.gz;
 
-        daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.2-linux/bin/sc --tunnel-domains=basis.audith.org;
+        daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.3-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
     npm update;
@@ -87,6 +87,8 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     ./artisan passport:install;
 
     sudo chown -R 1000:1000 ./;
+    sudo chmod -R 0777 ./storage/framework/views/twig;
+    sudo chmod -R 0777 ./storage/logs;
 
     ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
     if [ -z ${SAUCE_ACCESS_KEY+x} ]; then

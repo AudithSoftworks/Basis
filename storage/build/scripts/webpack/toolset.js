@@ -1,45 +1,72 @@
-var webpack = require('webpack');
-var precss = require('precss');
-var autoprefixer = require('autoprefixer');
+const webpack = require('webpack');
+const precss = require('precss');
+const autoprefixer = require('autoprefixer');
 
-var CleanWebpackPlugin = require('clean-webpack-plugin');
-var CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
-var ExtractTextPlugin = require('extract-text-webpack-plugin');
-var LoaderOptionsPlugin = require("webpack/lib/LoaderOptionsPlugin");
-var UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
+const CleanWebpackPlugin = require('clean-webpack-plugin');
+const CommonsChunkPlugin = require("webpack/lib/optimize/CommonsChunkPlugin");
+const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const LoaderOptionsPlugin = require("webpack/lib/LoaderOptionsPlugin");
+const UglifyJsPlugin = require('webpack/lib/optimize/UglifyJsPlugin');
 
-exports.extractBundle = function (options) {
-    var entry = {};
-    entry[options.name] = options.entries;
-
+exports.extractBundles = function () {
     return {
-        entry: entry,
         plugins: [
-            // Extract bundle and manifest files. Manifest is needed for reliable caching.
-            new CommonsChunkPlugin({names: [options.name, 'commons'], children: true, minChunks: 3})
-        ]
+            new CommonsChunkPlugin(
+                {
+                    name: 'vendor',
+                    minChunks: function (module /*, countOfHowManyTimesThisModuleIsUsedAcrossAllChunks */) {
+                        const context = module.context;
+
+                        // You can perform other similar checks here too. Now we check just node_modules.
+                        return context && context.indexOf('node_modules') >= 0;
+                    }
+                }
+            ),
+            new CommonsChunkPlugin(
+                {
+                    name: 'global',
+                    minChunks: function (module, countOfHowManyTimesThisModuleIsUsedAcrossAllChunks) {
+                        // You can perform other similar checks here too. Now we check just node_modules.
+                        // return context && context.indexOf('node_modules') >= 0;
+                        return module.resource
+                            && module.resource.indexOf('resources/assets/sass/global') >= 0
+                            && countOfHowManyTimesThisModuleIsUsedAcrossAllChunks === 2;
+                    }
+                }
+            ),
+        ],
     };
 };
 
 exports.loadersAndPluginsForVariousTypes = function () {
     return {
         module: {
-            loaders: [
+            rules: [
                 {
                     test: /\.css$/,
-                    loader: ExtractTextPlugin.extract({
-                        fallbackLoader: 'style-loader',
-                        loader: 'css-loader!postcss-loader'
+                    use: ExtractTextPlugin.extract({
+                        fallback: 'style-loader',
+                        use: [{
+                            loader: 'css-loader',
+                        }, {
+                            loader: 'postcss-loader'
+                        }]
                     })
                 }, {
                     test: /\.scss$/,
-                    loader: ExtractTextPlugin.extract({
-                        fallbackLoader: 'style-loader',
-                        loader: 'css-loader!postcss-loader!sass-loader'
+                    use: ExtractTextPlugin.extract({
+                        fallback: 'style-loader',
+                        use: [{
+                            loader: 'css-loader',
+                        }, {
+                            loader: 'postcss-loader'
+                        }, {
+                            loader: 'sass-loader'
+                        }]
                     })
                 }, {
                     test: /\.(gif|jpg|png)$/,
-                    loader: process.env.npm_lifecycle_event == 'build' ? 'file-loader?name=[path][name].[hash].[ext]' : 'file-loader?name=[path][name].[ext]'
+                    use: process.env.npm_lifecycle_event == 'build' ? 'file-loader?name=[path][name].[hash].[ext]' : 'file-loader?name=[path][name].[ext]'
                 }
             ]
         },
@@ -59,15 +86,14 @@ exports.loadersAndPluginsForVariousTypes = function () {
     };
 };
 
-exports.styles = function () {
+exports.styles = function ({include, exclude} = {}) {
     return {
         module: {
-            loaders: [
+            rules: [
                 {
-                    test: /\.js$/,
-                    loader: 'babel-loader'
-                }, {
                     test: /\.css$/,
+                    include,
+                    exclude,
                     use: [
                         'style-loader',
                         {
@@ -109,7 +135,7 @@ exports.styles = function () {
                     ]
                 }, {
                     test: /\.(gif|jpg|png)$/,
-                    loader: 'file-loader?name=[path][name].[hash].[ext]'
+                    use: 'file-loader?name=[path][name].[hash].[ext]'
                 }
             ]
         }

@@ -17,11 +17,11 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
 
     if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then
-        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.2-linux.tar.gz;
-        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.2-linux.tar.gz;
-        rm ./storage/build/tools/sc-4.4.2-linux.tar.gz;
+        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.3-linux.tar.gz;
+        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.3-linux.tar.gz;
+        rm ./storage/build/tools/sc-4.4.3-linux.tar.gz;
 
-        daemon -U -- /home/basis/storage/build/tools/sc-4.4.2-linux/bin/sc --tunnel-domains=basis.audith.org;
+        daemon -U -- /home/basis/storage/build/tools/sc-4.4.3-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
     npm update;
@@ -64,7 +64,8 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
 
     npm run build;
-    composer selfupdate && composer update --prefer-source --no-interaction;
+    sudo composer selfupdate;
+    composer update --prefer-source --no-interaction;
 
     ./artisan key:generate;
     ./artisan migrate;
