@@ -1,4 +1,4 @@
-FROM php:5.6
+FROM php:5
 MAINTAINER Shahriyar Imanov <shehi@imanov.me>
 
 WORKDIR /home/basis
@@ -36,6 +36,7 @@ RUN apt-get update -y \
 RUN docker-php-ext-install \
         bcmath \
         calendar \
+        dom \
         exif \
         gettext \
         mbstring \
@@ -103,7 +104,7 @@ RUN set -ex \
     done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.9.5
+ENV NODE_VERSION 6.10.2
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
     && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \

@@ -12,16 +12,16 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     crontab -l;
 
     export NPM_CONFIG_LOGLEVEL=warn;
-    export SAUCE_BUILD=travis-job-${TRAVIS_JOB_NUMBER};
+    export SAUCE_BUILD=audithsoftworks-basis-travis-job-${TRAVIS_JOB_NUMBER};
     export SAUCE_USERNAME=${SAUCE_USERNAME};
     export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
 
     if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then
-        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.3-linux.tar.gz;
-        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.3-linux.tar.gz;
-        rm ./storage/build/tools/sc-4.4.3-linux.tar.gz;
+        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
+        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.5-linux.tar.gz;
+        rm ./storage/build/tools/sc-4.4.5-linux.tar.gz;
 
-        daemon -U -- /home/basis/storage/build/tools/sc-4.4.3-linux/bin/sc --tunnel-domains=basis.audith.org;
+        daemon -U -- /home/basis/storage/build/tools/sc-4.4.5-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
     npm update;

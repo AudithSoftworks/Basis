@@ -1,4 +1,4 @@
-FROM php:5.6-fpm
+FROM php:5-fpm
 MAINTAINER Shahriyar Imanov <shehi@imanov.me>
 
 ENV DEBIAN_FRONTEND noninteractive
@@ -22,6 +22,7 @@ RUN apt-get install -y \
 RUN docker-php-ext-install \
         bcmath \
         calendar \
+        dom \
         exif \
         gettext \
         mbstring \

@@ -23,6 +23,7 @@ RUN apt-get install -y \
 RUN docker-php-ext-install \
         bcmath \
         calendar \
+        dom \
         exif \
         gettext \
         mbstring \
