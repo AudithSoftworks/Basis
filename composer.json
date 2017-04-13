@@ -15,29 +15,32 @@
         {
             "name": "Shahriyar Imanov",
             "email": "shehi@imanov.me",
-            "homepage": "http://imanov.me",
+            "homepage": "http://cv.imanov.me",
             "role": "Developer"
         }
     ],
     "require": {
-        "php": ">=5.6.4",
+        "php": ">=5.6.14",
         "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-mcrypt": "*",
         "ext-openssl": "*",
         "barryvdh/laravel-ide-helper": "^2.2",
-        "laravel/framework": "5.3.*",
-        "laravel/passport": "^1.0",
-        "laravel/socialite": "~2",
+        "laravel/dusk": "^1.0.5",
+        "laravel/framework": "5.4.*",
+        "laravel/passport": "^2.0",
+        "laravel/socialite": "^3.0",
+        "laravel/tinker": "~1.0",
         "predis/predis": "~1",
         "rcrowe/twigbridge": "~0.9"
     },
     "require-dev": {
+        "ext-dom": "*",
         "doctrine/dbal": "~2.5",
         "fzaninotto/faker": "~1.5",
         "mockery/mockery": "0.9.*",
         "phpspec/phpspec": "~3.0",
-        "phpunit/phpunit": "~5.0",
+        "phpunit/phpunit": "~5.7",
         "sauce/sausage": ">=0.17",
         "symfony/css-selector": "3.1.*",
         "symfony/dom-crawler": "3.1.*"
@@ -72,7 +75,8 @@
         ]
     },
     "config": {
-        "preferred-install": "dist"
+        "preferred-install": "dist",
+        "sort-packages": true
     },
     "minimum-stability": "dev",
     "prefer-stable": true
