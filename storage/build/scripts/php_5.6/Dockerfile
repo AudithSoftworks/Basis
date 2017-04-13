@@ -27,6 +27,7 @@ RUN apt-get update -y \
         libxslt1-dev \
         locales \
         locales-all \
+        mysql-client \
         nano \
         openjdk-7-jre \
         sudo \
