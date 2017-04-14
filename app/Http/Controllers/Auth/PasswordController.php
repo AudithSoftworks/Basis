@@ -56,12 +56,17 @@ class PasswordController extends Controller
             throw new ModelNotFoundException(trans('passwords.user'));
         }
 
-        $user->notify(new ResetPasswordNotification(app('auth.password.broker')->createToken($user)));
+        $user->notify(new ResetPasswordNotification($token = app('auth.password.broker')->createToken($user)));
 
         event(new RequestedResetPasswordLink($user));
 
         if ($request->expectsJson()) {
-            return response()->json(['message' => trans('passwords.sent')]);
+            $response = ['message' => trans('passwords.sent')];
+            if (env('APP_ENV') == 'testing') {
+                $response['token'] = $token;
+            }
+
+            return response()->json($response);
         }
 
         return redirect()->back()->with('message', trans('passwords.sent'));

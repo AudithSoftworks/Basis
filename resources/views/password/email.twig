@@ -31,7 +31,7 @@
                 <input class="form-control placeholder-no-fix" type="email" autocomplete="off" placeholder="{{ trans('auth.labels.email') }}" name="email">
             </fieldset>
             <fieldset class="form-actions col-md-12">
-                <a class="btn btn-default" href="{{ action('Auth\\LoginController@showLoginForm', [], false) }}">{{ trans('auth.buttons.login') }}</a>
+                <a class="btn btn-default" href="{{ route('login', [], false) }}">{{ trans('auth.buttons.login') }}</a>
                 <button type="submit" class="btn btn-success uppercase pull-right">{{ trans('auth.buttons.password') }}</button>
             </fieldset>
         </form>

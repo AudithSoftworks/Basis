@@ -1,14 +1,12 @@
 <?php namespace App\Services\Routing;
 
+use Illuminate\Routing\Route;
 use Illuminate\Routing\RouteCollection;
 
 class LocalizedRouteCollection extends RouteCollection
 {
     /**
-     * Add the route to any look-up tables if necessary.
-     *
-     * @param  \Illuminate\Routing\Route  $route
-     * @return void
+     * {@inheritdoc}
      */
     protected function addLookups($route)
     {
@@ -32,47 +30,51 @@ class LocalizedRouteCollection extends RouteCollection
     }
 
     /**
-     * Add a route to the controller action dictionary.
-     *
-     * @param  array                     $action
-     * @param  \Illuminate\Routing\Route $route
-     *
-     * @return void
-     */
-    protected function addToActionList($action, $route)
-    {
-        $locale = app('translator')->getLocale();
-        $this->actionList[trim($action['controller'], '\\')][$locale] = $route;
-    }
-
-    /**
-     * Get a route instance by its controller action.
-     *
-     * @param  string $action
-     *
-     * @return \Illuminate\Routing\Route|null
-     */
-    public function getByAction($action)
-    {
-        $locale = app('translator')->getLocale();
-
-        return isset($this->actionList[$action][$locale]) ? $this->actionList[$action][$locale] : null;
-    }
-
-    /**
-     * Get a route instance by its name.
-     *
-     * @param  string  $name
-     * @return \Illuminate\Routing\Route|null
+     * {@inheritdoc}
      */
     public function getByName($name)
     {
         $locale = app('translator')->getLocale();
-
-        if (isset($this->nameList[$name])) {
+        if (is_array($this->nameList[$name])) { // array with localized routes
+            return $this->nameList[$name][$locale];
+        } elseif ($this->nameList[$name] instanceof Route) { // no localization available, so it'll be a route object
             return $this->nameList[$name];
         }
 
-        return isset($this->nameList[$locale . '.' . $name]) ? $this->nameList[$locale . '.' . $name] : null;
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getByAction($action)
+    {
+        $locale = app('translator')->getLocale();
+        if (is_array($this->actionList[$action])) { // array with localized routes
+            return $this->actionList[$action][$locale];
+        } elseif ($this->actionList[$action] instanceof Route) { // no localization available, so it'll be a route object
+            return $this->actionList[$action];
+        }
+
+        return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function refreshNameLookups()
+    {
+        $this->nameList = [];
+
+        /** @var \Illuminate\Routing\Route $route */
+        foreach ($this->allRoutes as $route) {
+            if ($route->getName()) {
+                if (isset($route->getAction()['locale'])) {
+                    $this->nameList[$route->getName()][$route->getAction()['locale']] = $route;
+                } else {
+                    $this->nameList[$route->getName()] = $route;
+                }
+            }
+        }
     }
 }

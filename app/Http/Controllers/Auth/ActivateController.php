@@ -16,14 +16,6 @@ class ActivateController extends Controller
     use Activates, RedirectsUsers;
 
     /**
-     * Create a new authentication controller instance.
-     */
-    public function __construct()
-    {
-        $this->middleware('auth', ['only' => ['requestActivationCode']]);
-    }
-
-    /**
      * Request account activation link via email.
      *
      * @param \Illuminate\Http\Request $request
@@ -72,6 +64,7 @@ class ActivateController extends Controller
         if (!$activation) {
             throw new TokenNotValidException;
         }
+
         /** @var \App\Models\User $user */
         $user = User::findOrFail($activation->user_id);
 

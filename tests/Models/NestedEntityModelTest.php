@@ -6,12 +6,22 @@ use Carbon\Carbon;
 
 class NestedEntityModelTest extends IlluminateTestCase
 {
-    public static function setUpBeforeClass()
-    {
-        $app = require __DIR__ . '/../../bootstrap/app.php';
-        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
+    /** @var bool */
+    public static $migrated = false;
 
-        \Artisan::call('db:seed', ['--class' => 'NestedEntitiesTableSeeder']);
+    public function setUp()
+    {
+        // Migrations should run only once, before application is created (the moment when $this->app == null).
+        if (!static::$migrated) {
+            $this->afterApplicationCreated(function () {
+                $this->artisan('migrate:reset');
+                $this->artisan('migrate');
+                $this->artisan('db:seed', ['--class' => \NestedEntitiesTableSeeder::class]);
+            });
+            static::$migrated = true;
+        }
+
+        parent::setUp();
     }
 
     public function data_testInsertForException()
@@ -247,6 +257,7 @@ class NestedEntityModelTest extends IlluminateTestCase
         //----------------------------------------------------
 
         $nestedEntitiesModel = new NestedEntity();
+        /** @var \Illuminate\Support\Collection $fetchWithMinimumInfoContent */
         $fetchWithMinimumInfoContent = $nestedEntitiesModel->fetch();
         $this->assertEquals(1, $fetchWithMinimumInfoContent[0]->id);
         $this->assertEquals('Root', $fetchWithMinimumInfoContent[0]->name);

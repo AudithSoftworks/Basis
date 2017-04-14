@@ -2,16 +2,12 @@
 
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Routing\ControllerInspector;
 use Illuminate\Routing\Router;
 
 class LocalizedRouter extends Router
 {
     /**
-     * Create a new Router instance.
-     *
-     * @param  \Illuminate\Contracts\Events\Dispatcher $events
-     * @param  \Illuminate\Container\Container         $container
+     * {@inheritdoc}
      */
     public function __construct(Dispatcher $events, Container $container = null)
     {
@@ -21,76 +17,20 @@ class LocalizedRouter extends Router
     }
 
     /**
-     * Add a route to the underlying route collection.
-     *
-     * @param  array|string          $methods
-     * @param  string                $uri
-     * @param  \Closure|array|string $action
-     *
-     * @return \Illuminate\Routing\Route
+     * {@inheritdoc}
      */
     protected function addRoute($methods, $uri, $action)
     {
-        // Now we apply our Localization modifications.
-        $uri = $this->localizeUris($uri);
+        if (isset($action['locale'])) {
+            // Now we apply our Localization modifications.
+            $uri = $this->localizeUris($uri, $action['locale']);
+        }
 
         return parent::addRoute($methods, $uri, $action);
     }
 
     /**
-     * Route a controller to a URI with wildcard routing.
-     *
-     * @param  string $uri
-     * @param  string $controller
-     * @param  array  $names
-     *
-     * @return void
-     *
-     * @deprecated since version 5.2.
-     */
-    public function controller($uri, $controller, $names = [])
-    {
-        $prepended = $controller;
-
-        // First, we will check to see if a controller prefix has been registered in
-        // the route group. If it has, we will need to prefix it before trying to
-        // reflect into the class instance and pull out the method for routing.
-        if (!empty($this->groupStack)) {
-            $prepended = $this->prependGroupUses($controller);
-        }
-
-        $controllerInspector = new ControllerInspector;
-        $routable = $controllerInspector->getRoutable($prepended, $uri);
-
-        // Now we apply our Localization modifications.
-        foreach ($routable as &$routes) {
-            foreach ($routes as &$route) {
-                $route['plain'] = $this->localizeUris($route['plain']);
-                unset($route);
-            }
-            unset($routes);
-        }
-
-        // When a controller is routed using this method, we use Reflection to parse
-        // out all of the routable methods for the controller, then register each
-        // route explicitly for the developers, so reverse routing is possible.
-        foreach ($routable as $method => $routes) {
-            foreach ($routes as $route) {
-                $this->registerInspected($route, $controller, $method, $names);
-            }
-        }
-
-        $this->addFallthroughRoute($controller, $uri);
-    }
-
-    /**
-     * Route a resource to a controller.
-     *
-     * @param  string $name
-     * @param  string $controller
-     * @param  array  $options
-     *
-     * @return void
+     * {@inheritdoc}
      */
     public function resource($name, $controller, array $options = [])
     {
@@ -104,31 +44,14 @@ class LocalizedRouter extends Router
     }
 
     /**
-     * Add a fallthrough route for a controller.
+     * Translates URIs
      *
-     * @param  string $controller
-     * @param  string $uri
-     *
-     * @return void
-     *
-     * @deprecated since version 5.2.
-     */
-    protected function addFallthroughRoute($controller, $uri)
-    {
-        $localizedUri = app('translator')->get('routes.' . $uri . '.');
-        if (false !== strpos($localizedUri, '.')) {
-            $localizedUri = $uri;
-        }
-
-        parent::addFallthroughRoute($controller, $localizedUri);
-    }
-
-    /**
      * @param string $uri
+     * @param string $locale
      *
      * @return string
      */
-    private function localizeUris($uri)
+    private function localizeUris($uri, $locale)
     {
         $uriExploded = explode('/', trim($uri, '/'));
         $localizedUriTranslationBitParts = [];
@@ -144,6 +67,7 @@ class LocalizedRouter extends Router
             if (preg_match('#(?<!routes)\.\{[^\}]+\}\.#', $translationBitPart)) { // For lower-level paths, in order not to hit 'routes.' index.
                 $phraseToGetTranslationFor = preg_replace('#\{[^\}]+\}\.?#', '', $translationBitPart);
             }
+            app('translator')->setLocale($locale);
             $translatedPhrase = app('translator')->get($phraseToGetTranslationFor);
             if (false !== strpos($translatedPhrase, '.')) {
                 $translationBitPart = $uriExploded[$level];

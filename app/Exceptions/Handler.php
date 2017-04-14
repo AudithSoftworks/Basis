@@ -1,8 +1,8 @@
 <?php namespace App\Exceptions;
 
 use App\Exceptions\Users\UserNotActivatedException;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Http\Response as IlluminateResponse;
@@ -20,8 +20,10 @@ class Handler extends ExceptionHandler
      * @var array
      */
     protected $dontReport = [
+        AuthenticationException::class,
         AuthorizationException::class,
         HttpException::class,
+        TokenMismatchException::class,
         IlluminateValidationException::class,
         ModelNotFoundException::class,
     ];
@@ -45,7 +47,7 @@ class Handler extends ExceptionHandler
      * @param \Illuminate\Http\Request $request
      * @param \Exception               $e
      *
-     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse|\Symfony\Component\HttpFoundation\Response
      */
     public function render($request, \Exception $e)
     {
@@ -84,7 +86,8 @@ class Handler extends ExceptionHandler
             } elseif ($e instanceof \UnexpectedValueException || $e instanceof IlluminateValidationException || $e instanceof TokenMismatchException) {
                 $statusCode = IlluminateResponse::HTTP_UNPROCESSABLE_ENTITY;
                 if ($e instanceof IlluminateValidationException) {
-                    $messageBag = $e->validator->errors();
+                    /** @var \Illuminate\Support\MessageBag $messageBag */
+                    $messageBag = $e->validator->getMessageBag();
                     $responseBody['message'] = $messageBag->getMessages();
                 }
             } elseif ($e instanceof \OverflowException) {

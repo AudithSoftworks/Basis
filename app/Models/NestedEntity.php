@@ -1,6 +1,7 @@
 <?php namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Query\JoinClause;
 
@@ -22,7 +23,7 @@ use Illuminate\Database\Query\JoinClause;
  * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereUpdatedAt($value)
  * @method static \Illuminate\Database\Query\Builder|\App\Models\NestedEntity whereDeletedAt($value)
  */
-class NestedEntity extends \Eloquent
+class NestedEntity extends Model
 {
     use SoftDeletes;
 
@@ -48,23 +49,23 @@ class NestedEntity extends \Eloquent
     public function insertIntoAtTheBeginning($newEntityName, $referenceEntityId)
     {
         # Fetch reference entity
-        $referenceEntity = \DB::table($this->table)->where('id', $referenceEntityId)->first();
+        $referenceEntity = app('db.connection')->table($this->table)->where('id', $referenceEntityId)->first();
         if (is_null($referenceEntity)) {
             throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . " not found!");
         }
 
-        \DB::transaction(
+        return app('db.connection')->transaction(
             function () use ($newEntityName, $referenceEntity) {
                 # Create new entity
-                $newEntity = \DB::table($this->table);
+                $newEntity = app('db.connection')->table($this->table);
 
                 # Update ranges in preparation of insertion
-                \DB::table($this->table)
+                app('db.connection')->table($this->table)
                     ->where('right_range', '>', $referenceEntity->left_range)
-                    ->update(['right_range' => \DB::raw('right_range + 2')]);
-                \DB::table($this->table)
+                    ->update(['right_range' => app('db.connection')->raw('right_range + 2')]);
+                app('db.connection')->table($this->table)
                     ->where('left_range', '>', $referenceEntity->left_range)
-                    ->update(['left_range' => \DB::raw('left_range + 2')]);
+                    ->update(['left_range' => app('db.connection')->raw('left_range + 2')]);
 
                 # Insert now
                 return $newEntity->insert([
@@ -78,7 +79,6 @@ class NestedEntity extends \Eloquent
         );
     }
 
-
     /**
      * @param        $newEntityName
      * @param int    $referenceEntityId
@@ -89,23 +89,23 @@ class NestedEntity extends \Eloquent
     public function insertIntoAtTheEnd($newEntityName, $referenceEntityId)
     {
         # Fetch reference entity
-        $referenceEntity = \DB::table($this->table)->where('id', $referenceEntityId)->first();
+        $referenceEntity = app('db.connection')->table($this->table)->where('id', $referenceEntityId)->first();
         if (is_null($referenceEntity)) {
             throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . " not found!");
         }
 
-        \DB::transaction(
+        return app('db.connection')->transaction(
             function () use ($newEntityName, $referenceEntity) {
                 # Create new entity
-                $newEntity = \DB::table($this->table);
+                $newEntity = app('db.connection')->table($this->table);
 
                 # Update ranges in preparation of insertion
-                \DB::table($this->table)
+                app('db.connection')->table($this->table)
                     ->where('right_range', '>=', $referenceEntity->right_range)
-                    ->update(['right_range' => \DB::raw('right_range + 2')]);
-                \DB::table($this->table)
+                    ->update(['right_range' => app('db.connection')->raw('right_range + 2')]);
+                app('db.connection')->table($this->table)
                     ->where('left_range', '>', $referenceEntity->right_range)
-                    ->update(['left_range' => \DB::raw('left_range + 2')]);
+                    ->update(['left_range' => app('db.connection')->raw('left_range + 2')]);
 
                 # Insert now
                 return $newEntity->insert([
@@ -118,7 +118,6 @@ class NestedEntity extends \Eloquent
             }
         );
     }
-
 
     /**
      * Alias to insertIntoAtTheEnd()
@@ -134,7 +133,6 @@ class NestedEntity extends \Eloquent
         return $this->insertIntoAtTheEnd($newEntityName, $referenceEntityId);
     }
 
-
     /**
      * @param string $newEntityName
      * @param int    $referenceEntityId
@@ -145,23 +143,23 @@ class NestedEntity extends \Eloquent
     public function prependTo($newEntityName, $referenceEntityId)
     {
         # Fetch reference entity
-        $referenceEntity = \DB::table($this->table)->where('id', $referenceEntityId)->first();
+        $referenceEntity = app('db.connection')->table($this->table)->where('id', $referenceEntityId)->first();
         if (is_null($referenceEntity)) {
             throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . " not found!");
         }
 
-        \DB::transaction(
+        return app('db.connection')->transaction(
             function () use ($newEntityName, $referenceEntity) {
                 # Create new entity
-                $newEntity = \DB::table($this->table);
+                $newEntity = app('db.connection')->table($this->table);
 
                 # Update ranges in preparation of insertion
-                \DB::table($this->table)
+                app('db.connection')->table($this->table)
                     ->where('right_range', '>', $referenceEntity->left_range)
-                    ->update(['right_range' => \DB::raw('right_range + 2')]);
-                \DB::table($this->table)
+                    ->update(['right_range' => app('db.connection')->raw('right_range + 2')]);
+                app('db.connection')->table($this->table)
                     ->where('left_range', '>=', $referenceEntity->left_range)
-                    ->update(['left_range' => \DB::raw('left_range + 2')]);
+                    ->update(['left_range' => app('db.connection')->raw('left_range + 2')]);
 
                 # Insert now
                 return $newEntity->insert([
@@ -175,7 +173,6 @@ class NestedEntity extends \Eloquent
         );
     }
 
-
     /**
      * @param string $newEntityName
      * @param int    $referenceEntityId
@@ -186,23 +183,23 @@ class NestedEntity extends \Eloquent
     public function appendTo($newEntityName, $referenceEntityId)
     {
         # Fetch reference entity
-        $referenceEntity = \DB::table($this->table)->where('id', $referenceEntityId)->first();
+        $referenceEntity = app('db.connection')->table($this->table)->where('id', $referenceEntityId)->first();
         if (is_null($referenceEntity)) {
             throw new \InvalidArgumentException("Reference entity with id: " . $referenceEntityId . " not found!");
         }
 
-        \DB::transaction(
+        return app('db.connection')->transaction(
             function () use ($newEntityName, $referenceEntity) {
                 # Create new entity
-                $newEntity = \DB::table($this->table);
+                $newEntity = app('db.connection')->table($this->table);
 
                 # Update ranges in preparation of insertion
-                \DB::table($this->table)
+                app('db.connection')->table($this->table)
                     ->where('right_range', '>', $referenceEntity->right_range)
-                    ->update(['right_range' => \DB::raw('right_range + 2')]);
-                \DB::table($this->table)
+                    ->update(['right_range' => app('db.connection')->raw('right_range + 2')]);
+                app('db.connection')->table($this->table)
                     ->where('left_range', '>', $referenceEntity->right_range)
-                    ->update(['left_range' => \DB::raw('left_range + 2')]);
+                    ->update(['left_range' => app('db.connection')->raw('left_range + 2')]);
 
                 # Insert now
                 return $newEntity->insert([
@@ -216,20 +213,20 @@ class NestedEntity extends \Eloquent
         );
     }
 
-
     public function remove($id, $doSoftDelete = true)
     {
         # Round up delete-ables
-        $referenceEntity = \DB::table($this->table)->select('left_range', 'right_range', \DB::raw('right_range - left_range + 1 as range_width'))->where('id', $id)->first();
+        $referenceEntity = app('db.connection')->table($this->table)->select('left_range', 'right_range', app('db.connection')->raw('right_range - left_range + 1 as range_width'))->where('id', $id)
+            ->first();
         if (is_null($referenceEntity)) {
             throw new \InvalidArgumentException("Reference entity with id: " . $id . " not found!");
         }
-        $completeListOfEntitiesToDeleteIncludingOrphans = \DB::table($this->table)
+        $completeListOfEntitiesToDeleteIncludingOrphans = app('db.connection')->table($this->table)
             ->where('left_range', '>=', $referenceEntity->left_range)
             ->where('left_range', '<=', $referenceEntity->right_range);
 
         # Perform either a soft-delete or hard-delete
-        return \DB::transaction(
+        return app('db.connection')->transaction(
             function () use ($referenceEntity, $doSoftDelete, $completeListOfEntitiesToDeleteIncludingOrphans) {
                 if ($doSoftDelete) {
                     # Soft delete
@@ -239,20 +236,18 @@ class NestedEntity extends \Eloquent
                     $removeResult = $completeListOfEntitiesToDeleteIncludingOrphans->delete();
 
                     # Update ranges
-                    \DB::table($this->table)
+                    app('db.connection')->table($this->table)
                         ->where('right_range', '>', $referenceEntity->right_range)
-                        ->update(['right_range' => \DB::raw('right_range - ' . $referenceEntity->range_width)]);
-                    \DB::table($this->table)
+                        ->update(['right_range' => app('db.connection')->raw('right_range - ' . $referenceEntity->range_width)]);
+                    app('db.connection')->table($this->table)
                         ->where('left_range', '>', $referenceEntity->right_range)
-                        ->update(['left_range' => \DB::raw('left_range - ' . $referenceEntity->range_width)]);
+                        ->update(['left_range' => app('db.connection')->raw('left_range - ' . $referenceEntity->range_width)]);
                 }
 
                 return $removeResult;
             }
         );
-
     }
-
 
     /**
      * @param  int    $flag Parameters of Select, which are defined bitwise (see self:SELECT__* constants)
@@ -274,10 +269,10 @@ class NestedEntity extends \Eloquent
 
         # Prelim
         empty($id) && $id = 1;
-        $nestedEntities = \DB::table($this->table . ' as node')
+        $nestedEntities = app('db.connection')->table($this->table . ' as node')
             ->select('node.id', 'node.name')
             ->leftJoin(
-                $this->table . ' as parent',
+                $this->table . ' AS parent',
                 function (JoinClause $join) {
                     $join->on('node.left_range', '<=', 'parent.right_range')
                         ->on('node.left_range', '>=', 'parent.left_range');
@@ -290,12 +285,19 @@ class NestedEntity extends \Eloquent
         $flag == self::SELECT_ALL_WITH_MINIMUM_INFO && $nestedEntities->where('parent.id', '=', $id)->orderBy('node.left_range');
 
         # Scenario-3: Select'ing *everything* with depth information
-        $flag == self::SELECT_WITH_DEPTH_INFO && $nestedEntities->addSelect('node.name', \DB::raw('(COUNT(parent.name)-1) as depth'))->groupBy('node.id')->orderBy('node.left_range');
+        $flag == self::SELECT_WITH_DEPTH_INFO && $nestedEntities->addSelect(app('db.connection')
+            ->raw('(COUNT(parent.name)-1) as depth'))
+            ->groupBy('node.id', 'node.name')
+            ->orderBy('node.left_range');
 
         # Scenario-4: Fetches leaves only
-        $flag == self::SELECT_LEAVES_ONLY && $nestedEntities = \DB::table($this->table)->select('id', 'name')->where('right_range', '=', \DB::raw('left_range + 1'))->orderBy('left_range');
+        $flag == self::SELECT_LEAVES_ONLY && $nestedEntities = app('db.connection')->table($this->table)
+            ->select('id', 'name')
+            ->where('right_range', '=', app('db.connection')
+            ->raw('left_range + 1'))
+            ->orderBy('left_range');
         if ($flag == self::SELECT_LEAVES_ONLY && $id !== 1) {
-            $parentEntity = \DB::table($this->table)->select('left_range', 'right_range')->where('id', $id)->first();
+            $parentEntity = app('db.connection')->table($this->table)->select('left_range', 'right_range')->where('id', $id)->first();
             $nestedEntities->whereBetween('left_range', [$parentEntity->left_range, $parentEntity->right_range]);
         }
 

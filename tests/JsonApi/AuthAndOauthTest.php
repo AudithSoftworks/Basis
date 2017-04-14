@@ -3,37 +3,37 @@
 use App\Exceptions\Common\ValidationException;
 use App\Exceptions\Users\TokenNotValidException;
 use App\Tests\IlluminateTestCase;
-use Illuminate\Contracts\Console\Kernel;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class AuthAndOauthTest extends IlluminateTestCase
 {
-    /** @var array */
-    public static $requestHeaders = ['HTTP_ACCEPT' => 'application/json'];
+    /** @var bool */
+    public static $migrated = false;
 
     /** @var \stdClass */
     public static $oauthClientData;
 
     /** @var string */
-    public static $accessToken = '';
+    public static $passwordResetToken;
 
-    /** @var string */
-    public static $refreshToken = '';
-
-    /**
-     * Create an app instance for facades to work + Migrations.
-     */
-    public static function setUpBeforeClass()
+    public function setUp()
     {
-        putenv('APP_ENV=testing');
-        $app = require __DIR__ . '/../../bootstrap/app.php';
-        $app->make(Kernel::class)->bootstrap();
+        // Migrations should run only once, before application is created (the moment when $this->app == null).
+        if (!static::$migrated) {
+            $this->afterApplicationCreated(function () {
+                $this->artisan('migrate:reset');
+                $this->artisan('migrate');
+            });
+            static::$migrated = true;
+        }
 
-        \Artisan::call('migrate:refresh');
+        parent::setUp();
 
-        \Artisan::call('passport:client', ['--password' => true, '--name' => 'PhpUnitTestClient']);
-        self::$oauthClientData = app('db')->table('oauth_clients')->select('id', 'secret')->where('name', '=', 'PhpUnitTestClient')->first();
+        if (is_null(static::$oauthClientData)) {
+            $this->artisan('passport:client', ['--password' => true, '--name' => 'PhpUnitTestClient']);
+            static::$oauthClientData = app('db')->table('oauth_clients')->select('id', 'secret')->where('name', '=', 'PhpUnitTestClient')->first();
+        }
     }
 
     /**
@@ -41,10 +41,9 @@ class AuthAndOauthTest extends IlluminateTestCase
      */
     public function testRegisterWithGetMethodForException()
     {
-        $this->get('/api/v1/register', self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(405);
-        $this->seeJson(['exception' => MethodNotAllowedHttpException::class]);
+        $response = $this->json('GET', '/api/v1/register');
+        $response->assertStatus(405);
+        $response->assertJson(['exception' => MethodNotAllowedHttpException::class]);
     }
 
     /**
@@ -54,18 +53,16 @@ class AuthAndOauthTest extends IlluminateTestCase
     {
         # Validation failure: Password confirmation missing
         $credentials = ['email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver'];
-        $this->post('/api/v1/register', $credentials, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(422);
-        $this->seeJson(['exception' => ValidationException::class]);
-        $this->notSeeInDatabase('users', ['email' => $credentials['email']]);
+        $response = $this->json('POST', '/api/v1/register', $credentials);
+        $response->assertStatus(422);
+        $response->assertJson(['exception' => ValidationException::class]);
+        $this->assertDatabaseMissing('users', ['email' => $credentials['email']]);
 
         # Validation failure: Email address missing
         $credentials = ['password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'];
-        $this->post('/api/v1/register', $credentials, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(422);
-        $this->seeJson(['exception' => ValidationException::class]);
+        $response = $this->json('POST', '/api/v1/register', $credentials);
+        $response->assertStatus(422);
+        $response->assertJson(['exception' => ValidationException::class]);
     }
 
     /**
@@ -74,13 +71,12 @@ class AuthAndOauthTest extends IlluminateTestCase
     public function testRegisterWithPostMethodForSuccess()
     {
         $credentials = ['email' => 'john.doe@example.com', 'password' => 'theWeakestPasswordEver', 'password_confirmation' => 'theWeakestPasswordEver'];
-        $this->post('/api/v1/register', $credentials, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(201);
-        $this->seeJson([
+        $response = $this->json('POST', '/api/v1/register', $credentials);
+        $response->assertStatus(201);
+        $response->assertJson([
             'email' => 'john.doe@example.com'
         ]);
-        $this->seeInDatabase('users', ['email' => $credentials['email']]);
+        $this->assertDatabaseHas('users', ['email' => $credentials['email']]);
     }
 
     /**
@@ -92,19 +88,17 @@ class AuthAndOauthTest extends IlluminateTestCase
     {
         # Validation failure: Invalid email address
         $userData = ['email' => 'jane.doe@'];
-        $this->post('/api/v1/password/email', $userData, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->see('message');
-        $this->seeStatusCode(422);
-        $this->seeJson(['exception' => ValidationException::class]);
+        $response = $this->json('POST', '/api/v1/password/email', $userData);
+        $response->assertSee('message');
+        $response->assertStatus(422);
+        $response->assertJson(['exception' => ValidationException::class]);
 
         # User doesn't exist
         $userData = ['email' => 'jane.doe@example.com'];
-        $this->post('/api/v1/password/email', $userData, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->see('message');
-        $this->seeStatusCode(404);
-        $this->seeJson(['exception' => NotFoundHttpException::class]);
+        $response = $this->json('POST', '/api/v1/password/email', $userData);
+        $response->assertSee('message');
+        $response->assertStatus(404);
+        $response->assertJson(['exception' => NotFoundHttpException::class]);
     }
 
     /**
@@ -115,10 +109,10 @@ class AuthAndOauthTest extends IlluminateTestCase
     public function testSendPasswordResetLinkForSuccess()
     {
         $userData = ['email' => 'john.doe@example.com'];
-        $this->post('/api/v1/password/email', $userData, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(200);
-        $this->seeJson(['message' => trans('passwords.sent')]);
+        $response = $this->json('POST', '/api/v1/password/email', $userData);
+        $response->assertStatus(200);
+        $response->assertJson(['message' => trans('passwords.sent')]);
+        static::$passwordResetToken = $response->decodeResponseJson()['token'];
     }
 
     /**
@@ -128,8 +122,6 @@ class AuthAndOauthTest extends IlluminateTestCase
      */
     public function testResetPasswordForExceptions()
     {
-        $passwordResetToken = app('db')->table('password_resets')->where('email', '=', 'john.doe@example.com')->value('token');
-
         # Validation failure: Token missing
         $userData = [
             'id' => 1,
@@ -137,11 +129,10 @@ class AuthAndOauthTest extends IlluminateTestCase
             'password' => 's0m34ardPa55w0rdV3r510nTw0',
             'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0'
         ];
-        $this->post('/api/v1/password/reset', $userData, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->see('message');
-        $this->seeStatusCode(422);
-        $this->seeJson(['exception' => ValidationException::class]);
+        $response = $this->json('POST', '/api/v1/password/reset', $userData);
+        $response->assertSee('message');
+        $response->assertStatus(422);
+        $response->assertJson(['exception' => ValidationException::class]);
 
         # Validation failure: Password confirmation mismatch
         $userData = [
@@ -149,26 +140,24 @@ class AuthAndOauthTest extends IlluminateTestCase
             'email' => 'john.doe@example.com',
             'password' => 's0m34ardPa55w0rdV3r510nTw0',
             'password_confirmation' => 's0m34ardPa55w0rd',
-            'token' => $passwordResetToken
+            'token' => static::$passwordResetToken
         ];
-        $this->post('/api/v1/password/reset', $userData, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->see('message');
-        $this->seeStatusCode(422);
-        $this->seeJson(['exception' => ValidationException::class]);
+        $response = $this->json('POST', '/api/v1/password/reset', $userData);
+        $response->assertSee('message');
+        $response->assertStatus(422);
+        $response->assertJson(['exception' => ValidationException::class]);
 
         # Validation failure: Password confirmation missing
         $userData = [
             'id' => 1,
             'email' => 'john.doe@example.com',
             'password' => 's0m34ardPa55w0rdV3r510nTw0',
-            'token' => $passwordResetToken
+            'token' => static::$passwordResetToken
         ];
-        $this->post('/api/v1/password/reset', $userData, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->see('message');
-        $this->seeStatusCode(422);
-        $this->seeJson(['exception' => ValidationException::class]);
+        $response = $this->json('POST', '/api/v1/password/reset', $userData);
+        $response->assertSee('message');
+        $response->assertStatus(422);
+        $response->assertJson(['exception' => ValidationException::class]);
 
         # User doesn't exist
         $userData = [
@@ -176,13 +165,12 @@ class AuthAndOauthTest extends IlluminateTestCase
             'email' => 'jane.doe@example.com',
             'password' => 's0m34ardPa55w0rdV3r510nTw0',
             'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
-            'token' => $passwordResetToken
+            'token' => static::$passwordResetToken
         ];
-        $this->post('/api/v1/password/reset', $userData, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->see('message');
-        $this->seeStatusCode(404);
-        $this->seeJson(['exception' => NotFoundHttpException::class]);
+        $response = $this->json('POST', '/api/v1/password/reset', $userData);
+        $response->assertSee('message');
+        $response->assertStatus(404);
+        $response->assertJson(['exception' => NotFoundHttpException::class]);
 
         # Invalid token
         $userData = [
@@ -192,11 +180,10 @@ class AuthAndOauthTest extends IlluminateTestCase
             'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
             'token' => 'wrong-token'
         ];
-        $this->post('/api/v1/password/reset', $userData, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->see('message');
-        $this->seeStatusCode(422);
-        $this->seeJson(['exception' => TokenNotValidException::class]);
+        $response = $this->json('POST', '/api/v1/password/reset', $userData);
+        $response->assertSee('message');
+        $response->assertStatus(422);
+        $response->assertJson(['exception' => TokenNotValidException::class]);
     }
 
     /**
@@ -207,16 +194,14 @@ class AuthAndOauthTest extends IlluminateTestCase
     public function testPasswordResetPasswordForSuccess()
     {
         $userData = [
-            'id' => 1,
             'email' => 'john.doe@example.com',
             'password' => 's0m34ardPa55w0rdV3r510nTw0',
             'password_confirmation' => 's0m34ardPa55w0rdV3r510nTw0',
-            'token' => app('db')->table('password_resets')->where('email', '=', 'john.doe@example.com')->value('token')
+            'token' => static::$passwordResetToken
         ];
-        $this->post('/api/v1/password/reset', $userData, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(200);
-        $this->seeJson(['message' => trans('passwords.reset')]);
+        $response = $this->json('POST', '/api/v1/password/reset', $userData);
+        $response->assertStatus(200);
+        $response->assertJson(['message' => trans('passwords.reset')]);
     }
 
     /**
@@ -230,42 +215,39 @@ class AuthAndOauthTest extends IlluminateTestCase
         $user = [
             'grant_type' => 'password',
             'client_id' => 2, // Wrong client id
-            'client_secret' => self::$oauthClientData->secret,
+            'client_secret' => static::$oauthClientData->secret,
             'username' => 'john.doe@example.com',
             'password' => 's0m34ardPa55w0rdV3r510nTw0',
             'scope' => ''
         ];
-        $this->post('/oauth/token', $user, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(401);
-        $this->seeJson(['error' => 'invalid_client']);
+        $response = $this->json('POST', '/oauth/token', $user);
+        $response->assertStatus(401);
+        $response->assertJson(['error' => 'invalid_client']);
 
         # Invalid request: missing username
         $user = [
             'grant_type' => 'password',
-            'client_id' => self::$oauthClientData->id,
-            'client_secret' => self::$oauthClientData->secret,
+            'client_id' => static::$oauthClientData->id,
+            'client_secret' => static::$oauthClientData->secret,
             'password' => 's0m34ardPa55w0rdV3r510nTw0',
             'scope' => ''
         ];
-        $this->post('/oauth/token', $user, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(400);
-        $this->seeJson(['error' => 'invalid_request']);
+        $response = $this->json('POST', '/oauth/token', $user);
+        $response->assertStatus(400);
+        $response->assertJson(['error' => 'invalid_request']);
 
         # Invalid credentials
         $user = [
             'grant_type' => 'password',
-            'client_id' => self::$oauthClientData->id,
-            'client_secret' => self::$oauthClientData->secret,
+            'client_id' => static::$oauthClientData->id,
+            'client_secret' => static::$oauthClientData->secret,
             'username' => 'john.doe@example.com',
             'password' => 's0m34ardPa55w0rd', // Wrong password
             'scope' => ''
         ];
-        $this->post('/oauth/token', $user, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(401);
-        $this->seeJson(['error' => 'invalid_credentials']);
+        $response = $this->json('POST', '/oauth/token', $user);
+        $response->assertStatus(401);
+        $response->assertJson(['error' => 'invalid_credentials']);
     }
 
     /**
@@ -277,23 +259,17 @@ class AuthAndOauthTest extends IlluminateTestCase
     {
         $user = [
             'grant_type' => 'password',
-            'client_id' => self::$oauthClientData->id,
-            'client_secret' => self::$oauthClientData->secret,
+            'client_id' => static::$oauthClientData->id,
+            'client_secret' => static::$oauthClientData->secret,
             'username' => 'john.doe@example.com',
             'password' => 's0m34ardPa55w0rdV3r510nTw0',
             'scope' => ''
         ];
-        $this->post('/oauth/token', $user, self::$requestHeaders);
-        $this->shouldReturnJson();
-        $this->seeStatusCode(200);
-        $this->seeJson(['token_type' => 'Bearer']);
+        $response = $this->json('POST', '/oauth/token', $user);
+        $response->assertStatus(200);
+        $response->assertJson(['token_type' => 'Bearer']);
 
-        $responseData = json_decode($this->response->getContent());
-
-        self::$accessToken = $responseData->access_token;
-        self::$refreshToken = $responseData->refresh_token;
-
-        $this->assertNotEmpty(self::$accessToken);
-        $this->assertNotEmpty(self::$refreshToken);
+        $this->assertNotEmpty($response->decodeResponseJson()['access_token']);
+        $this->assertNotEmpty($response->decodeResponseJson()['refresh_token']);
     }
 }
