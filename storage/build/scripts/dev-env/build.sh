@@ -96,8 +96,9 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     fi;
 ";
 
+#stty cols 239 rows 61;
 #docker-compose down;
 #docker container prune;
 #docker network prune;
 #docker volume prune;
-docker images prune;
+#docker image prune;

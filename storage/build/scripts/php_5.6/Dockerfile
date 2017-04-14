@@ -120,10 +120,16 @@ RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-
     && rm -rf /tmp/npm-*
 
 # Install Node global dependencies
-RUN npm install -g ttf2eot jshint
+RUN npm install -g ttf2eot jshint phantomjs-prebuilt
 
 # Port for node --inspect
 EXPOSE 9229
+
+# Port for our PhantomJs Ghost driver
+EXPOSE 8080
+
+# Port for Laravel dev-server
+EXPOSE 8000
 
 # Clean-up
 RUN apt-get clean \
