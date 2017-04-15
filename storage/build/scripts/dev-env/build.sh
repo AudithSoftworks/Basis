@@ -90,9 +90,10 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     sudo chmod -R 0777 ./storage/framework/views/twig;
     sudo chmod -R 0777 ./storage/logs;
 
-    ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
     if [ -z ${SAUCE_ACCESS_KEY+x} ]; then
-        echo 'SAUCE_* env vars are missing!'; else ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases';
+        ./vendor/bin/phpunit --debug --verbose;
+    else
+        echo 'SAUCE_* env vars are missing!'; ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
     fi;
 ";
 
