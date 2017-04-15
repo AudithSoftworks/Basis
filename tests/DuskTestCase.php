@@ -16,7 +16,7 @@ abstract class DuskTestCase extends BaseTestCase
      */
     public static function prepare()
     {
-//        static::startChromeDriver();
+        //
     }
 
     /**
@@ -26,9 +26,6 @@ abstract class DuskTestCase extends BaseTestCase
      */
     protected function driver()
     {
-        return RemoteWebDriver::create(
-//            'http://localhost:9515', DesiredCapabilities::chrome()
-            'http://localhost:8080', DesiredCapabilities::phantomjs()
-        );
+        return RemoteWebDriver::create('http://basis.audith.org', DesiredCapabilities::phantomjs());
     }
 }
