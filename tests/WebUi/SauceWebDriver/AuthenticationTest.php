@@ -5,8 +5,13 @@ use Illuminate\Contracts\Console\Kernel;
 
 class AuthenticationTest extends SauceWebDriverTestCase
 {
+    /** @var bool */
+    public static $migrated = false;
+
+    /** @var string */
     protected static $startUrl = 'http://basis.audith.org';
 
+    /** @var array */
     public static $browsers = [
         [
             'browserName' => 'firefox',
@@ -16,18 +21,6 @@ class AuthenticationTest extends SauceWebDriverTestCase
             ]
         ]
     ];
-
-    public static function setUpBeforeClass()
-    {
-        putenv('APP_ENV=testing');
-
-        // Create an app instance for facades to work
-        $app = require __DIR__ . '/../../../bootstrap/app.php';
-        $app->make(Kernel::class)->bootstrap();
-
-        // Re-Migrate
-        \Artisan::call('migrate:refresh');
-    }
 
     public function setUp()
     {

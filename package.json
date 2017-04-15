@@ -2,19 +2,19 @@
     "private": true,
     "devDependencies": {
         "clean-webpack-plugin": "^0.1.15",
-        "css-loader": "^0.26.1",
-        "extract-text-webpack-plugin": "2.0.0-rc.3",
-        "file-loader": "^0.10.0",
+        "css-loader": "^0.28.0",
+        "extract-text-webpack-plugin": "2.1.0",
+        "file-loader": "^0.11.0",
         "font-face-mixin": "^1.1.0",
         "node-sass": "^4.0.0",
         "path": "^0.12.7",
         "postcss-loader": "^1.3.0",
         "precss": "^1.4.0",
-        "sass-loader": "^5.0.1",
-        "style-loader": "^0.13.1",
+        "sass-loader": "^6.0.3",
+        "style-loader": "^0.16.1",
         "webpack": "^2.2.1",
         "webpack-manifest-plugin": "^1.1.0",
-        "webpack-merge": "^2.6.1"
+        "webpack-merge": "^4.1.0"
     },
     "dependencies": {
         "block-ui": "^2.70.1",

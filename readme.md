@@ -1,4 +1,4 @@
-## Audith Basis on Laravel 5.3
+## Audith Basis on Laravel 5.4
 
 [![Build Status](https://travis-ci.org/AudithSoftworks/Basis.svg?branch=master)](https://travis-ci.org/AudithSoftworks/Basis)
 [![Build Status](https://saucelabs.com/buildstatus/shehi)](https://saucelabs.com/beta/builds/e3026690874a48e2ade1bb7a9606df53)

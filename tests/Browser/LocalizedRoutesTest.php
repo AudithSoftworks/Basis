@@ -1,26 +1,10 @@
-<?php namespace App\Tests\Misc;
+<?php namespace App\Browser;
 
-use App\Tests\IlluminateTestCase;
+use App\Tests\DuskTestCase;
+use Laravel\Dusk\Browser;
 
-class LocalizedRoutesTest extends IlluminateTestCase
+class LocalizedRoutesTest extends DuskTestCase
 {
-    /**
-     * This is used to memorize password reset token for tests.
-     *
-     * @var string
-     */
-    public static $passwordResetToken;
-
-    /**
-     * Create an app instance for facades to work + Migrations.
-     */
-    public static function setUpBeforeClass()
-    {
-        putenv('APP_ENV=testing');
-        $app = require __DIR__ . '/../../bootstrap/app.php';
-        $app->make(\Illuminate\Contracts\Console\Kernel::class)->bootstrap();
-    }
-
     public function data_testLocalizedHyperlinksInAuthenticationPages()
     {
         return [
@@ -36,24 +20,22 @@ class LocalizedRoutesTest extends IlluminateTestCase
      */
     public function testHyperlinksInAuthenticationPages($locale)
     {
-        \Lang::setLocale($locale);
-        $this->visit('/' . $locale);
-        $this->seeStatusCode(200);
-        $this->see(trans_choice('auth.headings.welcome', \App\Http\Controllers\Controller::TRANSLATION_TAG_GUEST_USER, ['name' => trans('auth.guest')]));
+        $this->app->make('translator')->setLocale($locale);
 
-        $this->click(trans('auth.buttons.login'));
-        $this->seeStatusCode(200);
-        $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.login.')));
+        $this->browse(function (Browser $browser) use ($locale) {
+            $browser->visit('/');
+            $browser->assertSee(trans_choice('auth.headings.welcome', \App\Http\Controllers\Controller::TRANSLATION_TAG_GUEST_USER, ['name' => trans('auth.guest')]));
 
-        $this->click(trans('auth.buttons.password'));
-        $this->seeStatusCode(200);
-        $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.password.') . '/' . trans('routes.password.email')));
+            $browser->click(trans('auth.buttons.login'));
+            $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.login.')));
 
-        $this->click(trans('auth.buttons.login'));
-        $this->seeStatusCode(200);
-        $this->click(trans('auth.buttons.register'));
-        $this->seeStatusCode(200);
-        $this->seePageIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register.')));
+            $browser->click(trans('auth.buttons.password'));
+            $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.password.') . '/' . trans('routes.password.email')));
+
+            $browser->click(trans('auth.buttons.login'));
+            $browser->click(trans('auth.buttons.register'));
+            $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register.')));
+        });
     }
 
     /**

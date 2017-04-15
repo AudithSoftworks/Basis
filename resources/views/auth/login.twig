@@ -41,7 +41,7 @@
                     <input type="checkbox" name="remember" value="1"> {{ trans('auth.remember_me') }}
                     <span></span>
                 </label>
-                <a href="{{ action('Auth\\PasswordController@requestPasswordResetLink', [], false) }}" id="forget-password" class="forget-password">{{ trans('auth.buttons.password') }}</a>
+                <a href="{{ route('password.email', [], false) }}" id="forget-password" class="forget-password">{{ trans('auth.buttons.password') }}</a>
             </fieldset>
             <fieldset class="login-options col-md-12">
                 <h4>{{ trans('auth.social_login') }}</h4>
@@ -52,7 +52,7 @@
                 </ul>
             </fieldset>
             <fieldset class="create-account">
-                <a href="{{ action('Auth\\RegisterController@showRegistrationForm', [], false) }}" class="uppercase">{{ trans('auth.buttons.register') }}</a>
+                <a href="{{ route('register', [], false) }}" class="uppercase">{{ trans('auth.buttons.register') }}</a>
             </fieldset>
         </form>
     </main>

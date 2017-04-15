@@ -32,11 +32,11 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
 
     if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
-        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.3-linux.tar.gz;
-        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.3-linux.tar.gz;
-        rm ./storage/build/tools/sc-4.4.3-linux.tar.gz;
+        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
+        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.5-linux.tar.gz;
+        rm ./storage/build/tools/sc-4.4.5-linux.tar.gz;
 
-        daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.3-linux/bin/sc --tunnel-domains=basis.audith.org;
+        daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.5-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
     npm update;
@@ -90,12 +90,16 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     sudo chmod -R 0777 ./storage/framework/views/twig;
     sudo chmod -R 0777 ./storage/logs;
 
-    ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
     if [ -z ${SAUCE_ACCESS_KEY+x} ]; then
-        echo 'SAUCE_* env vars are missing!'; else ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases';
+        ./vendor/bin/phpunit --debug --verbose;
+    else
+        echo 'SAUCE_* env vars are missing!'; ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
     fi;
 ";
 
+#stty cols 239 rows 61;
 #docker-compose down;
-#docker rm $(docker ps -a | grep "Exited" | awk "{print \$1}");
-if [[ $(docker images | grep "<none>") ]]; then docker rmi $(docker images | grep "<none>" | awk "{print \$3}"); fi;
+#docker container prune;
+#docker network prune;
+#docker volume prune;
+#docker image prune;

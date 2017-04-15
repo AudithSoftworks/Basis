@@ -140,8 +140,9 @@ return [
         /*
          * Application Service Providers...
          */
+        App\Providers\AppServiceProvider::class,
         App\Providers\AuthServiceProvider::class,
-        App\Providers\BroadcastServiceProvider::class,
+//        App\Providers\BroadcastServiceProvider::class,
         App\Providers\ConfigServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\FileStreamServiceProvider::class,
@@ -152,6 +153,7 @@ return [
         Barryvdh\LaravelIdeHelper\IdeHelperServiceProvider::class,
         Laravel\Passport\PassportServiceProvider::class,
         Laravel\Socialite\SocialiteServiceProvider::class,
+        Laravel\Tinker\TinkerServiceProvider::class,
         TwigBridge\ServiceProvider::class,
     ],
 
@@ -170,6 +172,8 @@ return [
         'Artisan' => Illuminate\Support\Facades\Artisan::class,
         'Auth' => Illuminate\Support\Facades\Auth::class,
         'Blade' => Illuminate\Support\Facades\Blade::class,
+        'Broadcast' => Illuminate\Support\Facades\Broadcast::class,
+        'Bus' => Illuminate\Support\Facades\Bus::class,
         'Cache' => Illuminate\Support\Facades\Cache::class,
         'Config' => Illuminate\Support\Facades\Config::class,
         'Cookie' => Illuminate\Support\Facades\Cookie::class,

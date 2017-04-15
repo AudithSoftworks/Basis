@@ -51,7 +51,7 @@
                 <span id="register_tnc_error"></span>
             </fieldset>
             <fieldset class="form-actions col-md-12">
-                <a class="btn green btn-outline" href="{{ action('Auth\\LoginController@showLoginForm', [], false) }}">{{ trans('auth.buttons.login') }}</a>
+                <a class="btn green btn-outline" href="{{ route('login', [], false) }}">{{ trans('auth.buttons.login') }}</a>
                 <button type="submit" class="btn btn-info uppercase pull-right">{{ trans('auth.buttons.signup') }}</button>
             </fieldset>
         </form>

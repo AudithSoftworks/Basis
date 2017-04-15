@@ -15,8 +15,8 @@ class CreateUsersTable extends Migration
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->string('name')->nullable();
-            $table->string('email')->unique()->nullable(); // Unique constraints can be Nullable, its SQL-92 compatible
-            $table->string('password', 255); // 255 instead of 60, for forward-compatibility with PASSWORD_DEFAULT constant
+            $table->string('email')->unique();
+            $table->string('password');
             $table->rememberToken();
             $table->timestamps();
             $table->softDeletes();

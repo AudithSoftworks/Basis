@@ -1,43 +1,29 @@
 <?php namespace App\Http\Middleware;
 
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Http\Request;
-use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
+use Illuminate\Auth\AuthenticationException;
+use \Illuminate\Auth\Middleware\Authenticate as IlluminateAuthenticateMiddleware;
 
-class Authenticate
+class Authenticate extends IlluminateAuthenticateMiddleware
 {
-    /**
-     * The Guard implementation.
-     *
-     * @var Guard
-     */
-    protected $auth;
-
-    /**
-     * Create a new filter instance.
-     *
-     * @param  Guard $auth
-     */
-    public function __construct(Guard $auth)
-    {
-        $this->auth = $auth;
-    }
-
     /**
      * Handle an incoming request.
      *
-     * @param  Request  $request
-     * @param  \Closure $next
+     * @param  \Illuminate\Http\Request $request
+     * @param  \Closure                 $next
+     * @param  string[]                 ...$guards
      *
      * @return mixed
+     * @throws \Illuminate\Auth\AuthenticationException
      */
-    public function handle(Request $request, \Closure $next)
+    public function handle($request, \Closure $next, ...$guards)
     {
-        if (app('auth.driver')->guest()) {
+        try {
+            $this->authenticate($guards);
+        } catch (AuthenticationException $e) {
             if ($request->expectsJson()) {
-                throw new UnauthorizedHttpException('Unauthorized');
+                throw $e;
             } else {
-                return redirect()->guest(route(app('translator')->getLocale() . '.login'));
+                return redirect()->guest(route('login'));
             }
         }
 
