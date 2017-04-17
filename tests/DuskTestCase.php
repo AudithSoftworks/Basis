@@ -26,6 +26,6 @@ abstract class DuskTestCase extends BaseTestCase
      */
     protected function driver()
     {
-        return RemoteWebDriver::create('http://basis.audith.org', DesiredCapabilities::phantomjs());
+        return RemoteWebDriver::create('http://localhost:4444', DesiredCapabilities::phantomjs());
     }
 }
