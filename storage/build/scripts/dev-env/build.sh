@@ -15,13 +15,11 @@ docker-compose build
 
 if [ -z ${PHP_VERSION+x} ]; then export PHP_VERSION='7'; fi; # 5|7
 
-if [[ $(docker-compose ps | grep Exit) || $(docker-compose ps | grep Up) ]]; then docker-compose down; fi;
-
+docker-compose down;
 docker-compose up -d php${PHP_VERSION}-cli;
 docker-compose ps;
-docker exec basis_php${PHP_VERSION}-cli_1 \
-    /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
-export NETWORK_GATEWAY=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1);
+docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 \
+    /bin/bash -c "echo $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${COMPOSE_PROJECT_NAME}nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
 
 test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 
@@ -30,7 +28,7 @@ test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 # and SAUCE_ACCESS_KEY env variables to the environment for which the next 'docker exec' is being run.
 ###############################################################################################################
 
-docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
+docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
     if [ ! -f ~/.bash_profile ]; then touch ~/.bash_profile; fi;
     if [ ! \$(cat ~/.bash_profile | grep SAUCE_) ]; then
         echo 'export SAUCE_USERNAME=\"$SAUCE_USERNAME\"' | sudo tee -a ~/.bash_profile;
@@ -38,6 +36,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     fi;
     source ~/.bash_profile;
 
+    daemon -U --respawn -- phantomjs --webdriver=25852;
     if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
         wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
         tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.5-linux.tar.gz;
@@ -98,7 +97,8 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     sudo chmod -R 0777 ./storage/framework/views/twig;
     sudo chmod -R 0777 ./storage/logs;
 
-    ./vendor/bin/phpunit --debug --verbose;
+    ./vendor/bin/phpunit --debug --verbose --testsuite='Laravel TestCases';
+    ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases';
 ";
 
 #stty cols 239 rows 61;

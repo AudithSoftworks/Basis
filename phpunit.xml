@@ -9,9 +9,10 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Illuminate TestCases">
+        <testsuite name="Laravel TestCases">
             <directory suffix="Test.php">./tests/JsonApi</directory>
             <directory suffix="Test.php">./tests/Models</directory>
+            <directory suffix="Test.php">./tests/Browser</directory>
         </testsuite>
         <testsuite name="SauceWebDriver TestCases">
             <directory suffix="Test.php">./tests/WebUi/SauceWebDriver</directory>
