@@ -16,7 +16,38 @@ class AuthenticationTest extends SauceWebDriverTestCase
         [
             'browserName' => 'firefox',
             'desiredCapabilities' => [
-                'version' => '46',
+                'platform' => 'Linux'
+            ]
+        ],
+        [
+            'browserName' => 'chrome',
+            'desiredCapabilities' => [
+                'platform' => 'Linux'
+            ]
+        ],
+        [
+            'browserName' => 'firefox',
+            'desiredCapabilities' => [
+                'platform' => 'macOS 10.12'
+            ]
+        ],
+        [
+            'browserName' => 'chrome',
+            'desiredCapabilities' => [
+                'platform' => 'macOS 10.12'
+            ]
+        ],
+        [
+            'browserName' => 'firefox',
+            'desiredCapabilities' => [
+                'version' => 'latest',
+                'platform' => 'Windows 8.1'
+            ]
+        ],
+        [
+            'browserName' => 'chrome',
+            'desiredCapabilities' => [
+                'version' => 'latest',
                 'platform' => 'Windows 8.1'
             ]
         ]
@@ -30,7 +61,7 @@ class AuthenticationTest extends SauceWebDriverTestCase
     public function testAuthenticateMiddleware()
     {
         $this->url(self::$startUrl . '/oauth/clients'); // An 'auth'-enabled path.
-        $this->assertEquals('http://basis.audith.org/en/login', $this->url()); // We get redirected.
+        $this->assertEquals(self::$startUrl . '/en/login', $this->url()); // We get redirected.
         $this->assertContains('Login - Audith Basis', $this->title());
     }
 

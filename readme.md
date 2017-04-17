@@ -1,23 +1,24 @@
 ## Audith Basis on Laravel 5.4
 
 [![Build Status](https://travis-ci.org/AudithSoftworks/Basis.svg?branch=master)](https://travis-ci.org/AudithSoftworks/Basis)
-[![Build Status](https://saucelabs.com/buildstatus/shehi)](https://saucelabs.com/beta/builds/e3026690874a48e2ade1bb7a9606df53)
+[![SensioLabsInsight](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3/mini.png)](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3)
+[![Code Quality](https://scrutinizer-ci.com/g/AudithSoftworks/Basis/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AudithSoftworks/Basis)
+[![Coverage](https://scrutinizer-ci.com/g/AudithSoftworks/Basis/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/AudithSoftworks/Basis)
+
+[![Build Status](https://saucelabs.com/browser-matrix/shehi.svg)](https://saucelabs.com/beta/builds/299efd0fba8a43a9af0f17f96b9818f1)
+
 [![Latest Stable Version](https://img.shields.io/packagist/v/audithsoftworks/basis.svg?maxAge=2592000?style=plastic)](https://packagist.org/packages/audithsoftworks/basis)
 ![License](https://img.shields.io/github/license/AudithSoftworks/Basis.svg?maxAge=2592000?style=plastic)
 [![Contributors](https://img.shields.io/github/contributors/AudithSoftworks/Basis.svg?maxAge=2592000?style=plastic)](https://github.com/AudithSoftworks/Basis)
-
-[![](https://img.shields.io/docker/automated/audithsoftworks/basis.svg?maxAge=2592000?style=plastic)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images")
-[![](https://images.microbadger.com/badges/version/audithsoftworks/basis.svg)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images")
-[![](https://images.microbadger.com/badges/image/audithsoftworks/basis.svg)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images layers")
-[![](https://img.shields.io/docker/pulls/audithsoftworks/basis.svg)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images")
 
 [![bitHound Overall Score](https://www.bithound.io/github/AudithSoftworks/Basis/badges/score.svg)](https://www.bithound.io/github/AudithSoftworks/Basis)
 [![bitHound Dependencies](https://www.bithound.io/github/AudithSoftworks/Basis/badges/dependencies.svg)](https://www.bithound.io/github/AudithSoftworks/Basis/master/dependencies/npm)
 [![bitHound Dev Dependencies](https://www.bithound.io/github/AudithSoftworks/Basis/badges/devDependencies.svg)](https://www.bithound.io/github/AudithSoftworks/Basis/master/dependencies/npm)
 
-[![SensioLabsInsight](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3/mini.png)](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3)
-[![Code Quality](https://scrutinizer-ci.com/g/AudithSoftworks/Basis/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/AudithSoftworks/Basis)
-[![Coverage](https://scrutinizer-ci.com/g/AudithSoftworks/Basis/badges/coverage.png?b=master)](https://scrutinizer-ci.com/g/AudithSoftworks/Basis)
+[![](https://img.shields.io/docker/automated/audithsoftworks/basis.svg?maxAge=2592000?style=plastic)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images")
+[![](https://images.microbadger.com/badges/version/audithsoftworks/basis.svg)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images")
+[![](https://images.microbadger.com/badges/image/audithsoftworks/basis.svg)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images layers")
+[![](https://img.shields.io/docker/pulls/audithsoftworks/basis.svg)](https://microbadger.com/images/audithsoftworks/basis "Docker Hub public images")
 
 Audith Basis is an enhanced version of Laravel framework, a feature list for which is provided below.
 

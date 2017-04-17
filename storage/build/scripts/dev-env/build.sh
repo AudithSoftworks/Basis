@@ -6,6 +6,10 @@
 #docker build -f storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .;
 #docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
 
+if [[ -z ${COMPOSE_PROJECT_NAME+x} ]]; then
+    export COMPOSE_PROJECT_NAME=basis_;
+fi;
+
 docker-compose build
 #docker-compose pull;
 
@@ -17,6 +21,7 @@ docker-compose up -d php${PHP_VERSION}-cli;
 docker-compose ps;
 docker exec basis_php${PHP_VERSION}-cli_1 \
     /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
+export NETWORK_GATEWAY=$(docker inspect --format='{{range .NetworkSettings.Networks}}{{.Gateway}}{{end}}' ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1);
 
 test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 
@@ -26,10 +31,12 @@ test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 ###############################################################################################################
 
 docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
-    crontab -l;
-
-    export SAUCE_USERNAME=${SAUCE_USERNAME};
-    export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
+    if [ ! -f ~/.bash_profile ]; then touch ~/.bash_profile; fi;
+    if [ ! \$(cat ~/.bash_profile | grep SAUCE_) ]; then
+        echo 'export SAUCE_USERNAME=\"$SAUCE_USERNAME\"' | sudo tee -a ~/.bash_profile;
+        echo 'export SAUCE_ACCESS_KEY=\"$SAUCE_ACCESS_KEY\"' | sudo tee -a ~/.bash_profile;
+    fi;
+    source ~/.bash_profile;
 
     if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
         wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
@@ -39,6 +46,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
         daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.5-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
+    crontab -l;
     npm update;
 
     cd \$WORKDIR;
@@ -90,11 +98,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 bash -c "
     sudo chmod -R 0777 ./storage/framework/views/twig;
     sudo chmod -R 0777 ./storage/logs;
 
-    if [ -z ${SAUCE_ACCESS_KEY+x} ]; then
-        ./vendor/bin/phpunit --debug --verbose;
-    else
-        echo 'SAUCE_* env vars are missing!'; ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
-    fi;
+    ./vendor/bin/phpunit --debug --verbose;
 ";
 
 #stty cols 239 rows 61;

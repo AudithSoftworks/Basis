@@ -9,8 +9,6 @@ test -f .env || sed \
     | tee .env > /dev/null 2>&1;
 
 docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
-    crontab -l;
-
     export NPM_CONFIG_LOGLEVEL=warn;
     export SAUCE_BUILD=audithsoftworks-basis-travis-job-${TRAVIS_JOB_NUMBER};
     export SAUCE_USERNAME=${SAUCE_USERNAME};
@@ -24,6 +22,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
         daemon -U -- /home/basis/storage/build/tools/sc-4.4.5-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
+    crontab -l;
     npm update;
 
     cd \$WORKDIR;
