@@ -14,6 +14,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     export SAUCE_USERNAME=${SAUCE_USERNAME};
     export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
 
+    daemon -U --respawn -- phantomjs --webdriver=25852;
     if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then
         wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
         tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.5-linux.tar.gz;
@@ -63,7 +64,6 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
 
     npm run build;
-    sudo composer selfupdate;
     composer update --prefer-source --no-interaction;
 
     ./artisan key:generate;
@@ -72,6 +72,6 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
 
     sudo chown -R basis:basis ./;
 
-    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then ./vendor/bin/phpunit --debug --verbose;
-    else ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases'; fi;
+    ./vendor/bin/phpunit --debug --verbose --testsuite='Laravel TestCases';
+    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases'; fi;
 ";

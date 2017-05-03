@@ -13,27 +13,27 @@ language: php
 matrix:
   fast_finish: true
   include:
-    - php: '5.6'
+    - php: '7'
       env:
-        - PHP_VERSION=5
+        - PHP_VERSION=7
         - DB_CONNECTION=mysql
         - DB_HOST=mariadb
         - DB_USERNAME=root
-    - php: '5.6'
+    - php: '7'
       env:
-        - PHP_VERSION=5
+        - PHP_VERSION=7
         - DB_CONNECTION=pgsql
         - DB_HOST=postgres
         - DB_USERNAME=postgres
-    - php: '7'
+    - php: '5.6'
       env:
-        - PHP_VERSION=7
+        - PHP_VERSION=5
         - DB_CONNECTION=mysql
         - DB_HOST=mariadb
         - DB_USERNAME=root
-    - php: '7'
+    - php: '5.6'
       env:
-        - PHP_VERSION=7
+        - PHP_VERSION=5
         - DB_CONNECTION=pgsql
         - DB_HOST=postgres
         - DB_USERNAME=postgres
@@ -67,8 +67,8 @@ install:
   - docker-compose up -d php${PHP_VERSION}-cli;
   - docker images;
   - docker-compose ps;
-  - echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts;
-  - docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
+  - echo $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts;
+  - docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "echo $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' basis_nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
 
 before_script:
   - chmod +x ./storage/build/scripts/ci/build.sh;
