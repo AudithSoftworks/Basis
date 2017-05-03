@@ -14,7 +14,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     export SAUCE_USERNAME=${SAUCE_USERNAME};
     export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
 
-    daemon -U --respawn -- phantomjs --webdriver=25852;
+    daemon -U --respawn -- phantomjs --webdriver=25852 --webdriver-logfile=\$WORKDIR/storage/logs/phantomjs.log --webdriver-loglevel=DEBUG;
     if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then
         wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
         tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.5-linux.tar.gz;
@@ -70,8 +70,28 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     ./artisan migrate;
     ./artisan passport:install;
 
-    sudo chown -R basis:basis ./;
+    sudo chown -R 1000:1000 ./;
+    sudo touch ./storage/logs/laravel.log;
+    sudo chown -R www-data:www-data ./storage/framework/views ./storage/logs;
+    sudo chmod -R 0777 ./storage/framework/views ./storage/logs;
 
-    ./vendor/bin/phpunit --debug --verbose --testsuite='Laravel TestCases';
-    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases'; fi;
+    ./vendor/bin/phpunit --debug --verbose --testsuite='Unit';
+
+    ls -l ./storage/framework/views/twig ./storage/logs;
+    sudo chmod -R 0777 ./storage/framework/views ./storage/logs;
+
+    ./artisan dusk -vvv;
+
+    ls -l ./storage/framework/views/twig ./storage/logs;
+    sudo chmod -R 0777 ./storage/framework/views ./storage/logs;
+
+    ./vendor/bin/phpcov merge ./storage/coverage --html ./storage/coverage/merged/
+
+    ls -l ./storage/framework/views/twig ./storage/logs;
+    sudo chmod -R 0777 ./storage/framework/views ./storage/logs;
+
+    ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver';
+
+    ls -l ./storage/framework/views/twig ./storage/logs;
+    sudo chmod -R 0777 ./storage/framework/views ./storage/logs;
 ";

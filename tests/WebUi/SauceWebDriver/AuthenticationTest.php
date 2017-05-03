@@ -13,30 +13,30 @@ class AuthenticationTest extends SauceWebDriverTestCase
 
     /** @var array */
     public static $browsers = [
-//        [
-//            'browserName' => 'firefox',
-//            'desiredCapabilities' => [
-//                'platform' => 'Linux'
-//            ]
-//        ],
-//        [
-//            'browserName' => 'chrome',
-//            'desiredCapabilities' => [
-//                'platform' => 'Linux'
-//            ]
-//        ],
-//        [
-//            'browserName' => 'firefox',
-//            'desiredCapabilities' => [
-//                'platform' => 'macOS 10.12'
-//            ]
-//        ],
-//        [
-//            'browserName' => 'chrome',
-//            'desiredCapabilities' => [
-//                'platform' => 'macOS 10.12'
-//            ]
-//        ],
+        [
+            'browserName' => 'firefox',
+            'desiredCapabilities' => [
+                'platform' => 'Linux'
+            ]
+        ],
+        [
+            'browserName' => 'chrome',
+            'desiredCapabilities' => [
+                'platform' => 'Linux'
+            ]
+        ],
+        [
+            'browserName' => 'firefox',
+            'desiredCapabilities' => [
+                'platform' => 'macOS 10.12'
+            ]
+        ],
+        [
+            'browserName' => 'chrome',
+            'desiredCapabilities' => [
+                'platform' => 'macOS 10.12'
+            ]
+        ],
         [
             'browserName' => 'firefox',
             'desiredCapabilities' => [

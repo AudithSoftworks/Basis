@@ -35,7 +35,9 @@ class LocalizedRoutesTest extends DuskTestCase
             $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.password.') . '/' . trans('routes.password.email')));
 
             $browser->clickLink(trans('auth.buttons.login'));
+            $browser->waitForText(trans('auth.headings.login'));
             $browser->clickLink(trans('auth.buttons.register'));
+            $browser->waitForText(trans('auth.headings.register'));
             $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register.')));
         });
     }

@@ -6,6 +6,7 @@
 /public/hot
 /public/swagger*
 /storage/*.key
+/storage/coverage*
 !.babelrc
 !.env.*
 !.git*
