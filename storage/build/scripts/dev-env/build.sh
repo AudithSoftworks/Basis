@@ -36,6 +36,7 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
     fi;
     source ~/.bash_profile;
 
+    daemon -U --respawn -- phantomjs --webdriver=4444;
     if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
         wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
         tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.5-linux.tar.gz;
@@ -96,7 +97,11 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
     sudo chmod -R 0777 ./storage/framework/views/twig;
     sudo chmod -R 0777 ./storage/logs;
 
-    ./vendor/bin/phpunit --debug --verbose;
+    ps axu;
+
+    ./vendor/bin/phpunit --debug --verbose --testsuite='Illuminate TestCases';
+    ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver TestCases';
+    ./artisan dusk;
 ";
 
 #stty cols 239 rows 61;

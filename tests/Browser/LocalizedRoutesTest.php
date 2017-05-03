@@ -23,17 +23,19 @@ class LocalizedRoutesTest extends DuskTestCase
         $this->app->make('translator')->setLocale($locale);
 
         $this->browse(function (Browser $browser) use ($locale) {
-            $browser->visit('/');
-            $browser->assertSee(trans_choice('auth.headings.welcome', \App\Http\Controllers\Controller::TRANSLATION_TAG_GUEST_USER, ['name' => trans('auth.guest')]));
+            $browser->visit('/' . $locale);
+            $browser->assertSourceHas(trans_choice('auth.headings.welcome', \App\Http\Controllers\Controller::TRANSLATION_TAG_GUEST_USER, ['name' => trans('auth.guest')]));
 
-            $browser->click(trans('auth.buttons.login'));
+            $browser->clickLink(trans('auth.buttons.login'));
+            $browser->waitForText(trans('auth.headings.login'));
             $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.login.')));
 
-            $browser->click(trans('auth.buttons.password'));
+            $browser->clickLink(trans('auth.buttons.password'));
+            $browser->waitForText(trans('auth.headings.password'));
             $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.password.') . '/' . trans('routes.password.email')));
 
-            $browser->click(trans('auth.buttons.login'));
-            $browser->click(trans('auth.buttons.register'));
+            $browser->clickLink(trans('auth.buttons.login'));
+            $browser->clickLink(trans('auth.buttons.register'));
             $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register.')));
         });
     }
