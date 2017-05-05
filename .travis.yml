@@ -78,7 +78,7 @@ script:
 
 after_script:
   - docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "pkill sc";
-  - if [[ $PHP_VERSION == 7 && $DB_CONNECTION == 'mysql' ]]; then wget https://scrutinizer-ci.com/ocular.phar; php ocular.phar code-coverage:upload --format=php-clover ./storage/coverage/merged/coverage.xml; fi
+  - if [[ $PHP_VERSION == 7 && $DB_CONNECTION == 'mysql' ]]; then wget https://scrutinizer-ci.com/ocular.phar; php ocular.phar code-coverage:upload --format=php-clover ./storage/coverage/coverage-clover-merged; fi
 
 notifications:
   hipchat: f504f9e2e6696c17589a7b49f4ce05@Audith.Basis

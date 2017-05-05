@@ -85,7 +85,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     ls -l ./storage/framework/views/twig ./storage/logs;
     sudo chmod -R 0777 ./storage/framework/views ./storage/logs;
 
-    ./vendor/bin/phpcov merge ./storage/coverage --html ./storage/coverage/merged/
+    ./vendor/bin/phpcov merge ./storage/coverage --clover ./storage/coverage/coverage-clover-merged.xml
 
     ls -l ./storage/framework/views/twig ./storage/logs;
     sudo chmod -R 0777 ./storage/framework/views ./storage/logs;
