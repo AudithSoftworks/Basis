@@ -19,7 +19,7 @@ docker-compose down;
 docker-compose up -d php${PHP_VERSION}-cli;
 docker-compose ps;
 docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 \
-    /bin/bash -c "echo $(docker inspect -f '{{ .NetworkSettings.Networks.basis_default.IPAddress }}' ${COMPOSE_PROJECT_NAME}nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
+    /bin/bash -c "echo $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${COMPOSE_PROJECT_NAME}nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
 
 test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 
@@ -36,6 +36,7 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
     fi;
     source ~/.bash_profile;
 
+    daemon -U --respawn -- phantomjs --webdriver=25852 --webdriver-logfile=\$WORKDIR/storage/logs/phantomjs.log --webdriver-loglevel=DEBUG;
     if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
         wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
         tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.5-linux.tar.gz;
@@ -85,7 +86,6 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/marcellus/stylesheet.css public/fonts/marcellus/*.ttf;
 
     npm run build;
-    sudo composer selfupdate;
     composer update --prefer-source --no-interaction;
 
     ./artisan key:generate;
@@ -96,7 +96,12 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
     sudo chmod -R 0777 ./storage/framework/views/twig;
     sudo chmod -R 0777 ./storage/logs;
 
-    ./vendor/bin/phpunit --debug --verbose;
+    ./vendor/bin/phpunit --debug --verbose --testsuite='Unit';
+    ./artisan dusk -vvv;
+
+    ./vendor/bin/phpcov merge ./storage/coverage --html ./storage/coverage/merged/;
+
+    ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver';
 ";
 
 #stty cols 239 rows 61;

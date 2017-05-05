@@ -22,6 +22,7 @@ class AuthenticationTest extends DuskTestCase
     {
         $this->browse(function (Browser $browser) {
             $browser->visit('/oauth/clients');
+            $browser->waitForText('Login');
             $browser->assertPathIs('/en/login');
         });
     }

@@ -9,11 +9,14 @@
          processIsolation="false"
          stopOnFailure="false">
     <testsuites>
-        <testsuite name="Illuminate TestCases">
+        <testsuite name="Unit">
             <directory suffix="Test.php">./tests/JsonApi</directory>
             <directory suffix="Test.php">./tests/Models</directory>
         </testsuite>
-        <testsuite name="SauceWebDriver TestCases">
+        <testsuite name="Dusk">
+            <directory suffix="Test.php">./tests/Browser</directory>
+        </testsuite>
+        <testsuite name="SauceWebDriver">
             <directory suffix="Test.php">./tests/WebUi/SauceWebDriver</directory>
         </testsuite>
     </testsuites>
@@ -23,15 +26,15 @@
         </whitelist>
     </filter>
     <logging>
-        <log type="coverage-html" target="./storage/coverage/report" lowUpperBound="35" highLowerBound="70"/>
-        <log type="coverage-clover" target="./storage/coverage/coverage.xml"/>
-        <log type="coverage-php" target="./storage/coverage/coverage.serialized"/>
+        <log type="coverage-html" target="./storage/coverage/unit/report" lowUpperBound="35" highLowerBound="70"/>
+        <log type="coverage-clover" target="./storage/coverage/unit/coverage.xml"/>
+        <log type="coverage-php" target="./storage/coverage/unit/coverage.cov"/>
         <log type="coverage-text" target="php://stdout" showUncoveredFiles="false"/>
-        <log type="json" target="./storage/coverage/logfile.json"/>
-        <log type="tap" target="./storage/coverage/logfile.tap"/>
-        <log type="junit" target="./storage/coverage/logfile.xml" logIncompleteSkipped="false"/>
-        <log type="testdox-html" target="./storage/coverage/testdox.html"/>
-        <log type="testdox-text" target="./storage/coverage/testdox.txt"/>
+        <log type="json" target="./storage/coverage/unit/logfile.json"/>
+        <log type="tap" target="./storage/coverage/unit/logfile.tap"/>
+        <log type="junit" target="./storage/coverage/unit/logfile.xml" logIncompleteSkipped="false"/>
+        <log type="testdox-html" target="./storage/coverage/unit/testdox.html"/>
+        <log type="testdox-text" target="./storage/coverage/unit/testdox.txt"/>
     </logging>
     <php>
         <env name="APP_ENV" value="testing"/>

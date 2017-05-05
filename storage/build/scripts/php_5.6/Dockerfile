@@ -105,7 +105,7 @@ RUN set -ex \
     done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.10.2
+ENV NODE_VERSION 6.10.3
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
     && curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/SHASUMS256.txt.asc" \
@@ -126,10 +126,7 @@ RUN npm install -g ttf2eot jshint phantomjs-prebuilt
 EXPOSE 9229
 
 # Port for our PhantomJs Ghost driver
-EXPOSE 8080
-
-# Port for Laravel dev-server
-EXPOSE 8000
+EXPOSE 25852
 
 # Clean-up
 RUN apt-get clean \
