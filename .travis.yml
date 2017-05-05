@@ -82,3 +82,6 @@ after_script:
 
 notifications:
   hipchat: f504f9e2e6696c17589a7b49f4ce05@Audith.Basis
+  slack:
+    rooms:
+      - audith:S5sZNDhaq1BnqBMNk4UunAnz#github-ci-logs
