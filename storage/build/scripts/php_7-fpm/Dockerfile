@@ -49,17 +49,20 @@ RUN pecl install -of xdebug mongodb \
     && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongo.ini
+RUN php -i | grep -i xdebug
+RUN php -i | grep -i mongo
 
 # Install php-redis extension through Git
 RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
     && cd /tmp/phpredis \
-    && git checkout php7 \
+    && git checkout 3.1.4 \
     && phpize \
     && ./configure \
     && make \
     && make install \
     && rm -rf /tmp/phpredis \
     && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini
+RUN php -i | grep -i redis
 
 # Timezone
 RUN echo "date.timezone = UTC" | tee /usr/local/etc/php/conf.d/date.ini

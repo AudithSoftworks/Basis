@@ -49,6 +49,9 @@ RUN pecl install -o -f redis xdebug \
     && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo no | pecl install -o -f mongo \
     && echo "extension=mongo.so" > /usr/local/etc/php/conf.d/mongo.ini
+RUN php -i | grep -i xdebug
+RUN php -i | grep -i mongo
+RUN php -i | grep -i redis
 
 # Timezone
 RUN echo "date.timezone = UTC" | tee /usr/local/etc/php/conf.d/date.ini

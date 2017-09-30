@@ -64,11 +64,13 @@ RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin -
 # Install php-redis php-mongo php-xdebug
 RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
     && cd /tmp/phpredis \
+    && git checkout 3.1.4 \
     && phpize \
     && ./configure \
     && make \
     && make install \
     && echo "extension=redis.so" | tee /usr/local/etc/php/conf.d/redis.ini
+RUN php -i | grep -i redis
 
 RUN rm -rf /tmp/pear \
     && echo no | pecl install -o -f mongo \
@@ -82,6 +84,8 @@ RUN pecl install -of xdebug \
     && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini
+RUN php -i | grep -i xdebug
+RUN php -i | grep -i mongo
 
 # Port for XDebug
 EXPOSE 54321
@@ -105,7 +109,7 @@ RUN set -ex \
     done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.11.1
+ENV NODE_VERSION 6.11.3
 ENV NPM_VERSION 4
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
