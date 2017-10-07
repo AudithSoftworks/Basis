@@ -6,20 +6,14 @@
 #docker build -f storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .;
 #docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
 
-if [[ -z ${COMPOSE_PROJECT_NAME+x} ]]; then
-    export COMPOSE_PROJECT_NAME=basis_;
-fi;
-
 docker-compose build
 #docker-compose pull;
 
-if [ -z ${PHP_VERSION+x} ]; then export PHP_VERSION='7'; fi; # 5|7
-
 docker-compose down;
-docker-compose up -d php${PHP_VERSION}-cli;
+docker-compose up -d;
 docker-compose ps;
-docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 \
-    /bin/bash -c "echo $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${COMPOSE_PROJECT_NAME}nginxForPhp${PHP_VERSION}_1) basis.audith.org | sudo tee -a /etc/hosts";
+docker exec dev-env \
+    /bin/bash -c "echo $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx) basis.audith.org | sudo tee -a /etc/hosts";
 
 test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 
@@ -28,7 +22,9 @@ test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 # and SAUCE_ACCESS_KEY env variables to the environment for which the next 'docker exec' is being run.
 ###############################################################################################################
 
-docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
+docker-compose exec dev-env bash -c "
+    sudo mkdir -p ~;
+    sudo chown -R basis:basis ~;
     if [ ! -f ~/.bash_profile ]; then touch ~/.bash_profile; fi;
     if [ ! \$(cat ~/.bash_profile | grep SAUCE_) ]; then
         echo 'export SAUCE_USERNAME=\"$SAUCE_USERNAME\"' | sudo tee -a ~/.bash_profile;
@@ -38,11 +34,11 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
 
     daemon -U --respawn -- phantomjs --webdriver=25852 --webdriver-logfile=\$WORKDIR/storage/logs/phantomjs.log --webdriver-loglevel=DEBUG;
     if [ ! -z ${SAUCE_ACCESS_KEY+x} ]; then
-        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
-        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.5-linux.tar.gz;
-        rm ./storage/build/tools/sc-4.4.5-linux.tar.gz;
+        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.9-linux.tar.gz;
+        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.9-linux.tar.gz;
+        rm ./storage/build/tools/sc-4.4.9-linux.tar.gz;
 
-        daemon -U --respawn -- /home/basis/storage/build/tools/sc-4.4.5-linux/bin/sc --tunnel-domains=basis.audith.org;
+        daemon -U --respawn -- /var/www/storage/build/tools/sc-4.4.9-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
     crontab -l;
@@ -51,7 +47,7 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
     cd \$WORKDIR;
     if [[ ! -d ./storage/build/tools/woff2 ]]; then
         git clone --depth=1 https://github.com/google/woff2.git ./storage/build/tools/woff2;
-        cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
+        cd /var/www/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
     fi;
 
     cd \$WORKDIR;
@@ -64,7 +60,6 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
         cd ./node_modules/.google-fonts && git pull origin master;
     else
         git clone --depth=1 https://github.com/google/fonts.git ./node_modules/.google-fonts;
-        rm -rf ./node_modules/.google-fonts/.git
     fi;
 
     cd \$WORKDIR;
@@ -77,7 +72,7 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
     if [[ ! -d ./public/fonts/pontano_sans ]]; then cp -r ./node_modules/.google-fonts/ofl/pontanosans ./public/fonts/pontano_sans; fi;
     if [[ ! -d ./public/fonts/montserrat ]]; then cp -r ./node_modules/.google-fonts/ofl/montserrat ./public/fonts/montserrat; fi;
 
-    chmod -R +x /home/basis/storage/build/tools;
+    chmod -R +x /var/www/storage/build/tools;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/simple-line-icons/stylesheet.css public/fonts/simple-line-icons/*.ttf;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf;
@@ -106,7 +101,3 @@ docker exec ${COMPOSE_PROJECT_NAME}php${PHP_VERSION}-cli_1 bash -c "
 
 #stty cols 239 rows 61;
 #docker-compose down;
-#docker container prune;
-#docker network prune;
-#docker volume prune;
-#docker image prune;

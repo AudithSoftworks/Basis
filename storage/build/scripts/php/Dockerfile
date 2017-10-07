@@ -1,7 +1,7 @@
 FROM php:7
 MAINTAINER Shahriyar Imanov <shehi@imanov.me>
 
-WORKDIR /home/basis
+WORKDIR /var/www
 
 ENV DEBIAN_FRONTEND noninteractive
 
@@ -107,7 +107,7 @@ RUN set -ex \
     done
 
 ENV NPM_CONFIG_LOGLEVEL info
-ENV NODE_VERSION 6.11.3
+ENV NODE_VERSION 6.11.4
 ENV NPM_VERSION 4
 
 RUN curl -SLO "https://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x64.tar.xz" \
@@ -145,4 +145,4 @@ RUN sed -i -e "s/%sudo.*/%sudo ALL=(ALL:ALL) NOPASSWD: ALL/g" /etc/sudoers
 
 # Add Web-font related tools to PATH
 USER basis
-ENV PATH $PATH:/home/basis/storage/build/tools/sfnt2woff:/home/basis/storage/build/tools/woff2
+ENV PATH $PATH:/var/www/storage/build/tools/sfnt2woff:/var/www/storage/build/tools/woff2
