@@ -1,9 +1,9 @@
 <?php namespace App\Tests\Browser;
 
-use App\Tests\DuskTestCase;
+use App\Tests\DuskChromeTestCase;
 use Laravel\Dusk\Browser;
 
-class AuthenticationTest extends DuskTestCase
+class AuthenticationChromeTest extends DuskChromeTestCase
 {
     public function setUp()
     {

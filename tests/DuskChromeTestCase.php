@@ -4,7 +4,7 @@ use Laravel\Dusk\TestCase as BaseTestCase;
 use Facebook\WebDriver\Remote\RemoteWebDriver;
 use Facebook\WebDriver\Remote\DesiredCapabilities;
 
-abstract class DuskTestCase extends BaseTestCase
+abstract class DuskChromeTestCase extends BaseTestCase
 {
     use CreatesApplication;
 
@@ -26,6 +26,6 @@ abstract class DuskTestCase extends BaseTestCase
      */
     protected function driver()
     {
-        return RemoteWebDriver::create('http://localhost:25852', DesiredCapabilities::phantomjs());
+        return RemoteWebDriver::create('http://selenium-chrome:4444/wd/hub', DesiredCapabilities::chrome());
     }
 }

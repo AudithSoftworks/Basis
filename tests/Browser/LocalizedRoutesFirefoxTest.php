@@ -1,9 +1,10 @@
 <?php namespace App\Tests\Browser;
 
-use App\Tests\DuskTestCase;
+use App\Http\Controllers\Controller;
+use App\Tests\DuskFirefoxTestCase;
 use Laravel\Dusk\Browser;
 
-class LocalizedRoutesTest extends DuskTestCase
+class LocalizedRoutesFirefoxTest extends DuskFirefoxTestCase
 {
     public function data_testLocalizedHyperlinksInAuthenticationPages()
     {
@@ -24,21 +25,21 @@ class LocalizedRoutesTest extends DuskTestCase
 
         $this->browse(function (Browser $browser) use ($locale) {
             $browser->visit('/' . $locale);
-            $browser->assertSourceHas(trans_choice('auth.headings.welcome', \App\Http\Controllers\Controller::TRANSLATION_TAG_GUEST_USER, ['name' => trans('auth.guest')]));
+            $browser->assertSourceHas(trans_choice('auth.headings.welcome', Controller::TRANSLATION_TAG_GUEST_USER, ['name' => trans('auth.guest')]));
 
             $browser->clickLink(trans('auth.buttons.login'));
-            $browser->waitForText(trans('auth.headings.login'));
-            $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.login.')));
+//            $browser->waitForText(trans('auth.headings.login'));
+            $browser->waitForLocation('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.login.')));
 
             $browser->clickLink(trans('auth.buttons.password'));
-            $browser->waitForText(trans('auth.headings.password'));
-            $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.password.') . '/' . trans('routes.password.email')));
+//            $browser->waitForText(trans('auth.headings.password'));
+            $browser->waitForLocation('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.password.') . '/' . trans('routes.password.email')));
 
             $browser->clickLink(trans('auth.buttons.login'));
-            $browser->waitForText(trans('auth.headings.login'));
+//            $browser->waitForText(trans('auth.headings.login'));
             $browser->clickLink(trans('auth.buttons.register'));
-            $browser->waitForText(trans('auth.headings.register'));
-            $browser->assertPathIs('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register.')));
+//            $browser->waitForText(trans('auth.headings.register'));
+            $browser->waitForLocation('/' . $locale . '/' . $this->urlDecodeCompatibleUnicodeMultibyteSequence(trans('routes.register.')));
         });
     }
 
