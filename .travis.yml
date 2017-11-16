@@ -43,7 +43,6 @@ install:
   - docker images;
   - docker-compose ps;
   - echo $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx) basis.audith.org | sudo tee -a /etc/hosts;
-  - docker exec dev-env /bin/bash -c "echo $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx) basis.audith.org | sudo tee -a /etc/hosts";
 
 before_script:
   - chmod +x ./storage/build/scripts/ci/build.sh;
