@@ -1,4 +1,4 @@
-## Audith Basis on Laravel 5.4
+## Audith Basis on Laravel 5.5
 
 [![Build Status](https://travis-ci.org/AudithSoftworks/Basis.svg?branch=master)](https://travis-ci.org/AudithSoftworks/Basis)
 [![SensioLabsInsight](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3/mini.png)](https://insight.sensiolabs.com/projects/22803477-ebe7-4906-a57c-f53bfae62ba3)
