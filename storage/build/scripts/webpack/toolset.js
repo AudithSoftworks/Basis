@@ -47,7 +47,7 @@ exports.loadersAndPluginsForVariousTypes = function () {
                     use: ExtractTextPlugin.extract({
                         fallback: 'style-loader',
                         use: [{
-                            loader: 'css-loader',
+                            loader: 'css-loader'
                         }, {
                             loader: 'postcss-loader'
                         }]
@@ -57,7 +57,7 @@ exports.loadersAndPluginsForVariousTypes = function () {
                     use: ExtractTextPlugin.extract({
                         fallback: 'style-loader',
                         use: [{
-                            loader: 'css-loader',
+                            loader: 'css-loader'
                         }, {
                             loader: 'postcss-loader'
                         }, {
@@ -66,13 +66,17 @@ exports.loadersAndPluginsForVariousTypes = function () {
                     })
                 }, {
                     test: /\.(gif|jpg|png)$/,
-                    use: process.env.npm_lifecycle_event == 'build' ? 'file-loader?name=[path][name].[hash].[ext]' : 'file-loader?name=[path][name].[ext]'
+                    use: process.env.npm_lifecycle_event === 'build' ? 'file-loader?name=[path][name].[hash].[ext]' : 'file-loader?name=[path][name].[ext]'
+                }, {
+                    test: /\.js$/,
+                    exclude: /node_modules/,
+                    loader: "babel-loader"
                 }
             ]
         },
         plugins: [
             new ExtractTextPlugin({
-                filename: process.env.npm_lifecycle_event == 'build' ? '[name].[contenthash].css' : '[name].css', // Don't use [contenthash] in dev environment, it increases compilation time.
+                filename: process.env.npm_lifecycle_event === 'build' ? '[name].[contenthash].css' : '[name].css', // Don't use [contenthash] in dev environment, it increases compilation time.
                 allChunks: false
             }),
             new LoaderOptionsPlugin({
