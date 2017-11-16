@@ -42,6 +42,16 @@ services:
     working_dir: /var/www
     links:
       - php-fpm:phpFpm
+    networks:
+      default:
+        aliases:
+          - basis.audith.org
+  selenium-chrome:
+    container_name: selenium-chrome
+    image: selenium/standalone-chrome-debug
+  selenium-firefox:
+    container_name: selenium-firefox
+    image: selenium/standalone-firefox-debug
   dev-env:
     container_name: dev-env
     build:
@@ -56,6 +66,8 @@ services:
       - postgres
       - redis
       - nginx
+      - selenium-chrome
+      - selenium-firefox
     environment:
       XDEBUG_CONFIG: "remote_host=172.18.0.1"
       REDIS_PORT: 6379

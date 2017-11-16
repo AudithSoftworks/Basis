@@ -1,8 +1,6 @@
 #!/usr/bin/env bash
 
 #docker build -f storage/build/scripts/nginx/Dockerfile -t audithsoftworks/basis:nginx .
-#docker build -f storage/build/scripts/php_5.6/Dockerfile -t audithsoftworks/basis:php_5.6 .;
-#docker build -f storage/build/scripts/php_5.6-fpm/Dockerfile -t audithsoftworks/basis:php_5.6-fpm .;
 #docker build -f storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .;
 #docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
 
@@ -12,8 +10,6 @@ docker-compose build
 docker-compose down;
 docker-compose up -d;
 docker-compose ps;
-docker exec dev-env \
-    /bin/bash -c "echo $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' nginx) basis.audith.org | sudo tee -a /etc/hosts";
 
 test -f .env || cat .env.example | tee .env > /dev/null 2>&1;
 
