@@ -20,14 +20,15 @@
         }
     ],
     "require": {
-        "php": ">=5.6.14",
+        "php": ">=7.0.0",
         "ext-curl": "*",
         "ext-mbstring": "*",
         "ext-mcrypt": "*",
         "ext-openssl": "*",
-        "barryvdh/laravel-ide-helper": "^2.2",
-        "laravel/dusk": "^1.0.5",
-        "laravel/framework": "5.4.*",
+        "barryvdh/laravel-ide-helper": "^2.4",
+        "fideloper/proxy": "~3.3",
+        "laravel/dusk": "^2.0.0",
+        "laravel/framework": "5.5.*",
         "laravel/passport": "^2.0",
         "laravel/socialite": "^3.0",
         "laravel/tinker": "~1.0",
@@ -37,18 +38,19 @@
     "require-dev": {
         "ext-dom": "*",
         "doctrine/dbal": "~2.5",
+        "filp/whoops": "~2.0",
         "fzaninotto/faker": "~1.5",
-        "mockery/mockery": "0.9.*",
-        "phpspec/phpspec": "~3.0",
-        "phpunit/phpcov": "^3.1",
-        "phpunit/phpunit": "~5.7",
+        "mockery/mockery": "~1.0",
+        "phpunit/phpcov": "^4.0",
+        "phpunit/phpunit": "~6.0",
         "sauce/sausage": ">=0.17",
         "symfony/css-selector": "3.1.*",
         "symfony/dom-crawler": "3.1.*"
     },
     "autoload": {
         "classmap": [
-            "database"
+            "database/seeds",
+            "database/factories"
         ],
         "psr-4": {
             "App\\": "app/"
@@ -57,6 +59,11 @@
     "autoload-dev": {
         "psr-4": {
             "App\\Tests\\": "tests/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "dont-discover": []
         }
     },
     "scripts": {
@@ -73,11 +80,16 @@
         "post-update-cmd": [
             "Illuminate\\Foundation\\ComposerScripts::postUpdate",
             "php artisan optimize"
+        ],
+        "post-autoload-dump": [
+            "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+            "@php artisan package:discover"
         ]
     },
     "config": {
         "preferred-install": "dist",
-        "sort-packages": true
+        "sort-packages": true,
+        "optimize-autoloader": true
     },
     "minimum-stability": "stable",
     "prefer-stable": true
