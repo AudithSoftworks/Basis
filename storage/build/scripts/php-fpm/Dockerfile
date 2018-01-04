@@ -6,16 +6,16 @@ ENV DEBIAN_FRONTEND noninteractive
 RUN apt-get update -y && apt-get install -y apt-utils && apt-get upgrade -y
 RUN apt-get install -y \
         git \
-        libcurl4-gnutls-dev \
         libfreetype6-dev \
         libicu-dev \
         libjpeg-dev \
         libjpeg62-turbo-dev \
         libmcrypt-dev \
         libmemcached-dev \
-        libpng12-dev \
+        libpng-dev \
         libpq-dev \
         libsqlite3-dev \
+        libssl-dev \
         libxml2-dev \
         libxslt1-dev \
         locales \
@@ -29,7 +29,6 @@ RUN docker-php-ext-install \
         exif \
         gettext \
         mbstring \
-        mcrypt \
         opcache \
         pdo_mysql \
         pdo_pgsql \
@@ -41,8 +40,8 @@ RUN docker-php-ext-install \
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
     && docker-php-ext-install gd
 
-RUN pecl install -of memcached \
-    && docker-php-ext-enable memcached
+RUN pecl install -of mcrypt memcached \
+    && docker-php-ext-enable mcrypt memcached
 
 # Install Google's depot-tools
 #RUN apt-get install -y python libglib2.0-dev
@@ -75,16 +74,20 @@ RUN pecl install -of memcached \
 #    && make install \
 #    && docker-php-ext-enable v8js
 
-# Install PECL php-xdebug and php-mongodb extensions
-RUN pecl install -of xdebug mongodb \
+# Install PECL php-mongodb
+RUN pecl install -of mongodb \
     && rm -rf /tmp/pear \
-    && echo "zend_extension=xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.idekey = basisPhpFpm" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-    && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
     && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongo.ini
+
+# Install PECL php-xdebug
+#RUN pecl install -of xdebug \
+#    && rm -rf /tmp/pear \
+#    && echo "zend_extension=xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
+#    && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+#    && echo "xdebug.idekey = basisPhp" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+#    && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+#    && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+#    && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini
 
 # Install php-redis extension through Git
 RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
