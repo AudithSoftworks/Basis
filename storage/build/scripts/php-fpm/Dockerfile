@@ -80,14 +80,14 @@ RUN pecl install -of mongodb \
     && echo "extension=mongodb.so" > /usr/local/etc/php/conf.d/mongo.ini
 
 # Install PECL php-xdebug
-#RUN pecl install -of xdebug \
-#    && rm -rf /tmp/pear \
-#    && echo "zend_extension=xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
-#    && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-#    && echo "xdebug.idekey = basisPhp" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-#    && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-#    && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
-#    && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini
+RUN pecl install -of xdebug-2.6.0beta1 \
+    && rm -rf /tmp/pear \
+    && echo "zend_extension=xdebug.so" | tee /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.max_nesting_level = 1000" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.idekey = basisPhp" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_enable = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_port = 54321" | tee -a /usr/local/etc/php/conf.d/xdebug.ini \
+    && echo "xdebug.remote_connect_back = 1" | tee -a /usr/local/etc/php/conf.d/xdebug.ini
 
 # Install php-redis extension through Git
 RUN git clone https://github.com/phpredis/phpredis.git /tmp/phpredis \
