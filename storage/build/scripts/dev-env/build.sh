@@ -4,7 +4,7 @@
 #docker build -f storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .;
 #docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
 
-docker-compose build
+#docker-compose build
 #docker-compose pull;
 
 docker-compose down;
@@ -59,14 +59,15 @@ docker-compose exec dev-env bash -c "
     fi;
 
     cd \$WORKDIR;
-    if [[ ! -d ./public/fonts/glyphicons ]]; then cp -r ./node_modules/bootstrap-sass/assets/fonts/bootstrap ./public/fonts/glyphicons; fi;
-    if [[ ! -d ./public/fonts/font_awesome ]]; then cp -r ./node_modules/font-awesome/fonts ./public/fonts/font_awesome; fi;
-    if [[ ! -d ./public/fonts/simple-line-icons ]]; then cp -r ./node_modules/simple-line-icons-webfont/fonts ./public/fonts/simple-line-icons; fi;
-    if [[ ! -d ./public/fonts/opensans ]]; then cp -r ./node_modules/.google-fonts/apache/opensans ./public/fonts/opensans; fi;
-    if [[ ! -d ./public/fonts/armata ]]; then cp -r ./node_modules/.google-fonts/ofl/armata ./public/fonts/armata; fi;
-    if [[ ! -d ./public/fonts/marcellus ]]; then cp -r ./node_modules/.google-fonts/ofl/marcellus ./public/fonts/marcellus; fi;
-    if [[ ! -d ./public/fonts/pontano_sans ]]; then cp -r ./node_modules/.google-fonts/ofl/pontanosans ./public/fonts/pontano_sans; fi;
-    if [[ ! -d ./public/fonts/montserrat ]]; then cp -r ./node_modules/.google-fonts/ofl/montserrat ./public/fonts/montserrat; fi;
+    rm -rf ./public/fonts/*;
+    cp -r ./node_modules/bootstrap-sass/assets/fonts/bootstrap ./public/fonts/glyphicons;
+    cp -r ./node_modules/font-awesome/fonts ./public/fonts/font_awesome;
+    cp -r ./node_modules/simple-line-icons-webfont/fonts ./public/fonts/simple-line-icons;
+    cp -r ./node_modules/.google-fonts/apache/opensans ./public/fonts/opensans;
+    cp -r ./node_modules/.google-fonts/ofl/armata ./public/fonts/armata;
+    cp -r ./node_modules/.google-fonts/ofl/marcellus ./public/fonts/marcellus;
+    cp -r ./node_modules/.google-fonts/ofl/pontanosans ./public/fonts/pontano_sans;
+    cp -r ./node_modules/.google-fonts/ofl/montserrat ./public/fonts/montserrat;
 
     chmod -R +x /var/www/storage/build/tools;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/simple-line-icons/stylesheet.css public/fonts/simple-line-icons/*.ttf;

@@ -66,8 +66,6 @@ services:
       - postgres
       - redis
       - nginx
-      - selenium-chrome
-      - selenium-firefox
     environment:
       XDEBUG_CONFIG: "remote_host=172.18.0.1"
       REDIS_PORT: 6379
