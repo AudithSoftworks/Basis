@@ -22,7 +22,6 @@ let common = {
         login: path.join(PATHS.js, 'login.js'),
         auth: path.join(PATHS.js, 'auth.js'),
         file: path.join(PATHS.js, 'file.js'),
-        admin: path.join(PATHS.js, 'admin.js')
     },
     output: {
         path: PATHS.build,
