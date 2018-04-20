@@ -47,7 +47,8 @@ class LoginController extends Controller
      * @param \Illuminate\Http\Request $request
      *
      * @return \Illuminate\Http\JsonResponse|\Illuminate\Http\RedirectResponse
-     * @throws \App\Exceptions\Common\ValidationException
+     * @throws ValidationException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function loginViaWeb(Request $request)
     {
@@ -193,7 +194,9 @@ class LoginController extends Controller
             $ownerAccount->save();
         }
 
-        ($doLinkOAuthAccount = $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount)) && app('auth.driver')->login($ownerAccount, true);
+        if ($doLinkOAuthAccount = $this->linkOAuthAccount($oauthUserData, $provider, $ownerAccount)) {
+            app('auth.driver')->login($ownerAccount, true);
+        }
 
         event(new LoggedIn($ownerAccount, $provider));
 

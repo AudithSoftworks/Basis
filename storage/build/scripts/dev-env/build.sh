@@ -4,8 +4,8 @@
 #docker build -f storage/build/scripts/php_7/Dockerfile -t audithsoftworks/basis:php_7 .;
 #docker build -f storage/build/scripts/php_7-fpm/Dockerfile -t audithsoftworks/basis:php_7-fpm .;
 
-#docker-compose build
-#docker-compose pull;
+#docker-compose build;
+docker-compose pull;
 
 docker-compose down;
 docker-compose up -d;
@@ -95,6 +95,3 @@ docker-compose exec dev-env bash -c "
 
     ./vendor/bin/phpunit --debug --verbose --no-coverage --testsuite='SauceWebDriver';
 ";
-
-#stty cols 239 rows 61;
-#docker-compose down;
