@@ -29,7 +29,7 @@
         "fideloper/proxy": "~3.3",
         "laravel/dusk": "^2.0.0",
         "laravel/framework": "5.5.*",
-        "laravel/passport": "^2.0",
+        "laravel/passport": "~4.0",
         "laravel/socialite": "^3.0",
         "laravel/tinker": "~1.0",
         "predis/predis": "~1",

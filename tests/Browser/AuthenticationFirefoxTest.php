@@ -18,6 +18,10 @@ class AuthenticationFirefoxTest extends DuskFirefoxTestCase
         parent::setUp();
     }
 
+    /**
+     * @throws \Exception
+     * @throws \Throwable
+     */
     public function testAuthenticateMiddleware()
     {
         $this->browse(function (Browser $browser) {
@@ -27,6 +31,10 @@ class AuthenticationFirefoxTest extends DuskFirefoxTestCase
         });
     }
 
+    /**
+     * @throws \Exception
+     * @throws \Throwable
+     */
     public function testHome()
     {
         $this->browse(function (Browser $browser) {

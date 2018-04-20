@@ -32,7 +32,8 @@ let common = {
     },
     plugins: [
         new ManifestPlugin({
-            fileName: 'rev-manifest.json'
+            fileName: 'rev-manifest.json',
+            publicPath: '/'
         }),
 
         new MiniCssExtractPlugin({

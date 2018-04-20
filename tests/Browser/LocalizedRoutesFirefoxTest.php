@@ -18,6 +18,9 @@ class LocalizedRoutesFirefoxTest extends DuskFirefoxTestCase
      * @dataProvider data_testLocalizedHyperlinksInAuthenticationPages
      *
      * @param string $locale
+     *
+     * @throws \Exception
+     * @throws \Throwable
      */
     public function testHyperlinksInAuthenticationPages($locale)
     {
