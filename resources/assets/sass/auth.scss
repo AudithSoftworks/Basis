@@ -3,11 +3,6 @@
 @import 'global/fonts/opensans';
 @import 'global/fonts/simple-line-icons';
 @import '~bootstrap-sass/assets/stylesheets/bootstrap';
-@import '~select2/src/scss/core';
-@import '~select2-bootstrap-theme/src/select2-bootstrap';
-@import 'global/components/mixins';
-@import 'global/components-md';
-@import 'global/plugins-md';
 
 /*
 |------------------------------
@@ -143,7 +138,7 @@ body {
             .form-actions {
                 border: 0;
                 margin-bottom: 0;
-                padding-bottom: 0px;
+                padding-bottom: 0;
             }
         }
 

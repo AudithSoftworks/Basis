@@ -1,7 +1,6 @@
 <?php namespace App\Tests\WebUi\SauceWebDriver;
 
 use App\Tests\SauceWebDriverTestCase;
-use Illuminate\Contracts\Console\Kernel;
 
 class AuthenticationTest extends SauceWebDriverTestCase
 {

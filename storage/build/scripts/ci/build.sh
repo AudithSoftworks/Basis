@@ -8,19 +8,22 @@ test -f .env || sed \
     -e "s/SAUCE_ACCESS_KEY=.*/SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY}/g" .env.example \
     | tee .env > /dev/null 2>&1;
 
-docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
+docker-compose exec --privileged dev-env /bin/bash -c "
     export NPM_CONFIG_LOGLEVEL=warn;
     export SAUCE_BUILD=audithsoftworks-basis-travis-job-${TRAVIS_JOB_NUMBER};
     export SAUCE_USERNAME=${SAUCE_USERNAME};
     export SAUCE_ACCESS_KEY=${SAUCE_ACCESS_KEY};
 
-    daemon -U --respawn -- phantomjs --webdriver=25852 --webdriver-logfile=\$WORKDIR/storage/logs/phantomjs.log --webdriver-loglevel=DEBUG;
-    if [[ ${PHP_VERSION} == 7 && ${DB_CONNECTION} == 'mysql' ]]; then
-        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.5-linux.tar.gz;
-        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.5-linux.tar.gz;
-        rm ./storage/build/tools/sc-4.4.5-linux.tar.gz;
+    sudo mkdir -p ~;
+    sudo chown -R basis:basis ~;
 
-        daemon -U -- /home/basis/storage/build/tools/sc-4.4.5-linux/bin/sc --tunnel-domains=basis.audith.org;
+    daemon -U --respawn -- phantomjs --webdriver=25852 --webdriver-logfile=\$WORKDIR/storage/logs/phantomjs.log --webdriver-loglevel=DEBUG;
+    if [[ ${DB_CONNECTION} == 'mysql' ]]; then
+        wget -P ./storage/build/tools https://saucelabs.com/downloads/sc-4.4.9-linux.tar.gz;
+        tar -C ./storage/build/tools -xzf ./storage/build/tools/sc-4.4.9-linux.tar.gz;
+        rm ./storage/build/tools/sc-4.4.9-linux.tar.gz;
+
+        daemon -U --respawn -- /var/www/storage/build/tools/sc-4.4.9-linux/bin/sc --tunnel-domains=basis.audith.org;
     fi;
 
     crontab -l;
@@ -29,7 +32,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     cd \$WORKDIR;
     if [[ ! -d ./storage/build/tools/woff2 ]]; then
         git clone --depth=1 https://github.com/google/woff2.git ./storage/build/tools/woff2;
-        cd /home/basis/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
+        cd /var/www/storage/build/tools/woff2 && git submodule init && git submodule update && make clean all;
     fi;
 
     cd \$WORKDIR;
@@ -55,7 +58,7 @@ docker exec basis_php${PHP_VERSION}-cli_1 /bin/bash -c "
     if [[ ! -d ./public/fonts/pontano_sans ]]; then cp -r ./node_modules/.google-fonts/ofl/pontanosans ./public/fonts/pontano_sans; fi;
     if [[ ! -d ./public/fonts/montserrat ]]; then cp -r ./node_modules/.google-fonts/ofl/montserrat ./public/fonts/montserrat; fi;
 
-    chmod -R +x /home/basis/storage/build/tools;
+    chmod -R +x /var/www/storage/build/tools;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/simple-line-icons/stylesheet.css public/fonts/simple-line-icons/*.ttf;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/opensans/stylesheet.css public/fonts/opensans/*.ttf;
     ./storage/build/tools/css3_font_converter/convertFonts.sh --use-font-weight --output=public/fonts/montserrat/stylesheet.css public/fonts/montserrat/*.ttf;

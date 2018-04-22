@@ -14,6 +14,6 @@
 
 @include font-face('Open Sans', $font-public-path + opensans/OpenSans-Regular, 400, normal, eot woff2 woff ttf);
 
-@include font-face('Open Sans', $font-public-path + opensans/OpenSans-SemiboldItalic, 600, italic, eot woff2 woff ttf);
+@include font-face('Open Sans', $font-public-path + opensans/OpenSans-SemiBoldItalic, 600, italic, eot woff2 woff ttf);
 
-@include font-face('Open Sans', $font-public-path + opensans/OpenSans-Semibold, 600, normal, eot woff2 woff ttf);
+@include font-face('Open Sans', $font-public-path + opensans/OpenSans-SemiBold, 600, normal, eot woff2 woff ttf);

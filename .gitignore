@@ -12,5 +12,4 @@
 !.git*
 !*.yml
 _ide_helper.php
-composer.lock
 old

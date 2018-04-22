@@ -50,12 +50,13 @@ class LocalizedRouter extends Router
      * @param string $locale
      *
      * @return string
+     * @throws \Illuminate\Container\EntryNotFoundException
      */
     private function localizeUris($uri, $locale)
     {
         $uriExploded = explode('/', trim($uri, '/'));
         $localizedUriTranslationBitParts = [];
-        while (list($level, $bitName) = each($uriExploded)) {
+        foreach ($uriExploded as $level => $bitName) {
             if ($level == 0) {
                 $localizedUriTranslationBitParts[$level] = 'routes.' . $bitName . '.';
             } else {
